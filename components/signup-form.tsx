@@ -13,7 +13,7 @@ import Link from "next/link"
 
 // const [userData, setUserData] = useState({})
 
-export function LoginForm({
+export function SignupForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
@@ -21,9 +21,9 @@ export function LoginForm({
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader className="text-center">
-          <CardTitle className="text-xl">Welcome back</CardTitle>
+          <CardTitle className="text-xl">Welcome</CardTitle>
           <CardDescription>
-            Login with your Google account
+            Signup with your Google account
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -39,11 +39,11 @@ export function LoginForm({
                     fill="currentColor"
                   />
                 </svg>
-                Login with Google
+                Signup with Google
               </Button>
             </div>
-            <Link href="/organizer/signup" className="ml-16 text-sm">
-              Don&apos;t have an account? <span className="underline">Signup</span>
+            <Link href="/organizer/login" className="ml-16 text-sm">
+              Already have an account? <span className="underline">Signin</span>
             </Link>
           </form>
         </CardContent>
