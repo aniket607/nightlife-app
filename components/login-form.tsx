@@ -7,11 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-// import { useState } from "react"
 import { signIn } from "@/auth"
-import Link from "next/link"
-
-// const [userData, setUserData] = useState({})
 
 export function LoginForm({
   className,
@@ -21,15 +17,15 @@ export function LoginForm({
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader className="text-center">
-          <CardTitle className="text-xl">Welcome back</CardTitle>
+          <CardTitle className="text-xl">Welcome to NightLife</CardTitle>
           <CardDescription>
-            Login with your Google account
+            Login / Signup with your Google account
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form action={async () => {
           "use server"
-          await signIn("google")
+          await signIn("google",{redirectTo:"/organizer"})
            }}>
             <div className="grid gap-6">
               <Button variant="outline" className="w-full">
@@ -42,9 +38,6 @@ export function LoginForm({
                 Login with Google
               </Button>
             </div>
-            <Link href="/organizer/signup" className="ml-16 text-sm">
-              Don&apos;t have an account? <span className="underline">Signup</span>
-            </Link>
           </form>
         </CardContent>
       </Card>
