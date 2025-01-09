@@ -5,7 +5,7 @@ CREATE TABLE "User" (
     "email" TEXT NOT NULL,
     "emailVerified" TIMESTAMP(3),
     "image" TEXT,
-    "access" BOOLEAN,
+    "access" BOOLEAN DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -70,8 +70,21 @@ CREATE TABLE "Event" (
     "eventDate" TIMESTAMP(3) NOT NULL,
     "glCount" INTEGER NOT NULL,
     "venueId" INTEGER NOT NULL,
+    "userId" TEXT NOT NULL,
 
     CONSTRAINT "Event_pkey" PRIMARY KEY ("eventId")
+);
+
+-- CreateTable
+CREATE TABLE "Guestlist" (
+    "glId" SERIAL NOT NULL,
+    "guestName" TEXT NOT NULL,
+    "guestAge" INTEGER NOT NULL,
+    "guestMobile" BIGINT NOT NULL,
+    "guestEmail" TEXT NOT NULL,
+    "eventId" INTEGER NOT NULL,
+
+    CONSTRAINT "Guestlist_pkey" PRIMARY KEY ("glId")
 );
 
 -- CreateIndex
@@ -82,6 +95,9 @@ CREATE UNIQUE INDEX "Session_sessionToken_key" ON "Session"("sessionToken");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Venue_venueName_key" ON "Venue"("venueName");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Guestlist_eventId_key" ON "Guestlist"("eventId");
 
 -- AddForeignKey
 ALTER TABLE "Account" ADD CONSTRAINT "Account_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -94,3 +110,9 @@ ALTER TABLE "Venue" ADD CONSTRAINT "Venue_userId_fkey" FOREIGN KEY ("userId") RE
 
 -- AddForeignKey
 ALTER TABLE "Event" ADD CONSTRAINT "Event_venueId_fkey" FOREIGN KEY ("venueId") REFERENCES "Venue"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Event" ADD CONSTRAINT "Event_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Guestlist" ADD CONSTRAINT "Guestlist_eventId_fkey" FOREIGN KEY ("eventId") REFERENCES "Event"("eventId") ON DELETE RESTRICT ON UPDATE CASCADE;

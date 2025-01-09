@@ -9,7 +9,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [Google],
   callbacks: {
     signIn: async ({user, account}) => {
-      console.log("User signed in", user, account);
+      console.log("User signed in");
       return true
     },
   },
