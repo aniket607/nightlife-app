@@ -66,6 +66,7 @@ model Venue {
   address     String
   locationUrl String?
   userId      String
+  venueImgUrl String
   users       User    @relation(fields: [userId], references: [id])
   events      Event[]
 }
@@ -76,6 +77,7 @@ model Event {
   eventDescription String?
   eventDate        DateTime
   glCount          Int
+  eventImgUrl      String?
   venueId          Int
   userId           String     // Added this line
   venue            Venue      @relation(fields: [venueId], references: [id])
