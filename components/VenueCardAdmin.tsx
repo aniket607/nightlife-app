@@ -3,7 +3,7 @@ import React from "react";
 import { useRouter } from "next/navigation"; // Import useRouter for navigation
 
 interface VenueCardAdminProps {
-  venueId:number;
+  venueId:string;
   venueImage: string;
   name: string;
   rating: number;

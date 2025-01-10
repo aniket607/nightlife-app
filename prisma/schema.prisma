@@ -59,7 +59,7 @@ model VerificationToken {
 }
 
 model Venue {
-  id          Int     @id @default(autoincrement())
+  id          String    @id @default(cuid())
   venueName   String  @unique
   venueArea   String
   rating      Float
@@ -78,7 +78,7 @@ model Event {
   eventDate        DateTime
   glCount          Int
   eventImgUrl      String?
-  venueId          Int
+  venueId          String
   userId           String     // Added this line
   venue            Venue      @relation(fields: [venueId], references: [id])
   user             User       @relation(fields: [userId], references: [id]) // Added this line
