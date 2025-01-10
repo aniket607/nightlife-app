@@ -48,6 +48,7 @@ export default async function Page() {
                 {venueData.map((venue) => (
         <VenueCardAdmin
           key={venue.id}
+          venueId={venue.id}
           venueImage={venue.venueImgUrl}
           name={venue.venueName}
           rating={venue.rating}

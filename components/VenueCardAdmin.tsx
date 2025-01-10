@@ -1,6 +1,9 @@
+"use client";
 import React from "react";
+import { useRouter } from "next/navigation"; // Import useRouter for navigation
 
 interface VenueCardAdminProps {
+  venueId:number;
   venueImage: string;
   name: string;
   rating: number;
@@ -9,12 +12,21 @@ interface VenueCardAdminProps {
 }
 
 const VenueCardAdmin: React.FC<VenueCardAdminProps> = ({
+  venueId,
   venueImage,
   name,
   rating,
   area,
   address,
 }) => {
+  const router = useRouter(); // Initialize Next.js router
+
+  // Function to handle button click and redirect
+  const handleViewVenue = () => {
+    // Redirect to 'organizer/venue' with the venue name as a query parameter
+    router.push(`/organizer/venue?id=${encodeURIComponent(venueId)}`);
+  };
+
   return (
     <div className="flex border border-gray-300 rounded-lg p-4 shadow-md m-4">
       <div className="flex-shrink-0 w-24 h-24 rounded-md overflow-hidden">
@@ -36,7 +48,10 @@ const VenueCardAdmin: React.FC<VenueCardAdminProps> = ({
         <p className="text-sm text-gray-500 mt-2">Address: {address}</p>
 
         <div className="mt-auto flex justify-end">
-          <button className="bg-blue-500 text-white text-sm font-medium py-1 px-4 rounded hover:bg-blue-600">
+          <button
+            className="bg-purple-600 !text-white font-bold hover:bg-purple-700 text-sm py-1 px-4 rounded"
+            onClick={handleViewVenue} // Add onClick handler
+          >
             View Venue
           </button>
         </div>
