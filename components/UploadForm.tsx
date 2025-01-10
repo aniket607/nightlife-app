@@ -2,7 +2,13 @@
 import { useState, useRef } from "react";
 import { uploadFile } from "@/app/actions/uploadfile";
 
-export default function UploadForm() {
+export default function UploadForm({ 
+    setImageUrl, 
+    setIsImageUploaded
+  }: { 
+    setImageUrl: (url: string) => void,
+    setIsImageUploaded: (isUploaded: boolean) => void
+  })  {
     const [file, setFile] = useState<File | undefined>(undefined);
     const [preview, setPreview] = useState<string | null>(null);
     const [uploading, setUploading] = useState(false);
@@ -49,12 +55,12 @@ export default function UploadForm() {
                 clearInterval(interval);
                 setUploadProgress(100);
                 
-                console.log("Upload result:", result);
-                
-                if (result.success) {
-                    setUploadedImageUrl(result.url!);
+                if (result.url) {
+                    setImageUrl(result.url);
+                    setUploadedImageUrl(result.url);
+                    setIsImageUploaded(true);  // Set to true when upload is successful
                 } else {
-                    console.error("Upload failed:", result.failure);
+                    console.error("Upload failed: No URL returned");
                 }
             } catch (error) {
                 console.error("Upload error:", error);
@@ -63,6 +69,7 @@ export default function UploadForm() {
             }
         }
     };
+    
 
     return (
         <div className="max-w-md mx-auto p-6 bg-gray-100 rounded-lg shadow-md">
@@ -82,7 +89,7 @@ export default function UploadForm() {
                             htmlFor="file-upload" 
                             className="cursor-pointer bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition duration-300 inline-block"
                         >
-                            Choose a file
+                            Choose an Image
                         </label>
                     </div>
                 )}
