@@ -15,7 +15,7 @@ export default function AddEventButton() {
       onClick={handleClick}
       className="bg-purple-600 text-white font-bold hover:bg-purple-700"
     >
-      Add Event
+      Add Venue
     </Button>
   );
 }
