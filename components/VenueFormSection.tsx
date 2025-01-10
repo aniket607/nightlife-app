@@ -4,7 +4,7 @@ import { useState, useTransition, FormEvent } from "react";
 import UploadForm from "@/components/UploadForm";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { putvenuedata } from "@/app/actions/putvenuedata";
+import { putVenueData } from "@/app/actions/putVenueData";
 import toast, { Toaster } from "react-hot-toast";
 import { ZodIssue } from "zod";
 
@@ -26,7 +26,7 @@ export default function VenueFormSection() {
 
     startTransition(async () => {
       try {
-        const result = await putvenuedata(formData);
+        const result = await putVenueData(formData);
 
         if (result.success) {
           setIsDisabled(true); // Disable all inputs and buttons

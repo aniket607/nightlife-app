@@ -1,12 +1,12 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import SignoutButton from "@/components/signout-button";
+import SignoutButton from "@/components/SignoutButton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { checkUser } from "../actions/checkuser";
+import { checkUser } from "../actions/checkUser";
 import AddEventButton from "@/components/AddEventButton";
 import VenueCardAdmin from "@/components/VenueCardAdmin";
-import { fetchVenues } from "../actions/fetchvenues";
+import { fetchVenues } from "../actions/fetchVenues";
 
 export default async function Page() {
   const session = await auth();
