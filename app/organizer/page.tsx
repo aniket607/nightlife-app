@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { checkUser } from "../actions/checkuser";
 import AddEventButton from "@/components/AddEventButton";
 import VenueCardAdmin from "@/components/VenueCardAdmin";
+import { fetchVenues } from "../actions/fetchvenues";
 
 export default async function Page() {
   const session = await auth();
@@ -21,34 +22,7 @@ export default async function Page() {
 
   const imageUrl = user?.image ?? undefined;
   const checkaccess = await checkUser();
-
-  const venues = [
-    {
-      id: 1,
-      image: 'https://fastly.picsum.photos/id/122/4147/2756.jpg?hmac=-B_1uAvYufznhjeA9xSSAJjqt07XrVzDWCf5VDNX0pQ',
-      name: 'Grand Hall',
-      rating: 4.8,
-      area: 'MG Road',
-      address: '45 MG Road, Indore, 452001',
-    },
-    {
-      id: 2,
-      image: 'https://fastly.picsum.photos/id/122/4147/2756.jpg?hmac=-B_1uAvYufznhjeA9xSSAJjqt07XrVzDWCf5VDNX0pQ',
-      name: 'Banquet Bliss',
-      rating: 4.5,
-      area: 'Vijay Nagar',
-      address: '678 Vijay Nagar, Indore, 452001',
-    },
-    {
-      id: 3,
-      image: 'https://fastly.picsum.photos/id/122/4147/2756.jpg?hmac=-B_1uAvYufznhjeA9xSSAJjqt07XrVzDWCf5VDNX0pQ',
-      name: 'Elegant Venue',
-      rating: 4.9,
-      area: 'Palasia',
-      address: '12 Palasia, Indore, 452001',
-    },
-  ];
-
+  const venueData=await fetchVenues();
 
   return (
     <div className="min-h-screen bg-gray-100 py-8">
@@ -71,13 +45,13 @@ export default async function Page() {
               <div className="space-y-6">
                 <AddEventButton />
                 <div className="h-auto border border-black rounded-md p-4 flex flex-col">
-                {venues.map((venue) => (
+                {venueData.map((venue) => (
         <VenueCardAdmin
           key={venue.id}
-          venueImage={venue.image}
-          name={venue.name}
+          venueImage={venue.venueImgUrl}
+          name={venue.venueName}
           rating={venue.rating}
-          area={venue.area}
+          area={venue.venueArea}
           address={venue.address}
         />
       ))}
