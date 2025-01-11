@@ -76,10 +76,12 @@ model Event {
   eventName        String
   eventDescription String?
   eventDate        DateTime
+  eventTime      DateTime @db.Time
   glCount          Int
   eventImgUrl      String?
   venueId          String
-  userId           String     // Added this line
+  userId           String     
+  createdAt      DateTime @default(now())
   venue            Venue      @relation(fields: [venueId], references: [id])
   user             User       @relation(fields: [userId], references: [id]) // Added this line
   guestlist        Guestlist?

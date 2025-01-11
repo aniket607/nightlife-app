@@ -11,7 +11,7 @@ export default async function Page({ searchParams }: { searchParams: { id: strin
     redirect("/organizer/login");
   }
 
-  const venueId = searchParams.id;
+  const venueId = await searchParams.id;
 
   let venue = null;
   try {

@@ -1,9 +1,9 @@
 "use server";
 
 import { z } from "zod";
-import prisma from "@/lib/prisma"; // Adjust to your project structure
+import prisma from "@/lib/prisma"; 
 import { auth } from "@/auth";
-import { Prisma } from "@prisma/client"; // Import Prisma types for error handling
+import { Prisma } from "@prisma/client"; // Imported Prisma types for error handling
 
 // 1. Create a Zod schema
 const formSchema = z.object({

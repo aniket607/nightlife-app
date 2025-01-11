@@ -1,4 +1,5 @@
 import { auth } from '@/auth';
+import EventFormSection from '@/components/EventFormSection';
 import { redirect } from 'next/navigation';
 import React from 'react'
 
@@ -9,8 +10,11 @@ export default async function page({ searchParams }: { searchParams: { id: strin
       }
       const userId=session.user.id;
       const venueId = searchParams.id;
+      
   return (
-    <div>page</div>
+    <div>
+        <EventFormSection userId={userId!} venueId={venueId}/>
+    </div>
   )
 }
 
