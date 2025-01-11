@@ -4,7 +4,7 @@ import { useState, useTransition, FormEvent } from "react";
 import UploadForm from "@/components/UploadForm";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { putVenueData } from "@/app/actions/putVenueData";
+import { putVenueData } from "@/app/actions/putvenuedata";
 import toast, { Toaster } from "react-hot-toast";
 import { ZodIssue } from "zod";
 
