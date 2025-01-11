@@ -15,7 +15,7 @@ const formSchema = z.object({
   venueImgUrl: z.string().url("Invalid image URL"),
 });
 
-export async function putvenuedata(formData: FormData) {
+export async function putVenueData(formData: FormData) {
   const session = await auth();
   const sesId = session?.user?.id;
 

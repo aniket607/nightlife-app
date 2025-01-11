@@ -1,6 +1,6 @@
 "use client"
 import { useState, useRef } from "react";
-import { uploadFile } from "@/app/actions/uploadfile";
+import { uploadFile } from "@/app/actions/uploadFile";
 
 export default function UploadForm({ 
     setImageUrl, 
