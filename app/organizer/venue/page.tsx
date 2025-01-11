@@ -53,7 +53,7 @@ export default async function Page({ searchParams }: { searchParams: { id: strin
   return (
     <div className="flex h-screen">
       <VenuePageLeftSection venue={venue} />
-      <VenuePageRightSection events={events} />
+      <VenuePageRightSection events={events} venueId={venueId} />
     </div>
   );
 }

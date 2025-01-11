@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 interface Event {
@@ -10,8 +11,9 @@ interface Event {
   description: string;
 }
 
-export default function VenuePageRightSection({ events }: { events: Event[] }) {
+export default function VenuePageRightSection({ events,venueId }: { events: Event[], venueId:string}) {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const router=useRouter();
 
   const handleImageClick = (image: string) => {
     setSelectedImage(image);
@@ -20,12 +22,21 @@ export default function VenuePageRightSection({ events }: { events: Event[] }) {
   const closePopup = () => {
     setSelectedImage(null);
   };
+  const handleAddEvent = () => {
+    if (venueId) {
+      // Redirect to /organizer/venue/addevent with the same 'id' param
+      router.push(`/organizer/venue/addevent?id=${encodeURIComponent(venueId)}`);
+    }
+  };
 
   return (
     <div className="w-2/3 p-10 overflow-y-scroll">
       <div className="flex w-full mb-4 justify-between items-center">
         <h2 className="text-2xl font-semibold text-gray-800 ml-20">Events</h2>
-        <button className="!bg-purple-600 !text-white hover:bg-purple-700 p-2 rounded font-normal mr-20">
+        <button 
+        className="!bg-purple-600 !text-white hover:bg-purple-700 p-2 rounded font-normal mr-20"
+        onClick={handleAddEvent}
+        >
           Add Event
         </button>
       </div>
@@ -55,7 +66,8 @@ export default function VenuePageRightSection({ events }: { events: Event[] }) {
               <p className="text-sm text-gray-600 mt-2 line-clamp-3">
                 {event.description}
               </p>
-              <button className="!bg-purple-600 !text-white hover:bg-purple-700 p-2 rounded font-normal mt-10">
+              <button 
+              className="!bg-purple-600 !text-white hover:bg-purple-700 p-2 rounded font-normal mt-10">
                 Add Event
               </button>
             </div>
