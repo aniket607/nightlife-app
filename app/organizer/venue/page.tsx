@@ -24,7 +24,7 @@ export default async function Page({ searchParams }: { searchParams: { id: strin
     {
       id: 1,
       image:
-        "https://aws-nightlife.s3.eu-north-1.amazonaws.com/1736532942633-2024-07-09.jpg",
+        "https://aws-nightlife.s3.eu-north-1.amazonaws.com/KavaEventBanner.jpeg",
       name: "Event One",
       date: "January 20, 2025",
       description:
@@ -33,7 +33,7 @@ export default async function Page({ searchParams }: { searchParams: { id: strin
     {
       id: 2,
       image:
-        "https://aws-nightlife.s3.eu-north-1.amazonaws.com/1736532942633-2024-07-09.jpg",
+        "https://aws-nightlife.s3.eu-north-1.amazonaws.com/KavaEventBanner.jpeg",
       name: "Event Two",
       date: "February 10, 2025",
       description:
@@ -42,7 +42,7 @@ export default async function Page({ searchParams }: { searchParams: { id: strin
     {
       id: 3,
       image:
-        "https://aws-nightlife.s3.eu-north-1.amazonaws.com/1736532942633-2024-07-09.jpg",
+        "https://aws-nightlife.s3.eu-north-1.amazonaws.com/KavaEventBanner.jpeg",
       name: "Event Three",
       date: "March 5, 2025",
       description:

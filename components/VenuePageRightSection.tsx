@@ -32,7 +32,7 @@ export default function VenuePageRightSection({ events,venueId }: { events: Even
   return (
     <div className="w-2/3 p-10 overflow-y-scroll">
       <div className="flex w-full mb-4 justify-between items-center">
-        <h2 className="text-2xl font-semibold text-gray-800 ml-20">Events</h2>
+        <h2 className="text-4xl font-semibold text-gray-800 ml-20">Events</h2>
         <button 
         className="!bg-purple-600 !text-white hover:bg-purple-700 p-2 rounded font-normal mr-20"
         onClick={handleAddEvent}
@@ -45,25 +45,25 @@ export default function VenuePageRightSection({ events,venueId }: { events: Even
         {events.map((event) => (
           <div
             key={event.id}
-            className="flex bg-gray-100 rounded-md shadow-md h-60 w-[50vw] m-auto"
+            className="flex bg-purple-50 rounded-md shadow-md h-60 w-[50vw] m-auto"
           >
             {/* Event Image */}
             <div className="w-1/3 h-full rounded-l-md overflow-hidden">
               <img
                 src={event.image}
                 alt={event.name}
-                className="w-full h-full object-cover cursor-pointer"
+                className="w-full h-full object-cover cursor-pointer rounded"
                 onClick={() => handleImageClick(event.image)}
               />
             </div>
 
             {/* Event Info */}
-            <div className="flex flex-col justify-center items-start p-4 w-2/3">
-              <h3 className="text-2xl font-semibold text-gray-800 truncate">
+            <div className="flex flex-col items-start p-4 w-2/3">
+              <h3 className="text-3xl font-semibold text-gray-800 truncate">
                 {event.name}
               </h3>
-              <p className="text-base text-gray-500 mt-1">{event.date}</p>
-              <p className="text-sm text-gray-600 mt-2 line-clamp-3">
+              <p className="text-base text-gray-600 mt-1">{event.date}</p>
+              <p className="text-sm w-[80%] text-gray-600 mt-2 line-clamp-3">
                 {event.description}
               </p>
             </div>
