@@ -66,10 +66,6 @@ export default function VenuePageRightSection({ events,venueId }: { events: Even
               <p className="text-sm text-gray-600 mt-2 line-clamp-3">
                 {event.description}
               </p>
-              <button 
-              className="!bg-purple-600 !text-white hover:bg-purple-700 p-2 rounded font-normal mt-10">
-                Add Event
-              </button>
             </div>
           </div>
         ))}
