@@ -4,20 +4,20 @@ import { fetchVenueById } from "@/app/actions/fetchvenuedata";
 import VenuePageLeftSection from "@/components/VenuePageLeftSection";
 import VenuePageRightSection from "@/components/VenuePageRightSection";
 
-export default async function Page({ searchParams }: { searchParams: { id: string } }) {
+export default async function Page({ searchParams }: { searchParams: Promise<{ id: string }> }) {
   const session = await auth();
 
   if (!session?.user) {
     redirect("/organizer/login");
   }
 
-  const venueId = await searchParams.id;
+  const { id: venueId } = await searchParams;
 
   let venue = null;
   try {
     venue = await fetchVenueById(venueId);
   } catch (error) {
-    
+    // Handle error
   }
 
   const events = [
