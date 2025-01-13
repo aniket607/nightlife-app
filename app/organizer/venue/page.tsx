@@ -49,13 +49,45 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ i
       date: "March 5, 2025",
       description:
         "Celebrate with us at this grand event. Lorem ipsum dolor sit amet consectetur adipisicing elit. Minus, pariatur!",
+    },{
+      id: 4,
+      image:
+        "https://aws-nightlife.s3.eu-north-1.amazonaws.com/KavaEventBanner.jpeg",
+      name: "Event Three",
+      date: "March 5, 2025",
+      description:
+        "Celebrate with us at this grand event. Lorem ipsum dolor sit amet consectetur adipisicing elit. Minus, pariatur!",
+    },
+    {
+      id: 5,
+      image:
+        "https://aws-nightlife.s3.eu-north-1.amazonaws.com/KavaEventBanner.jpeg",
+      name: "Event Three",
+      date: "March 5, 2025",
+      description:
+        "Celebrate with us at this grand event. Lorem ipsum dolor sit amet consectetur adipisicing elit. Minus, pariatur!",
+    },
+    {
+      id: 6,
+      image:
+        "https://aws-nightlife.s3.eu-north-1.amazonaws.com/KavaEventBanner.jpeg",
+      name: "Event Three",
+      date: "March 5, 2025",
+      description:
+        "Celebrate with us at this grand event. Lorem ipsum dolor sit amet consectetur adipisicing elit. Minus, pariatur!",
     },
   ];
 
   return (
-    <div className="flex h-screen">
-      <VenuePageLeftSection venue={venue} />
-      <VenuePageRightSection events={events} venueId={venueId} />
+    <div className="mx-auto h-screen">
+      <div className="flex h-full overflow-hidden">
+        <VenuePageLeftSection venue={venue} />
+        <div className="w-2/3 h-full overflow-y-auto">
+          <VenuePageRightSection events={events} venueId={venueId} />
+        </div>
+      </div>
     </div>
   );
+  
+  
 }

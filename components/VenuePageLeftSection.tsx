@@ -1,5 +1,7 @@
 "use client";
 
+import { useRef, useEffect } from 'react';
+
 interface Venue {
   id: string;
   venueName: string;
@@ -12,16 +14,31 @@ interface Venue {
 }
 
 export default function VenuePageLeftSection({ venue }: { venue: Venue | null }) {
+  const leftSectionRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const leftSection = leftSectionRef.current;
+    if (leftSection) {
+      const preventScroll = (e: WheelEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+      };
+      leftSection.addEventListener('wheel', preventScroll, { passive: false });
+      return () => {
+        leftSection.removeEventListener('wheel', preventScroll);
+      };
+    }
+  }, []);
+
   return (
-    <div className="w-1/3 bg-white p-8 border-r border-gray-300 sticky top-0">
+    <div ref={leftSectionRef} className="w-1/3 bg-white p-8 border-r border-gray-300 h-screen overflow-hidden">
       {/* Venue Image */}
       <div className="w-[100] h-60 rounded-md overflow-hidden">
-         <img
+        <img
           src={venue?.venueImgUrl}
           alt={venue?.venueName || "Venue Image"}
           className="w-full h-full object-cover"
-        /> 
-        
+        />
       </div>
 
       {/* Venue Info */}

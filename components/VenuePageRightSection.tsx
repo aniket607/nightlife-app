@@ -30,7 +30,7 @@ export default function VenuePageRightSection({ events,venueId }: { events: Even
   };
 
   return (
-    <div className="w-2/3 p-10 overflow-y-scroll">
+    <div className="p-10">
       <div className="flex w-full mb-4 justify-between items-center">
         <h2 className="text-4xl font-semibold text-gray-800 ml-20">Events</h2>
         <button 

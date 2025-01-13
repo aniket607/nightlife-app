@@ -8,21 +8,27 @@ import SignoutButton from "@/components/SignoutButton";
 export default function ClientHeader({imageUrl, email}: {imageUrl: string | undefined, email: string | undefined}) {
     const router = useRouter();
     const pathname = usePathname();
+    const isOnDashboard = pathname === '/organizer';
 
     return (
         <header className="sticky top-0 z-50 bg-gradient-to-r from-purple-400 to-indigo-400 text-white shadow-lg">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center py-4">
                     <div className="flex items-center space-x-8">
-                        {pathname !== '/organizer/' && (
+                        {!isOnDashboard && (
                             <button 
-                                onClick={() => router.back()} 
-                                className="p-2 rounded-full bg-white/20 hover:bg-indigo-700 transition duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                aria-label="Go back"
+                            onClick={() => router.back()} 
+                            className={`p-2 rounded-full transition duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
+                                isOnDashboard 
+                                ? 'bg-gray-300 cursor-not-allowed' 
+                                : 'bg-white/20 hover:bg-indigo-700'
+                            }`}
+                            aria-label="Go back"
+                            disabled={isOnDashboard}
                             >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                                </svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" className={`h-6 w-6 ${isOnDashboard ? 'text-gray-500' : 'text-white'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                            </svg>
                             </button>
                         )}
                         <Link href="/organizer/">
