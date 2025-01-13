@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -9,6 +10,28 @@ export default function ClientHeader({imageUrl, email}: {imageUrl: string | unde
     const router = useRouter();
     const pathname = usePathname();
     const isOnDashboard = pathname === '/organizer';
+    const [navigationStack, setNavigationStack] = useState<string[]>([]);
+
+    // Update navigation stack when pathname changes
+    useEffect(() => {
+        // Skip form routes from being added to history
+        if (!pathname.includes('add') && !pathname.includes('edit')) {
+            setNavigationStack(prev => [...prev, pathname]);
+        }
+    }, [pathname]);
+
+    const handleBack = () => {
+        // Get the previous valid route from navigation stack
+        const previousRoute = navigationStack[navigationStack.length - 2];
+        if (previousRoute) {
+            router.push(previousRoute);
+            // Remove current and previous route from stack
+            setNavigationStack(prev => prev.slice(0, -2));
+        } else {
+            // Fallback to dashboard if no previous route
+            router.push('/organizer');
+        }
+    };
 
     return (
         <header className="sticky top-0 z-50 bg-black text-gray-100">
@@ -18,18 +41,18 @@ export default function ClientHeader({imageUrl, email}: {imageUrl: string | unde
                 <div className="flex items-center space-x-4">
                     {!isOnDashboard && (
                         <button 
-                            onClick={() => router.back()} 
-                            className={`p-2 rounded-full transition duration-300 focus:outline-none ${
-                                isOnDashboard 
-                                ? 'cursor-not-allowed' 
-                                : 'hover:bg-gray-800'
-                            }`}
-                            aria-label="Go back"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                            </svg>
-                        </button>
+                        onClick={handleBack} 
+                        className={`p-2 rounded-full transition duration-300 focus:outline-none ${
+                            isOnDashboard 
+                            ? 'cursor-not-allowed' 
+                            : 'hover:bg-gray-800'
+                        }`}
+                        aria-label="Go back"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                    </button>
                     )}
                     <Link href="/organizer/">
                         <span className="text-sm font-medium bg-gray-600/40 px-7 rounded-full py-3 font-poppins hover:bg-gray-600/20 hover:text-white/50 transition duration-300">
