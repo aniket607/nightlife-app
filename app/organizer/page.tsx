@@ -33,12 +33,14 @@ export default async function Page() {
             <div className="flex justify-between items-center mb-6">
               <div className="text-2xl font-bold">Organizer Dashboard</div>
               <div className="flex items-center space-x-4">
+              {imageUrl && (
                 <Avatar>
                   <AvatarImage src={imageUrl} />
                   <AvatarFallback>
                     {user?.email ? user.email.charAt(0).toUpperCase() : "U"}
                   </AvatarFallback>
                 </Avatar>
+              )}
                 <SignoutButton />
               </div>
             </div>
