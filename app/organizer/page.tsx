@@ -24,10 +24,13 @@ export default async function Page() {
           <div className="p-6">
             {checkaccess ? (
               <div className="space-y-6">
-                <AddVenueButton />
+                <div className="flex justify-end mb-4">
+                  <AddVenueButton />
+                </div>
                   {myVenues.length > 0 && (
-                    <div className="h-auto border border-black rounded-md p-4 flex flex-col mb-6">
-                      <div className="font-bold pl-5 mb-4">My Venues:</div>
+                    <div className="h-auto border border-black rounded-md">
+                    <div className="font-bold text-lg mb-1 pt-6 pl-6">My Venues:</div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 px-2 mb-4">
                       {myVenues.map((venue) => (
                         <VenueCardAdmin
                           key={venue.id}
@@ -40,9 +43,11 @@ export default async function Page() {
                         />
                       ))}
                     </div>
+                  </div>
                   )}
-                <div className="h-auto border border-black rounded-md p-4 flex flex-col">
-                  <div className="font-bold pl-5">All Venues:</div>
+                <div className="h-auto border border-black rounded-md mt-6">
+                <div className="font-bold text-lg mb-1 pt-6 pl-6">All Venues:</div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 px-2 mb-4">
                   {venueData.map((venue) => (
                     <VenueCardAdmin
                       key={venue.id}
@@ -55,6 +60,7 @@ export default async function Page() {
                     />
                   ))}
                 </div>
+              </div>
               </div>
             ) : (
               <NoAccessComponent />

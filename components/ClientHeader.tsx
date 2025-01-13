@@ -10,7 +10,7 @@ export default function ClientHeader({imageUrl, email}: {imageUrl: string | unde
     const pathname = usePathname();
 
     return (
-        <header className="sticky top-0 z-50 bg-gradient-to-r from-purple-600/85 to-indigo-600/85 text-white shadow-lg">
+        <header className="sticky top-0 z-50 bg-gradient-to-r from-purple-400 to-indigo-400 text-white shadow-lg">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center py-4">
                     <div className="flex items-center space-x-8">
@@ -26,7 +26,7 @@ export default function ClientHeader({imageUrl, email}: {imageUrl: string | unde
                             </button>
                         )}
                         <Link href="/organizer/">
-                            <span className="text-xl font-extrabold tracking-tight bg-black/20 px-3 py-4 rounded-md hover:text-indigo-200 transition duration-300">
+                            <span className="text-xl font-extrabold tracking-tight bg-white/5 px-3 py-3 rounded-md hover:text-black/60 hover:bg-white/15 transition duration-300">
                                 Dashboard
                             </span>
                         </Link>
