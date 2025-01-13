@@ -34,7 +34,7 @@ export default function VenuePageRightSection({ events,venueId }: { events: Even
       <div className="flex w-full mb-4 justify-between items-center">
         <h2 className="text-4xl font-semibold text-gray-800 ml-20">Events</h2>
         <button 
-        className="!bg-purple-600 !text-white hover:bg-purple-700 p-2 rounded font-normal mr-20"
+        className="!bg-gray-600 !text-white hover:!bg-black px-4 py-2 rounded-md font-normal mr-20"
         onClick={handleAddEvent}
         >
           Add Event
@@ -45,7 +45,7 @@ export default function VenuePageRightSection({ events,venueId }: { events: Even
         {events.map((event) => (
           <div
             key={event.id}
-            className="flex bg-purple-50 rounded-md shadow-md h-60 w-[50vw] m-auto"
+            className="flex bg-gray-400 rounded-md shadow-md h-60 w-[50vw] m-auto"
           >
             {/* Event Image */}
             <div className="w-1/3 h-full rounded-l-md overflow-hidden">

@@ -64,32 +64,31 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({ userId, venueId }) 
       }
     });
   };
-
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
+    <div className="flex justify-center items-center min-h-screen bg-primary">
       <Toaster position="top-right" />
-
-      <div className="w-full max-w-3xl p-8 bg-white rounded-lg shadow-lg">
-        <h2 className="text-2xl font-bold text-center mb-6 text-purple-600">Add New Event</h2>
-
+  
+      <div className="w-full max-w-4xl p-8 bg-secondary rounded-lg shadow-2xl">
+        <h2 className="text-2xl font-bold text-center mb-6 text-gray-200">Add New Event</h2>
+  
         <div className="flex flex-col md:flex-row gap-8 items-center">
           {/* Upload Section */}
           <div className="w-full md:w-1/2">
-            <h3 className="text-lg font-semibold text-gray-700 mb-4">Upload Event Image</h3>
+            <h3 className="text-lg font-semibold text-gray-300 mb-4">Upload Event Image</h3>
             <UploadForm setImageUrl={setImageUrl} setIsImageUploaded={setIsImageUploaded} />
           </div>
-
+  
           {/* Form Section */}
           <div className="w-full md:w-1/2">
             <form
-              className="space-y-6"
+              className="space-y-6 border border-gray-700 p-5 rounded-lg shadow-md bg-gray-900/50"
               onSubmit={handleFormSubmit}
             >
               <input type="hidden" name="eventImgUrl" value={imageUrl} />
-
+  
               {/* Event Name */}
               <div>
-                <label htmlFor="eventName" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="eventName" className="block text-sm font-medium text-gray-300 mb-1">
                   Event Name
                 </label>
                 <input
@@ -99,13 +98,13 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({ userId, venueId }) 
                   placeholder="Enter Event Name"
                   required
                   disabled={isDisabled}
-                  className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-purple-500"
+                  className="w-full bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-600"
                 />
               </div>
-
+  
               {/* Event Description */}
               <div>
-                <label htmlFor="eventDescription" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="eventDescription" className="block text-sm font-medium text-gray-300 mb-1">
                   Event Description
                 </label>
                 <textarea
@@ -114,13 +113,13 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({ userId, venueId }) 
                   placeholder="Enter Event Description"
                   required
                   disabled={isDisabled}
-                  className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-purple-500"
+                  className="w-full bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-600"
                 ></textarea>
               </div>
-
+  
               {/* Event Date */}
               <div>
-                <label htmlFor="eventDate" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="eventDate" className="block text-sm font-medium text-gray-300 mb-1">
                   Event Date
                 </label>
                 <DatePicker
@@ -128,14 +127,14 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({ userId, venueId }) 
                   onChange={(date: Date | null) => setEventDate(date)}
                   dateFormat="yyyy-MM-dd"
                   placeholderText="Select Event Date"
-                  className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-purple-500"
+                  className="w-full bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-600"
                   disabled={isDisabled}
                 />
               </div>
-
+  
               {/* Event Time */}
               <div>
-                <label htmlFor="eventTime" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="eventTime" className="block text-sm font-medium text-gray-300 mb-1">
                   Event Time
                 </label>
                 <input
@@ -146,13 +145,13 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({ userId, venueId }) 
                   onChange={(e) => setEventTime(e.target.value)}
                   required
                   disabled={isDisabled}
-                  className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-purple-500"
+                  className="w-full bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-600"
                 />
               </div>
-
+  
               {/* Guest List Count */}
               <div>
-                <label htmlFor="glCount" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="glCount" className="block text-sm font-medium text-gray-300 mb-1">
                   Guest List Count (GL Count)
                 </label>
                 <input
@@ -163,18 +162,18 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({ userId, venueId }) 
                   placeholder="Enter GL Count"
                   required
                   disabled={isDisabled}
-                  className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-purple-500"
+                  className="w-full bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-600"
                 />
               </div>
-
+  
               {/* Submit Button */}
               <button
                 type="submit"
                 disabled={isPending || isDisabled}
                 className={`w-full py-2 px-4 rounded transition duration-300 ${
                   isPending || isDisabled
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-purple-500 hover:bg-purple-600 text-white"
+                    ? "bg-gray-700 text-gray-400 cursor-not-allowed"
+                    : "bg-gray-700 hover:bg-gray-600 text-gray-200"
                 }`}
               >
                 {isPending ? "Submitting..." : "Submit"}
@@ -185,6 +184,7 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({ userId, venueId }) 
       </div>
     </div>
   );
+  
 };
 
 export default EventFormSection;

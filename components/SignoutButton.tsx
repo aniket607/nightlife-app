@@ -4,7 +4,7 @@ import { Button } from "./ui/button"
 export default function signoutButton() {
   return (
     <div>
-        <Button variant="destructive" className="w-fit" onClick={() => signOut()}>Sign Out</Button>
+        <Button variant="destructive" className="w-fit rounded-full" onClick={() => signOut()}>Sign Out</Button>
     </div>
   )
 }

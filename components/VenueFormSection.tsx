@@ -52,28 +52,27 @@ export default function VenueFormSection() {
   };
 
   return (
-    <div className="w-full max-w-4xl p-8 bg-white rounded-lg shadow-2xl">
+    <div className="w-full max-w-4xl p-8 bg-secondary rounded-lg shadow-2xl">
       <Toaster position="top-right" />
-
+  
       <div className="flex flex-col md:flex-row gap-8 items-center">
-        <div className="w-full md:w-1/2 ">
-          <div className="px-28 font-bold">Upload Venue Image</div>
+        <div className="w-full md:w-1/2">
+          <div className="px-24 font-bold text-lg text-gray-200 mb-5">Upload Venue Image:</div>
           <UploadForm
             setImageUrl={setImageUrl}
             setIsImageUploaded={setIsImageUploaded}
           />
         </div>
-
+  
         <div className="w-full md:w-1/2">
-          {/* Use onSubmit instead of action= to prevent reset */}
           <form
-            className="space-y-6 border p-5 rounded-lg shadow-md border-rose-500"
+            className="space-y-6 border border-gray-700 p-5 rounded-lg shadow-md bg-gray-900/50"
             onSubmit={handleFormSubmit}
           >
             <input type="hidden" name="venueImgUrl" value={imageUrl} />
-
+  
             <div className="space-y-2">
-              <Label htmlFor="venue_name" className="block mb-1">
+              <Label htmlFor="venue_name" className="block mb-1 text-gray-300">
                 Venue Name
               </Label>
               <Input
@@ -83,11 +82,12 @@ export default function VenueFormSection() {
                 id="venue_name"
                 required
                 disabled={isDisabled} // Disable input if form is submitted
+                className="bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 focus:border-gray-600 focus:ring-gray-600"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="venue_area" className="block mb-1">
+              <Label htmlFor="venue_area" className="block mb-1 text-gray-300">
                 Venue Area
               </Label>
               <Input
@@ -97,11 +97,13 @@ export default function VenueFormSection() {
                 id="venue_area"
                 required
                 disabled={isDisabled}
+                className="bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 focus:border-gray-600 focus:ring-gray-600"
+
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="venue_rating" className="block mb-1">
+              <Label htmlFor="venue_rating" className="block mb-1 text-gray-300">
                 Venue Rating
               </Label>
               <Input
@@ -113,13 +115,14 @@ export default function VenueFormSection() {
                 name="venue_rating"
                 id="venue_rating"
                 required
-                className="w-32"
+                className="w-32 bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 focus:border-gray-600 focus:ring-gray-600 "
                 disabled={isDisabled}
+                
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="venue_addr" className="block mb-1">
+              <Label htmlFor="venue_addr" className="block mb-1 text-gray-300">
                 Venue Address
               </Label>
               <Input
@@ -129,11 +132,13 @@ export default function VenueFormSection() {
                 id="venue_addr"
                 required
                 disabled={isDisabled}
+                className=" bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 focus:border-gray-600 focus:ring-gray-600 "
+
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="locationUrl" className="block mb-1">
+              <Label htmlFor="locationUrl" className="block mb-1 text-gray-300">
                 Venue Location Url
               </Label>
               <Input
@@ -143,6 +148,8 @@ export default function VenueFormSection() {
                 id="locationUrl"
                 required
                 disabled={isDisabled}
+                className=" bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 focus:border-gray-600 focus:ring-gray-600 "
+
               />
             </div>
 
@@ -152,8 +159,8 @@ export default function VenueFormSection() {
               disabled={isPending || isDisabled} // Disable during pending or after success
               className={`w-full py-2 px-4 rounded transition duration-300 ${
                 isPending || isDisabled
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-blue-500 hover:bg-blue-600 text-white"
+                  ? "bg-gray-700 text-gray-400 cursor-not-allowed"
+                  : "bg-gray-700 hover:bg-gray-600 text-gray-200"
               }`}
             >
               {isPending ? "Submitting..." : "Submit"}

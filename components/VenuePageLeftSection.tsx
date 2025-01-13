@@ -32,7 +32,7 @@ export default function VenuePageLeftSection({ venue }: { venue: Venue | null })
   }, []);
 
   return (
-    <div ref={leftSectionRef} className="w-1/3 bg-white p-8 border-r border-gray-300 h-screen overflow-hidden">
+    <div ref={leftSectionRef} className="w-1/3 bg-white dark:bg-primary p-8 border-r border-gray-300 h-screen overflow-hidden">
       
       {/* Venue Image */}
 
@@ -48,12 +48,12 @@ export default function VenuePageLeftSection({ venue }: { venue: Venue | null })
 
       {/* Venue Info */}
       <div className="mt-4">
-        <h1 className="text-4xl font-semibold text-gray-800">
+        <h1 className="text-4xl font-semibold text-gray-400">
           {venue?.venueName || "Venue Name"}
         </h1>
         <p className="text-base font-semibold text-yellow-500">★ {venue?.rating || 0}</p>
-        <p className="text-sm font-medium text-gray-900 mt-2">Area: {venue?.venueArea}</p>
-        <p className="text-sm font-medium text-gray-900 mt-1">Address: {venue?.address}</p>
+        <p className="text-sm font-medium text-gray-500 mt-2">Area: {venue?.venueArea}</p>
+        <p className="text-sm font-medium text-gray-500 mt-1">Address: {venue?.address}</p>
       </div>
     </div>
   );

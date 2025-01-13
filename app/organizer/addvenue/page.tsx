@@ -9,8 +9,11 @@ export default async function Page() {
   }
 
   return (
-    <div className="container mx-auto h-screen flex items-center justify-center overflow-x-hidden">
-      <VenueFormSection />
+    <div className="min-h-screen w-full bg-primary">
+      <div className="container mx-auto h-screen flex items-center justify-center overflow-x-hidden">
+        <VenueFormSection />
+      </div>
     </div>
+
   );
 }

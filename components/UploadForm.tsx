@@ -72,7 +72,7 @@ export default function UploadForm({
     
 
     return (
-        <div className="max-w-md mx-auto p-6 bg-gray-100 rounded-lg shadow-md">
+        <div className="max-w-md mx-auto p-6 bg-primary rounded-lg shadow-md">
             <form onSubmit={handleSubmit} className="space-y-4">
                 {!uploading && !uploadedImageUrl && (
                     <div className="relative">
@@ -87,7 +87,7 @@ export default function UploadForm({
                         />
                         <label 
                             htmlFor="file-upload" 
-                            className="cursor-pointer bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition duration-300 inline-block"
+                            className="cursor-pointer bg-blue-900 text-white py-2 px-4 rounded hover:bg-blue-800 transition duration-300 inline-block"
                         >
                             Choose an Image
                         </label>
@@ -114,7 +114,7 @@ export default function UploadForm({
                         className={`w-full py-2 px-4 rounded transition duration-300 ${
                             !file || uploading 
                                 ? 'bg-gray-400 cursor-not-allowed' 
-                                : 'bg-green-500 hover:bg-green-600 text-white'
+                                : 'bg-green-800 hover:bg-green-700 text-white'
                         }`}
                     >
                         {uploading ? "Uploading..." : "Upload"}

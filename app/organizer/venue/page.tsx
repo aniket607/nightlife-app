@@ -79,7 +79,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ i
   ];
 
   return (
-    <div className="mx-auto h-screen">
+    <div className="mx-auto h-screen bg-secondary">
       <div className="flex h-full overflow-hidden">
         <VenuePageLeftSection venue={venue} />
         <div className="w-2/3 h-full overflow-y-auto">
