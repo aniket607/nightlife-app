@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import SignoutButton from "@/components/SignoutButton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { checkUser } from "../actions/checkUser";
-import AddEventButton from "@/components/AddEventButton";
+import AddVenueButton from "@/components/AddVenueButton";
 import VenueCardAdmin from "@/components/VenueCardAdmin";
 import { fetchVenues } from "../actions/fetchVenues";
 
@@ -23,6 +23,7 @@ export default async function Page() {
   const imageUrl = user?.image ?? undefined;
   const checkaccess = await checkUser();
   const venueData=await fetchVenues();
+  const myVenues = venueData.filter(venue => venue.userId === userId);
 
   return (
     <div className="min-h-screen bg-gray-100 py-8">
@@ -43,19 +44,36 @@ export default async function Page() {
             </div>
             {checkaccess ? (
               <div className="space-y-6">
-                <AddEventButton />
+                <AddVenueButton />
+                  {myVenues.length > 0 && (
+                    <div className="h-auto border border-black rounded-md p-4 flex flex-col mb-6">
+                      <div className="font-bold pl-5 mb-4">My Venues:</div>
+                      {myVenues.map((venue) => (
+                        <VenueCardAdmin
+                          key={venue.id}
+                          venueId={venue.id}
+                          venueImage={venue.venueImgUrl}
+                          name={venue.venueName}
+                          rating={venue.rating}
+                          area={venue.venueArea}
+                          address={venue.address}
+                        />
+                      ))}
+                    </div>
+                  )}
                 <div className="h-auto border border-black rounded-md p-4 flex flex-col">
-                {venueData.map((venue) => (
-        <VenueCardAdmin
-          key={venue.id}
-          venueId={venue.id}
-          venueImage={venue.venueImgUrl}
-          name={venue.venueName}
-          rating={venue.rating}
-          area={venue.venueArea}
-          address={venue.address}
-        />
-      ))}
+                  <div className="font-bold pl-5">All Venues:</div>
+                  {venueData.map((venue) => (
+                    <VenueCardAdmin
+                      key={venue.id}
+                      venueId={venue.id}
+                      venueImage={venue.venueImgUrl}
+                      name={venue.venueName}
+                      rating={venue.rating}
+                      area={venue.venueArea}
+                      address={venue.address}
+                    />
+                  ))}
                 </div>
               </div>
             ) : (
