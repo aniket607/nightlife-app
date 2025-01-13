@@ -4,18 +4,23 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 interface Event {
-  id: number;
-  image: string;
-  name: string;
-  date: string;
-  description: string;
+  eventId: number; // Assuming `Int` maps to `number`
+  eventName: string;
+  eventDescription?: string | null; // Optional field
+  eventDate: Date; // Maps to `DateTime`
+  eventTime: Date; // `DateTime @db.Time` also maps to `Date`
+  glCount: number;
+  eventImgUrl?: string | null; // Optional field
+  venueId: string;
+  userId: string;
+  createdAt: Date; // Maps to `DateTime`
 }
 
 export default function VenuePageRightSection({ events,venueId }: { events: Event[], venueId:string}) {
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedImage, setSelectedImage] = useState<string | null>();
   const router=useRouter();
 
-  const handleImageClick = (image: string) => {
+  const handleImageClick = (image: string | null) => {
     setSelectedImage(image);
   };
 
@@ -44,27 +49,27 @@ export default function VenuePageRightSection({ events,venueId }: { events: Even
       <div className="grid grid-cols-1 gap-4">
         {events.map((event) => (
           <div
-            key={event.id}
+            key={event?.eventId}
             className="flex bg-purple-50 rounded-md shadow-md h-60 w-[50vw] m-auto"
           >
             {/* Event Image */}
             <div className="w-1/3 h-full rounded-l-md overflow-hidden">
               <img
-                src={event.image}
-                alt={event.name}
+                src={event?.eventImgUrl??null}
+                alt={event.eventName}
                 className="w-full h-full object-cover cursor-pointer rounded"
-                onClick={() => handleImageClick(event.image)}
+                onClick={() => handleImageClick(event?.eventImgUrl??null)}
               />
             </div>
 
             {/* Event Info */}
             <div className="flex flex-col items-start p-4 w-2/3">
               <h3 className="text-3xl font-semibold text-gray-800 truncate">
-                {event.name}
+                {event.eventName}
               </h3>
-              <p className="text-base text-gray-600 mt-1">{event.date}</p>
+              <p className="text-base text-gray-600 mt-1">{event.eventDate.toISOString().split("T")[0]}</p>
               <p className="text-sm w-[80%] text-gray-600 mt-2 line-clamp-3">
-                {event.description}
+                {event.eventDescription}
               </p>
             </div>
           </div>
