@@ -1,5 +1,6 @@
 "use client";
 
+import Image from 'next/image';
 import { useRef, useEffect } from 'react';
 
 interface Venue {
@@ -32,14 +33,18 @@ export default function VenuePageLeftSection({ venue }: { venue: Venue | null })
 
   return (
     <div ref={leftSectionRef} className="w-1/3 bg-white p-8 border-r border-gray-300 h-screen overflow-hidden">
+      
       {/* Venue Image */}
-      <div className="w-[100] h-60 rounded-md overflow-hidden">
-        <img
-          src={venue?.venueImgUrl}
-          alt={venue?.venueName || "Venue Image"}
-          className="w-full h-full object-cover"
-        />
-      </div>
+
+<div className="w-[100] h-60 rounded-md overflow-hidden relative">
+  <Image
+    src={venue?.venueImgUrl || '/placeholder-image.jpg'}
+    alt={venue?.venueName || "Venue Image"}
+    layout="fill"
+    objectFit="cover"
+    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+  />
+</div>
 
       {/* Venue Info */}
       <div className="mt-4">
