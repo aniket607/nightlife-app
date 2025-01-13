@@ -13,14 +13,15 @@ interface Venue {
 
 export default function VenuePageLeftSection({ venue }: { venue: Venue | null }) {
   return (
-    <div className="w-1/3 bg-white p-10 border-r border-gray-300 sticky top-0">
+    <div className="w-1/3 bg-white p-8 border-r border-gray-300 sticky top-0">
       {/* Venue Image */}
-      <div className="w-full h-96 rounded-md overflow-hidden">
-        <img
+      <div className="w-[100] h-60 rounded-md overflow-hidden">
+         <img
           src={venue?.venueImgUrl}
           alt={venue?.venueName || "Venue Image"}
           className="w-full h-full object-cover"
-        />
+        /> 
+        
       </div>
 
       {/* Venue Info */}
