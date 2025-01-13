@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { useRouter } from "next/navigation"; // Import useRouter for navigation
+import Image from "next/image";
 
 interface VenueCardAdminProps {
   venueId:string;
@@ -28,31 +29,38 @@ const VenueCardAdmin: React.FC<VenueCardAdminProps> = ({
   };
 
   return (
-    <div className="flex border border-gray-300 rounded-lg p-4 shadow-md m-4">
-      <div className="flex-shrink-0 w-24 h-24 rounded-md overflow-hidden">
-        <img
-          src={venueImage}
-          alt={name}
-          className="w-full h-full object-cover"
-        />
+    <div className="flex flex-col border border-gray-300 rounded-lg m-4 w-80 overflow-clip shadow-xl">
+      <div className="flex-shrink-0 w-80 h-48 overflow-hidden ">
+         <div className="w-[100] h-60 rounded-md overflow-hidden relative">
+         <Image
+            src={venueImage || '/placeholder-image.jpg'}
+            alt={name || "Venue Image"}
+            layout="fill"
+            objectFit="cover"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          />
+          </div>
       </div>
 
-      <div className="ml-4 flex flex-col flex-grow">
+      <div className="mx-2 mt-2 flex flex-col flex-grow">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-800">{name}</h2>
-          <span className="text-base text-yellow-500">★ {rating}</span>
+          <h2 className="text-lg font-semibold text-gray-800 dark:text-white">{name}</h2>
+          <div>
+            <span className="text-base text-yellow-400 ">★ </span>
+            <span className="font-bold text-black dark:text-white">{rating}</span>
+          </div>
         </div>
 
-        <p className="text-sm text-gray-600 mt-1">Area: {area}</p>
+        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{area}</p>
 
-        <p className="text-sm text-gray-500 mt-2">Address: {address}</p>
+        <p className="text-xs text-gray-500 dark:text-gray-300 mt-1">{address}</p>
 
-        <div className="mt-auto flex justify-end">
+        <div className="">
           <button
-            className="bg-purple-600 !text-white font-bold hover:bg-purple-700 text-sm py-1 px-4 rounded"
+            className="bg-gray-600 !text-white font-bold hover:bg-black text-sm py-1 px-1 w-full rounded my-3"
             onClick={handleViewVenue} // Add onClick handler
           >
-            View Venue
+            View Details
           </button>
         </div>
       </div>

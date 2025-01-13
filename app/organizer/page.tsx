@@ -1,10 +1,7 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
-import { prisma } from "@/lib/prisma";
-import SignoutButton from "@/components/SignoutButton";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { checkUser } from "../actions/checkUser";
-import AddEventButton from "@/components/AddEventButton";
+import AddVenueButton from "@/components/AddVenueButton";
 import VenueCardAdmin from "@/components/VenueCardAdmin";
 import { fetchVenues } from "../actions/fetchVenues";
 
@@ -15,48 +12,55 @@ export default async function Page() {
   }
 
   const userId = session.user.id;
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { image: true, email: true },
-  });
 
-  const imageUrl = user?.image ?? undefined;
   const checkaccess = await checkUser();
   const venueData=await fetchVenues();
+  const myVenues = venueData.filter(venue => venue.userId === userId);
 
   return (
-    <div className="min-h-screen bg-gray-100 py-8">
+    <div className="min-h-screen bg-gray-300 dark:bg-primary py-8">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
+        <div className="bg-white dark:bg-secondary rounded-lg shadow-md overflow-hidden">
           <div className="p-6">
-            <div className="flex justify-between items-center mb-6">
-              <div className="text-2xl font-bold">Organizer Dashboard</div>
-              <div className="flex items-center space-x-4">
-                <Avatar>
-                  <AvatarImage src={imageUrl} />
-                  <AvatarFallback>
-                    {user?.email ? user.email.charAt(0).toUpperCase() : "U"}
-                  </AvatarFallback>
-                </Avatar>
-                <SignoutButton />
-              </div>
-            </div>
             {checkaccess ? (
               <div className="space-y-6">
-                <AddEventButton />
-                <div className="h-auto border border-black rounded-md p-4 flex flex-col">
-                {venueData.map((venue) => (
-        <VenueCardAdmin
-          key={venue.id}
-          venueId={venue.id}
-          venueImage={venue.venueImgUrl}
-          name={venue.venueName}
-          rating={venue.rating}
-          area={venue.venueArea}
-          address={venue.address}
-        />
-      ))}
+                <div className="flex justify-end mb-4">
+                  <AddVenueButton />
                 </div>
+                  {myVenues.length > 0 && (
+                    <div className="h-auto border border-black dark:border-gray-500 rounded-md">
+                    <div className="font-bold text-lg mb-1 pt-6 pl-6 dark:text-gray-200">My Venues:</div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 px-2 mb-4">
+                      {myVenues.map((venue) => (
+                        <VenueCardAdmin
+                          key={venue.id}
+                          venueId={venue.id}
+                          venueImage={venue.venueImgUrl}
+                          name={venue.venueName}
+                          rating={venue.rating}
+                          area={venue.venueArea}
+                          address={venue.address}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  )}
+                <div className="h-auto border border-black dark:border-gray-500 rounded-md mt-6">
+                <div className="font-bold text-lg mb-1 pt-6 pl-6 dark:text-gray-200">All Venues:</div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 px-2 mb-4">
+                  {venueData.map((venue) => (
+                    <VenueCardAdmin
+                      key={venue.id}
+                      venueId={venue.id}
+                      venueImage={venue.venueImgUrl}
+                      name={venue.venueName}
+                      rating={venue.rating}
+                      area={venue.venueArea}
+                      address={venue.address}
+                    />
+                  ))}
+                </div>
+              </div>
               </div>
             ) : (
               <NoAccessComponent />

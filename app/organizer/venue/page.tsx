@@ -27,6 +27,8 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ i
 
   const { id: venueId } = await searchParams;
 
+  if(!venueId) redirect("/organizer/");
+
   let venue = null;
   try {
     venue = await fetchVenueById(venueId);
@@ -74,9 +76,15 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ i
   // ];
 
   return (
-    <div className="flex h-screen">
-      <VenuePageLeftSection venue={venue} />
-      <VenuePageRightSection events={events} venueId={venueId} />
+    <div className="mx-auto h-screen bg-secondary">
+      <div className="flex h-full overflow-hidden">
+        <VenuePageLeftSection venue={venue} />
+        <div className="w-2/3 h-full overflow-y-auto">
+          <VenuePageRightSection events={events} venueId={venueId} />
+        </div>
+      </div>
     </div>
   );
+  
+  
 }
