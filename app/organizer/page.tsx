@@ -1,8 +1,5 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
-import { prisma } from "@/lib/prisma";
-import SignoutButton from "@/components/SignoutButton";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { checkUser } from "../actions/checkUser";
 import AddVenueButton from "@/components/AddVenueButton";
 import VenueCardAdmin from "@/components/VenueCardAdmin";
@@ -15,35 +12,16 @@ export default async function Page() {
   }
 
   const userId = session.user.id;
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { image: true, email: true },
-  });
 
-  const imageUrl = user?.image ?? undefined;
   const checkaccess = await checkUser();
   const venueData=await fetchVenues();
   const myVenues = venueData.filter(venue => venue.userId === userId);
 
   return (
-    <div className="min-h-screen bg-gray-100 py-8">
+    <div className="min-h-screen bg-gray-300 py-8">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white rounded-lg shadow-md overflow-hidden">
           <div className="p-6">
-            <div className="flex justify-between items-center mb-6">
-              <div className="text-2xl font-bold">Organizer Dashboard</div>
-              <div className="flex items-center space-x-4">
-              {imageUrl && (
-                <Avatar>
-                  <AvatarImage src={imageUrl} />
-                  <AvatarFallback>
-                    {user?.email ? user.email.charAt(0).toUpperCase() : "U"}
-                  </AvatarFallback>
-                </Avatar>
-              )}
-                <SignoutButton />
-              </div>
-            </div>
             {checkaccess ? (
               <div className="space-y-6">
                 <AddVenueButton />

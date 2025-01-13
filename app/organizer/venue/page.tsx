@@ -13,6 +13,8 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ i
 
   const { id: venueId } = await searchParams;
 
+  if(!venueId) redirect("/organizer/");
+
   let venue = null;
   try {
     venue = await fetchVenueById(venueId);
