@@ -49,7 +49,7 @@ export default function ClientHeader({imageUrl, email}: {imageUrl: string | unde
     };
 
     return (
-        <header className="sticky top-0 z-50 bg-primary text-gray-100">
+        <header className="sticky top-0 z-50 bg-transparent text-gray-100">
             <div className="max-w-6xl mx-auto px-2 sm:px-6 lg:px-8 py-2 sm:py-4">
                 <div className="bg-gradient-to-t from-[#151515] via-[#151817] to-[#181A1A] rounded-full px-3 sm:px-6 py-2 border border-gray-700">
                     <div className="flex justify-between items-center">
@@ -70,8 +70,13 @@ export default function ClientHeader({imageUrl, email}: {imageUrl: string | unde
                                 </button>
                             )}
                             <Link href="/organizer/">
-                                <span className="text-xs sm:text-sm font-medium bg-gray-600/40 px-3 sm:px-7 rounded-full py-2 sm:py-3 font-poppins hover:bg-gray-600/20 hover:text-white/50 transition duration-300">
+                                <span className="text-xs sm:text-sm font-bold px-3 sm:px-7 rounded-full py-2 sm:py-3 font-poppins text-gray-300 hover:text-white hover:bg-white/5 transition-all duration-300">
                                     Dashboard
+                                </span>
+                            </Link>
+                            <Link href="/organizer/myevents" className="hidden md:block">
+                                <span className="text-xs sm:text-sm font-bold px-3 sm:px-7 rounded-full py-2 sm:py-3 font-poppins text-gray-300 hover:text-white hover:bg-white/5 transition-all duration-300">
+                                    My Events
                                 </span>
                             </Link>
                         </div>
@@ -79,24 +84,49 @@ export default function ClientHeader({imageUrl, email}: {imageUrl: string | unde
                         <div className="flex items-center space-x-3 sm:space-x-6">
                             <div className="relative avatar-dropdown">
                                 {imageUrl && (
-                                    <button 
-                                        onClick={toggleDropdown}
-                                        className="focus:outline-none"
-                                    >
-                                        <Avatar className="h-7 w-7 sm:h-8 sm:w-8 ring-1 ring-gray-700 hover:ring-gray-500 transition-all">
-                                            <AvatarImage src={imageUrl} alt={email || 'User'} />
-                                            <AvatarFallback className="bg-gray-800 text-gray-200 text-xs sm:text-sm">
-                                                {email ? email.charAt(0).toUpperCase() : "U"}
-                                            </AvatarFallback>
-                                        </Avatar>
-                                    </button>
+                                    <>
+                                        {/* Mobile: Clickable Avatar */}
+                                        <button 
+                                            onClick={toggleDropdown}
+                                            className="md:hidden focus:outline-none"
+                                        >
+                                            <Avatar className="h-10 w-10 ring-1 ring-gray-700 hover:ring-gray-500 transition-all">
+                                                <AvatarImage src={imageUrl} alt={email || 'User'} />
+                                                <AvatarFallback className="bg-gray-800 text-gray-200 text-xs">
+                                                    {email ? email.charAt(0).toUpperCase() : "U"}
+                                                </AvatarFallback>
+                                            </Avatar>
+                                        </button>
+
+                                        {/* Desktop: Non-clickable Avatar */}
+                                        <div className="hidden md:block">
+                                            <Avatar className="h-8 w-8 ring-1 ring-gray-700 transition-all">
+                                                <AvatarImage src={imageUrl} alt={email || 'User'} />
+                                                <AvatarFallback className="bg-gray-800 text-gray-200 text-sm">
+                                                    {email ? email.charAt(0).toUpperCase() : "U"}
+                                                </AvatarFallback>
+                                            </Avatar>
+                                        </div>
+                                    </>
                                 )}
                                 
                                 {/* Mobile Dropdown */}
                                 {isDropdownOpen && (
-                                    <div className="absolute right-0 mt-2 w-28 md:hidden bg-gray-800/95 backdrop-blur-sm rounded-full shadow-lg transform origin-top-right transition-all duration-200 ease-out">
-                                        <div className="p-1">
-                                            <SignoutButton />
+                                    <div className="absolute right-0 mt-2 w-48 md:hidden bg-gray-800/95 backdrop-blur-sm rounded-lg shadow-lg transform origin-top-right transition-all duration-200 ease-out border border-gray-700/50">
+                                        <div className="py-2 px-1">
+                                            <Link href="/organizer/myevents">
+                                                <div className="block px-4 py-2 text-sm text-gray-200 rounded-lg transition-colors bg-white/5 border border-gray-600/30 mx-1 hover:bg-white/10">
+                                                    <div className="flex items-center space-x-2">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                        </svg>
+                                                        <span>My Events</span>
+                                                    </div>
+                                                </div>
+                                            </Link>
+                                            <div className="mt-1 px-1">
+                                                <SignoutButton />
+                                            </div>
                                         </div>
                                     </div>
                                 )}

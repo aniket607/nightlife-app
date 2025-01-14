@@ -21,7 +21,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body
-        className={`${poppins.variable}`}
+        className={`${poppins.variable} bg-secondary min-h-screen`}
       >
         {children}
       </body>
