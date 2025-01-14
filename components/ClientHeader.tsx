@@ -11,30 +11,45 @@ export default function ClientHeader({imageUrl, email}: {imageUrl: string | unde
     const pathname = usePathname();
     const isOnDashboard = pathname === '/organizer';
     const [navigationStack, setNavigationStack] = useState<string[]>([]);
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+    // Close dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            const target = event.target as HTMLElement;
+            if (!target.closest('.avatar-dropdown')) {
+                setIsDropdownOpen(false);
+            }
+        };
+
+        document.addEventListener('click', handleClickOutside);
+        return () => document.removeEventListener('click', handleClickOutside);
+    }, []);
 
     // Update navigation stack when pathname changes
     useEffect(() => {
-        // Skip form routes from being added to history
         if (!pathname.includes('add') && !pathname.includes('edit')) {
             setNavigationStack(prev => [...prev, pathname]);
         }
     }, [pathname]);
 
     const handleBack = () => {
-        // Get the previous valid route from navigation stack
         const previousRoute = navigationStack[navigationStack.length - 2];
         if (previousRoute) {
             router.push(previousRoute);
-            // Remove current and previous route from stack
             setNavigationStack(prev => prev.slice(0, -2));
         } else {
-            // Fallback to dashboard if no previous route
             router.push('/organizer');
         }
     };
 
+    const toggleDropdown = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setIsDropdownOpen(!isDropdownOpen);
+    };
+
     return (
-        <header className="sticky top-0 z-50 bg-black text-gray-100">
+        <header className="sticky top-0 z-50 bg-primary text-gray-100">
             <div className="max-w-6xl mx-auto px-2 sm:px-6 lg:px-8 py-2 sm:py-4">
                 <div className="bg-gradient-to-t from-[#151515] via-[#151817] to-[#181A1A] rounded-full px-3 sm:px-6 py-2 border border-gray-700">
                     <div className="flex justify-between items-center">
@@ -62,20 +77,39 @@ export default function ClientHeader({imageUrl, email}: {imageUrl: string | unde
                         </div>
                         
                         <div className="flex items-center space-x-3 sm:space-x-6">
-                            {imageUrl && (
-                                <Avatar className="h-7 w-7 sm:h-8 sm:w-8 ring-1 ring-gray-700">
-                                    <AvatarImage src={imageUrl} alt={email || 'User'} />
-                                    <AvatarFallback className="bg-gray-800 text-gray-200 text-xs sm:text-sm">
-                                        {email ? email.charAt(0).toUpperCase() : "U"}
-                                    </AvatarFallback>
-                                </Avatar>
-                            )}
-                            <SignoutButton />
+                            <div className="relative avatar-dropdown">
+                                {imageUrl && (
+                                    <button 
+                                        onClick={toggleDropdown}
+                                        className="focus:outline-none"
+                                    >
+                                        <Avatar className="h-7 w-7 sm:h-8 sm:w-8 ring-1 ring-gray-700 hover:ring-gray-500 transition-all">
+                                            <AvatarImage src={imageUrl} alt={email || 'User'} />
+                                            <AvatarFallback className="bg-gray-800 text-gray-200 text-xs sm:text-sm">
+                                                {email ? email.charAt(0).toUpperCase() : "U"}
+                                            </AvatarFallback>
+                                        </Avatar>
+                                    </button>
+                                )}
+                                
+                                {/* Mobile Dropdown */}
+                                {isDropdownOpen && (
+                                    <div className="absolute right-0 mt-2 w-28 md:hidden bg-gray-800/95 backdrop-blur-sm rounded-full shadow-lg transform origin-top-right transition-all duration-200 ease-out">
+                                        <div className="p-1">
+                                            <SignoutButton />
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                            
+                            {/* Desktop Sign Out Button */}
+                            <div className="hidden md:block">
+                                <SignoutButton />
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </header>
-
     );
 }
