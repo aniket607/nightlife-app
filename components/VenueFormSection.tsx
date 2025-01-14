@@ -52,120 +52,126 @@ export default function VenueFormSection() {
   };
 
   return (
-    <div className="w-full max-w-4xl p-8 bg-secondary rounded-lg shadow-2xl">
+    <div className="w-full max-w-4xl bg-secondary rounded-xl shadow-2xl overflow-hidden">
       <Toaster position="top-right" />
   
-      <div className="flex flex-col md:flex-row gap-8 items-center">
-        <div className="w-full md:w-1/2">
-          <div className="px-24 font-bold text-lg text-gray-200 mb-5">Upload Venue Image:</div>
-          <UploadForm
-            setImageUrl={setImageUrl}
-            setIsImageUploaded={setIsImageUploaded}
-          />
+      <div className="flex flex-col md:flex-row">
+        {/* Image Upload Section */}
+        <div className="w-full md:w-1/2 p-5 sm:p-6 md:p-8 bg-gray-900/50">
+          <h2 className="text-xl sm:text-2xl font-semibold text-gray-200 mb-5 sm:mb-6 text-center">
+            Upload Venue Image
+          </h2>
+          <div className="max-w-sm mx-auto">
+            <UploadForm
+              setImageUrl={setImageUrl}
+              setIsImageUploaded={setIsImageUploaded}
+            />
+          </div>
         </div>
   
-        <div className="w-full md:w-1/2">
-          <form
-            className="space-y-6 border border-gray-700 p-5 rounded-lg shadow-md bg-gray-900/50"
-            onSubmit={handleFormSubmit}
-          >
-            <input type="hidden" name="venueImgUrl" value={imageUrl} />
-  
-            <div className="space-y-2">
-              <Label htmlFor="venue_name" className="block mb-1 text-gray-300">
-                Venue Name
-              </Label>
-              <Input
-                type="text"
-                placeholder="One8 Commune"
-                name="venue_name"
-                id="venue_name"
-                required
-                disabled={isDisabled} // Disable input if form is submitted
-                className="bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 focus:border-gray-600 focus:ring-gray-600"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="venue_area" className="block mb-1 text-gray-300">
-                Venue Area
-              </Label>
-              <Input
-                type="text"
-                placeholder="Vijay Nagar"
-                name="venue_area"
-                id="venue_area"
-                required
-                disabled={isDisabled}
-                className="bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 focus:border-gray-600 focus:ring-gray-600"
-
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="venue_rating" className="block mb-1 text-gray-300">
-                Venue Rating
-              </Label>
-              <Input
-                type="number"
-                step="0.1"
-                min="0"
-                max="5"
-                placeholder="Rating (0-5)"
-                name="venue_rating"
-                id="venue_rating"
-                required
-                className="w-32 bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 focus:border-gray-600 focus:ring-gray-600 "
-                disabled={isDisabled}
-                
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="venue_addr" className="block mb-1 text-gray-300">
-                Venue Address
-              </Label>
-              <Input
-                type="text"
-                placeholder="Enter Venue's Complete Address"
-                name="venue_addr"
-                id="venue_addr"
-                required
-                disabled={isDisabled}
-                className=" bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 focus:border-gray-600 focus:ring-gray-600 "
-
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="locationUrl" className="block mb-1 text-gray-300">
-                Venue Location Url
-              </Label>
-              <Input
-                type="text"
-                placeholder="Enter Venue's Google maps Url"
-                name="locationUrl"
-                id="locationUrl"
-                required
-                disabled={isDisabled}
-                className=" bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 focus:border-gray-600 focus:ring-gray-600 "
-
-              />
-            </div>
-
-            {/* Submit button */}
-            <button
-              type="submit"
-              disabled={isPending || isDisabled} // Disable during pending or after success
-              className={`w-full py-2 px-4 rounded transition duration-300 ${
-                isPending || isDisabled
-                  ? "bg-gray-700 text-gray-400 cursor-not-allowed"
-                  : "bg-gray-700 hover:bg-gray-600 text-gray-200"
-              }`}
+        {/* Form Section */}
+        <div className="w-full md:w-1/2 p-5 sm:p-6 md:p-8 bg-gray-800/50">
+          <h2 className="text-xl sm:text-2xl font-semibold text-gray-200 mb-5 sm:mb-6 text-center">
+            Venue Details
+          </h2>
+          <div className="max-w-sm mx-auto">
+            <form
+              className="space-y-5"
+              onSubmit={handleFormSubmit}
             >
-              {isPending ? "Submitting..." : "Submit"}
-            </button>
-          </form>
+              <input type="hidden" name="venueImgUrl" value={imageUrl} />
+    
+              <div className="space-y-2.5">
+                <Label htmlFor="venue_name" className="text-sm sm:text-base text-gray-300">
+                  Venue Name
+                </Label>
+                <Input
+                  type="text"
+                  placeholder="One8 Commune"
+                  name="venue_name"
+                  id="venue_name"
+                  required
+                  disabled={isDisabled}
+                  className="bg-gray-900/50 border-gray-700 text-gray-200 placeholder:text-gray-500 focus:border-gray-600 focus:ring-gray-600 h-11"
+                />
+              </div>
+  
+              <div className="space-y-2.5">
+                <Label htmlFor="venue_area" className="text-sm sm:text-base text-gray-300">
+                  Area
+                </Label>
+                <Input
+                  type="text"
+                  placeholder="Vijay Nagar"
+                  name="venue_area"
+                  id="venue_area"
+                  required
+                  disabled={isDisabled}
+                  className="bg-gray-900/50 border-gray-700 text-gray-200 placeholder:text-gray-500 focus:border-gray-600 focus:ring-gray-600 h-11"
+                />
+              </div>
+  
+              <div className="space-y-2.5">
+                <Label htmlFor="venue_rating" className="text-sm sm:text-base text-gray-300">
+                  Rating
+                </Label>
+                <Input
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  max="5"
+                  placeholder="0-5"
+                  name="venue_rating"
+                  id="venue_rating"
+                  required
+                  disabled={isDisabled}
+                  className="bg-gray-900/50 border-gray-700 text-gray-200 placeholder:text-gray-500 focus:border-gray-600 focus:ring-gray-600 h-11"
+                />
+              </div>
+  
+              <div className="space-y-2.5">
+                <Label htmlFor="venue_addr" className="text-sm sm:text-base text-gray-300">
+                  Complete Address
+                </Label>
+                <Input
+                  type="text"
+                  placeholder="Enter venue's complete address"
+                  name="venue_addr"
+                  id="venue_addr"
+                  required
+                  disabled={isDisabled}
+                  className="bg-gray-900/50 border-gray-700 text-gray-200 placeholder:text-gray-500 focus:border-gray-600 focus:ring-gray-600 h-11"
+                />
+              </div>
+  
+              <div className="space-y-2.5">
+                <Label htmlFor="locationUrl" className="text-sm sm:text-base text-gray-300">
+                  Google Maps URL
+                </Label>
+                <Input
+                  type="text"
+                  placeholder="Enter venue's Google Maps URL"
+                  name="locationUrl"
+                  id="locationUrl"
+                  required
+                  disabled={isDisabled}
+                  className="bg-gray-900/50 border-gray-700 text-gray-200 placeholder:text-gray-500 focus:border-gray-600 focus:ring-gray-600 h-11"
+                />
+              </div>
+  
+              <button
+                type="submit"
+                disabled={isPending || isDisabled}
+                className={`w-full py-3 px-4 rounded-lg text-sm font-medium transition duration-300 ${
+                  isPending || isDisabled
+                    ? "bg-gray-700 text-gray-400 cursor-not-allowed"
+                    : "bg-blue-600 hover:bg-blue-700 text-white hover:shadow-lg transform hover:-translate-y-0.5"
+                }`}
+              >
+                {isPending ? "Submitting..." : "Add Venue"}
+              </button>
+            </form>
+          </div>
         </div>
       </div>
     </div>
