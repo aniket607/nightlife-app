@@ -19,7 +19,7 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({ userId, venueId }) 
   const [isPending, startTransition] = useTransition();
   const [isDisabled, setIsDisabled] = useState(false); // Disable form after submission
   const [eventDate, setEventDate] = useState<Date | null>(null); // State for selected date
-  const [eventTime, setEventTime] = useState<string>(""); // State for selected time
+  const [eventTime, setEventTime] = useState<Date | null>(null); // Changed to Date type for DatePicker
 
   const handleFormSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault(); // Prevent default form submit & reload
@@ -36,7 +36,11 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({ userId, venueId }) 
 
     const formData = new FormData(event.currentTarget);
     formData.append("eventDate", eventDate.toISOString().split("T")[0]); // Add formatted date
-    formData.append("eventTime", eventTime); // Add time
+    
+    // Format time as HH:mm
+    const hours = eventTime.getHours().toString().padStart(2, '0');
+    const minutes = eventTime.getMinutes().toString().padStart(2, '0');
+    formData.append("eventTime", `${hours}:${minutes}`);
 
     startTransition(async () => {
       try {
@@ -125,10 +129,15 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({ userId, venueId }) 
                 <DatePicker
                   selected={eventDate}
                   onChange={(date: Date | null) => setEventDate(date)}
-                  dateFormat="yyyy-MM-dd"
+                  dateFormat="MMMM d, yyyy"
                   placeholderText="Select Event Date"
+                  minDate={new Date()}
                   className="w-full bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-600"
                   disabled={isDisabled}
+                  calendarClassName="bg-gray-800 border-gray-700 text-gray-200"
+                  dayClassName={date => 
+                    "hover:bg-gray-700 rounded-full"
+                  }
                 />
               </div>
   
@@ -137,15 +146,18 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({ userId, venueId }) 
                 <label htmlFor="eventTime" className="block text-sm font-medium text-gray-300 mb-1">
                   Event Time
                 </label>
-                <input
-                  type="time"
-                  name="eventTime"
-                  id="eventTime"
-                  value={eventTime}
-                  onChange={(e) => setEventTime(e.target.value)}
-                  required
-                  disabled={isDisabled}
+                <DatePicker
+                  selected={eventTime}
+                  onChange={(time: Date | null) => setEventTime(time)}
+                  showTimeSelect
+                  showTimeSelectOnly
+                  timeIntervals={15}
+                  timeCaption="Time"
+                  dateFormat="h:mm aa"
+                  placeholderText="Select Event Time"
                   className="w-full bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-600"
+                  disabled={isDisabled}
+                  calendarClassName="bg-gray-800 border-gray-700 text-gray-200"
                 />
               </div>
   
