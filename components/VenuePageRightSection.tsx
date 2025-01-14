@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -53,13 +54,15 @@ export default function VenuePageRightSection({ events,venueId }: { events: Even
             className="flex bg-purple-50 rounded-md shadow-md h-60 w-[50vw] m-auto"
           >
             {/* Event Image */}
-            <div className="w-1/3 h-full rounded-l-md overflow-hidden">
-              <img
-                src={event?.eventImgUrl??null}
-                alt={event.eventName}
-                className="w-full h-full object-cover cursor-pointer rounded"
-                onClick={() => handleImageClick(event?.eventImgUrl??null)}
-              />
+            <div className="w-1/3 h-full rounded-l-md overflow-hidden relative">
+                    <Image
+                      src={event?.eventImgUrl || '/placeholder-image.jpg'}
+                      alt={event.eventName || "Event Image"}
+                      fill
+                      className="object-cover cursor-pointer rounded"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      onClick={() => handleImageClick(event?.eventImgUrl || null)}
+                    />
             </div>
 
             {/* Event Info */}
