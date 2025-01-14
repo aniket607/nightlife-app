@@ -66,48 +66,6 @@ export default function VenuePageRightSection({
           Add Event
         </button>
       </div>
-      <Accordion type="single" collapsible defaultValue="item-1">
-        <AccordionItem value="item-1">
-          <AccordionTrigger>UPCOMING</AccordionTrigger>
-          <AccordionContent>
-            <div className="grid grid-cols-1 gap-4 px-2 sm:px-4 md:px-8">
-              {upcomingEvents.map((event: Event) => (
-                <div
-                  key={event?.eventId}
-                  className="flex flex-col sm:flex-row bg-purple-50 rounded-md shadow-md w-full sm:h-60"
-                >
-                  {/* Event Image */}
-                  <div className="w-full sm:w-1/3 h-48 sm:h-full rounded-t-md sm:rounded-l-md sm:rounded-t-none overflow-hidden relative">
-                    <Image
-                      src={event?.eventImgUrl || "/placeholder-image.jpg"}
-                      alt={event.eventName || "Event Image"}
-                      fill
-                      className="object-cover cursor-pointer rounded"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      onClick={() =>
-                        handleImageClick(event?.eventImgUrl || null)
-                      }
-                    />
-                  </div>
-
-                  {/* Event Info */}
-                  <div className="flex flex-col items-start p-4 w-full sm:w-2/3">
-                    <h3 className="text-xl sm:text-2xl md:text-3xl font-semibold text-gray-800 truncate w-full">
-                      {event.eventName}
-                    </h3>
-                    <p className="text-sm sm:text-base text-gray-600 mt-1">
-                      {event.eventDate.toISOString().split("T")[0]}
-                    </p>
-                    <p className="text-sm w-full sm:w-[80%] text-gray-600 mt-2 line-clamp-3">
-                      {event.eventDescription}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
 
       <Accordion type="single" collapsible>
         <AccordionItem value="item-1">
@@ -140,6 +98,77 @@ export default function VenuePageRightSection({
                     </h3>
                     <p className="text-sm sm:text-base text-gray-600 mt-1">
                       {event.eventDate.toISOString().split("T")[0]}
+                    </p>
+                    <p className="text-sm sm:text-base text-gray-600 mt-1">
+                      {/* Format and display event time */}
+                      {(() => {
+                        const date = new Date(event.eventTime);
+                        let hours = date.getHours();
+                        const minutes = date
+                          .getMinutes()
+                          .toString()
+                          .padStart(2, "0");
+                        const amPm = hours >= 12 ? "PM" : "AM";
+                        hours = hours % 12 || 12; // Convert to 12-hour format
+                        return `${hours}:${minutes} ${amPm}`;
+                      })()}
+                    </p>
+                    <p className="text-sm w-full sm:w-[80%] text-gray-600 mt-2 line-clamp-3">
+                      {event.eventDescription}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
+
+      <Accordion type="single" collapsible defaultValue="item-1">
+        <AccordionItem value="item-1">
+          <AccordionTrigger>UPCOMING</AccordionTrigger>
+          <AccordionContent>
+            <div className="grid grid-cols-1 gap-4 px-2 sm:px-4 md:px-8">
+              {upcomingEvents.map((event: Event) => (
+                <div
+                  key={event?.eventId}
+                  className="flex flex-col sm:flex-row bg-purple-50 rounded-md shadow-md w-full sm:h-60"
+                >
+                  {/* Event Image */}
+                  <div className="w-full sm:w-1/3 h-48 sm:h-full rounded-t-md sm:rounded-l-md sm:rounded-t-none overflow-hidden relative">
+                    <Image
+                      src={event?.eventImgUrl || "/placeholder-image.jpg"}
+                      alt={event.eventName || "Event Image"}
+                      fill
+                      className="object-cover cursor-pointer rounded"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      onClick={() =>
+                        handleImageClick(event?.eventImgUrl || null)
+                      }
+                    />
+                  </div>
+
+                  {/* Event Info */}
+                  <div className="flex flex-col items-start p-4 w-full sm:w-2/3">
+                    <h3 className="text-xl sm:text-2xl md:text-3xl font-semibold text-gray-800 truncate w-full">
+                      {event.eventName}
+                    </h3>
+                    <p className="text-sm sm:text-base text-gray-600 mt-1">
+                      {event.eventDate.toISOString().split("T")[0]}
+                    </p>
+                    <p className="text-sm sm:text-base text-gray-600 mt-1">
+                      {/* Format and display event time */}
+                      {(() => {
+                        const date = new Date(event.eventTime);
+                        let hours = date.getHours();
+                        const minutes = date
+                          .getMinutes()
+                          .toString()
+                          .padStart(2, "0");
+                        const amPm = hours >= 12 ? "PM" : "AM";
+                        hours = hours % 12 || 12; // Convert to 12-hour format
+                        return `${hours}:${minutes} ${amPm}`;
+                      })()}
                     </p>
                     <p className="text-sm w-full sm:w-[80%] text-gray-600 mt-2 line-clamp-3">
                       {event.eventDescription}
