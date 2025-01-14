@@ -29,35 +29,34 @@ const VenueCardAdmin: React.FC<VenueCardAdminProps> = ({
   };
 
   return (
-    <div className="flex flex-col border border-gray-300 rounded-lg m-4 w-80 overflow-clip shadow-xl">
-      <div className="flex-shrink-0 w-80 h-48 overflow-hidden ">
-         <div className="w-[100] h-60 rounded-md overflow-hidden relative">
+    <div className="flex flex-col border border-gray-300 rounded-lg overflow-hidden shadow-xl">
+      <div className="relative w-full aspect-video">
          <Image
             src={venueImage || '/placeholder-image.jpg'}
             alt={name || "Venue Image"}
             layout="fill"
             objectFit="cover"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            className="rounded-t-lg"
           />
-          </div>
       </div>
 
-      <div className="mx-2 mt-2 flex flex-col flex-grow">
+      <div className="p-3 sm:p-4 flex flex-col flex-grow">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-800 dark:text-white">{name}</h2>
-          <div>
+          <h2 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-white truncate">{name}</h2>
+          <div className="flex-shrink-0 ml-2">
             <span className="text-base text-yellow-400 ">★ </span>
             <span className="font-bold text-black dark:text-white">{rating}</span>
           </div>
         </div>
 
-        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{area}</p>
+        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 truncate">{area}</p>
 
-        <p className="text-xs text-gray-500 dark:text-gray-300 mt-1">{address}</p>
+        <p className="text-xs text-gray-500 dark:text-gray-300 mt-1 line-clamp-2">{address}</p>
 
-        <div className="">
+        <div className="mt-auto pt-3">
           <button
-            className="bg-gray-600 !text-white font-bold hover:bg-black text-sm py-1 px-1 w-full rounded my-3"
+            className="w-full bg-gray-600 !text-white font-bold hover:bg-black text-sm py-2 px-4 rounded transition-colors"
             onClick={handleViewVenue} // Add onClick handler
           >
             View Details

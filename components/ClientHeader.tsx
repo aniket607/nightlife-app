@@ -35,47 +35,47 @@ export default function ClientHeader({imageUrl, email}: {imageUrl: string | unde
 
     return (
         <header className="sticky top-0 z-50 bg-black text-gray-100">
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        <div className="bg-gradient-to-t from-[#151515] via-[#151817] to-[#181A1A] rounded-full px-6 py-2 border border-gray-700">
-            <div className="flex justify-between items-center">
-                <div className="flex items-center space-x-4">
-                    {!isOnDashboard && (
-                        <button 
-                        onClick={handleBack} 
-                        className={`p-2 rounded-full transition duration-300 focus:outline-none ${
-                            isOnDashboard 
-                            ? 'cursor-not-allowed' 
-                            : 'hover:bg-gray-800'
-                        }`}
-                        aria-label="Go back"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                        </svg>
-                    </button>
-                    )}
-                    <Link href="/organizer/">
-                        <span className="text-sm font-medium bg-gray-600/40 px-7 rounded-full py-3 font-poppins hover:bg-gray-600/20 hover:text-white/50 transition duration-300">
-                            Dashboard
-                        </span>
-                    </Link>
-                </div>
-                
-                <div className="flex items-center space-x-6">
-                    {imageUrl && (
-                        <Avatar className="h-8 w-8 ring-1 ring-gray-700">
-                            <AvatarImage src={imageUrl} alt={email || 'User'} />
-                            <AvatarFallback className="bg-gray-800 text-gray-200">
-                                {email ? email.charAt(0).toUpperCase() : "U"}
-                            </AvatarFallback>
-                        </Avatar>
-                    )}
-                    <SignoutButton />
+            <div className="max-w-6xl mx-auto px-2 sm:px-6 lg:px-8 py-2 sm:py-4">
+                <div className="bg-gradient-to-t from-[#151515] via-[#151817] to-[#181A1A] rounded-full px-3 sm:px-6 py-2 border border-gray-700">
+                    <div className="flex justify-between items-center">
+                        <div className="flex items-center space-x-2 sm:space-x-4">
+                            {!isOnDashboard && (
+                                <button 
+                                    onClick={handleBack} 
+                                    className={`p-1.5 sm:p-2 rounded-full transition duration-300 focus:outline-none ${
+                                        isOnDashboard 
+                                        ? 'cursor-not-allowed' 
+                                        : 'hover:bg-gray-800'
+                                    }`}
+                                    aria-label="Go back"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 sm:h-6 sm:w-6 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                                    </svg>
+                                </button>
+                            )}
+                            <Link href="/organizer/">
+                                <span className="text-xs sm:text-sm font-medium bg-gray-600/40 px-3 sm:px-7 rounded-full py-2 sm:py-3 font-poppins hover:bg-gray-600/20 hover:text-white/50 transition duration-300">
+                                    Dashboard
+                                </span>
+                            </Link>
+                        </div>
+                        
+                        <div className="flex items-center space-x-3 sm:space-x-6">
+                            {imageUrl && (
+                                <Avatar className="h-7 w-7 sm:h-8 sm:w-8 ring-1 ring-gray-700">
+                                    <AvatarImage src={imageUrl} alt={email || 'User'} />
+                                    <AvatarFallback className="bg-gray-800 text-gray-200 text-xs sm:text-sm">
+                                        {email ? email.charAt(0).toUpperCase() : "U"}
+                                    </AvatarFallback>
+                                </Avatar>
+                            )}
+                            <SignoutButton />
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-</header>
+        </header>
 
     );
 }
