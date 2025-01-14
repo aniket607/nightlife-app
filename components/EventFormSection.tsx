@@ -2,7 +2,7 @@
 
 import { useState, useTransition, FormEvent } from "react";
 import UploadForm from "@/components/UploadForm";
-import { putEventData } from "@/app/actions/putEventData"; // Action for submitting event data
+import { putEventData } from "@/actions/putEventData"; // Action for submitting event data
 import toast, { Toaster } from "react-hot-toast";
 import { ZodIssue } from "zod";
 import DatePicker from "react-datepicker"; // React Datepicker for date selection

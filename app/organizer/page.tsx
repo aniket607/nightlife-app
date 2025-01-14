@@ -1,9 +1,9 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
-import { checkUser } from "../actions/checkUser";
+import { checkUser } from "../../actions/checkUser";
 import AddVenueButton from "@/components/AddVenueButton";
 import VenueCardAdmin from "@/components/VenueCardAdmin";
-import { fetchVenues } from "../actions/fetchVenues";
+import { fetchVenues } from "../../actions/fetchVenues";
 
 export default async function Page() {
   const session = await auth();

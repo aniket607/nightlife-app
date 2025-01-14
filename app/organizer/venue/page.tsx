@@ -1,9 +1,9 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
-import { fetchVenueById } from "@/app/actions/fetchvenuedata";
+import { fetchVenueById } from "@/actions/fetchvenuedata";
 import VenuePageLeftSection from "@/components/VenuePageLeftSection";
 import VenuePageRightSection from "@/components/VenuePageRightSection";
-import { fetchEventByVenueId } from "@/app/actions/fetchEventData";
+import { fetchEventByVenueId } from "@/actions/fetchEventData";
 
 interface Event {
   eventId: number; // Assuming `Int` maps to `number`
