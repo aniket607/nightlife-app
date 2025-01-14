@@ -25,9 +25,9 @@ export default function VenuePageLeftSection({ venue }: { venue: Venue | null })
       ></div>
 
       {/* Content with relative positioning */}
-      <div className="relative z-10 flex-1 flex flex-col">
+      <div className="relative z-10">
         {/* Venue Image */}
-        <div className="w-full h-32 sm:h-48 md:h-60 rounded-md overflow-hidden relative">
+        <div className="w-full aspect-video sm:h-48 md:h-60 rounded-md overflow-hidden relative bg-gradient-to-br from-gray-800/80 via-gray-900/90 to-black before:absolute before:inset-0 before:bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1),transparent_70%)] before:opacity-50">
           <Image
             src={venue?.venueImgUrl || '/placeholder-image.jpg'}
             alt={venue?.venueName || "Venue Image"}

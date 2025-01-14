@@ -127,15 +127,17 @@ export default function VenuePageRightSection({
                         {/* Mobile: Side by side layout */}
                         <div className="flex flex-row sm:hidden flex-1">
                           {/* Event Image */}
-                          <div className="relative w-1/3 aspect-[3/4]">
+                          <div className="relative w-1/3 aspect-[3/4] bg-gradient-to-br from-gray-800/80 via-gray-900/90 to-black before:absolute before:inset-0 before:bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1),transparent_70%)] before:opacity-50">
                             <Image
                               src={event?.eventImgUrl || "/placeholder-image.jpg"}
-                              alt={event.eventName || "Event Image"}
+                              alt={event.eventName}
                               fill
-                              className="object-cover"
-                              sizes="(max-width: 640px) 33vw, 120px"
+                              sizes="(max-width: 768px) 33vw"
+                              className="object-cover transition-opacity duration-300"
+                              placeholder="blur"
+                              blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4eHRoaHSQtJSEkMjU1LC0yMi4xODY6Ojo4MS89PUFGRlJSUjI+SVlOUENOQ0pJUlL/2wBDAR0XFx0aHR4eHRoaHSQtJSEkMjU1LC0yMi4xODY6Ojo4MS89PUFGRlJSUjI+SVlOUENOQ0pJUlJSUlJSUlJSUlL/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+                              loading="lazy"
                             />
-                            <div className="absolute inset-0 bg-gradient-to-r from-transparent to-gray-900/10"></div>
                           </div>
 
                           {/* Event Info */}
@@ -173,15 +175,17 @@ export default function VenuePageRightSection({
                         {/* Desktop: Original layout */}
                         <div className="hidden sm:flex sm:flex-row flex-1">
                           {/* Event Image */}
-                          <div className="relative w-[120px] h-full">
+                          <div className="relative w-[120px] h-full bg-gradient-to-br from-gray-800/80 via-gray-900/90 to-black before:absolute before:inset-0 before:bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1),transparent_70%)] before:opacity-50">
                             <Image
                               src={event?.eventImgUrl || "/placeholder-image.jpg"}
-                              alt={event.eventName || "Event Image"}
+                              alt={event.eventName}
                               fill
-                              className="object-cover"
                               sizes="120px"
+                              className="object-cover transition-opacity duration-300"
+                              placeholder="blur"
+                              blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4eHRoaHSQtJSEkMjU1LC0yMi4xODY6Ojo4MS89PUFGRlJSUjI+SVlOUENOQ0pJUlL/2wBDAR0XFx0aHR4eHRoaHSQtJSEkMjU1LC0yMi4xODY6Ojo4MS89PUFGRlJSUjI+SVlOUENOQ0pJUlJSUlJSUlJSUlL/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+                              loading="lazy"
                             />
-                            <div className="absolute inset-0 bg-gradient-to-r from-transparent to-gray-900/10"></div>
                           </div>
 
                           {/* Event Info */}
@@ -303,15 +307,17 @@ export default function VenuePageRightSection({
                         {/* Mobile: Side by side layout */}
                         <div className="flex flex-row sm:hidden flex-1">
                           {/* Event Image */}
-                          <div className="relative w-1/3 aspect-[3/4]">
+                          <div className="relative w-1/3 aspect-[3/4] bg-gradient-to-br from-gray-800/80 via-gray-900/90 to-black before:absolute before:inset-0 before:bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1),transparent_70%)] before:opacity-50">
                             <Image
                               src={event?.eventImgUrl || "/placeholder-image.jpg"}
-                              alt={event.eventName || "Event Image"}
+                              alt={event.eventName}
                               fill
-                              className="object-cover"
-                              sizes="(max-width: 640px) 33vw, 120px"
+                              sizes="(max-width: 768px) 33vw"
+                              className="object-cover transition-opacity duration-300"
+                              placeholder="blur"
+                              blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4eHRoaHSQtJSEkMjU1LC0yMi4xODY6Ojo4MS89PUFGRlJSUjI+SVlOUENOQ0pJUlL/2wBDAR0XFx0aHR4eHRoaHSQtJSEkMjU1LC0yMi4xODY6Ojo4MS89PUFGRlJSUjI+SVlOUENOQ0pJUlJSUlJSUlJSUlL/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+                              loading="lazy"
                             />
-                            <div className="absolute inset-0 bg-gradient-to-r from-transparent to-gray-900/10"></div>
                           </div>
 
                           {/* Event Info */}
@@ -349,15 +355,17 @@ export default function VenuePageRightSection({
                         {/* Desktop: Original layout */}
                         <div className="hidden sm:flex sm:flex-row flex-1">
                           {/* Event Image */}
-                          <div className="relative w-[120px] h-full">
+                          <div className="relative w-[120px] h-full bg-gradient-to-br from-gray-800/80 via-gray-900/90 to-black before:absolute before:inset-0 before:bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1),transparent_70%)] before:opacity-50">
                             <Image
                               src={event?.eventImgUrl || "/placeholder-image.jpg"}
-                              alt={event.eventName || "Event Image"}
+                              alt={event.eventName}
                               fill
-                              className="object-cover"
                               sizes="120px"
+                              className="object-cover transition-opacity duration-300"
+                              placeholder="blur"
+                              blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4eHRoaHSQtJSEkMjU1LC0yMi4xODY6Ojo4MS89PUFGRlJSUjI+SVlOUENOQ0pJUlL/2wBDAR0XFx0aHR4eHRoaHSQtJSEkMjU1LC0yMi4xODY6Ojo4MS89PUFGRlJSUjI+SVlOUENOQ0pJUlJSUlJSUlJSUlL/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+                              loading="lazy"
                             />
-                            <div className="absolute inset-0 bg-gradient-to-r from-transparent to-gray-900/10"></div>
                           </div>
 
                           {/* Event Info */}
