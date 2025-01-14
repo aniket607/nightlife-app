@@ -22,7 +22,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ i
   const session = await auth();
 
   if (!session?.user) {
-    redirect("/organizer/login");
+    redirect("/login");
   }
 
   const { id: venueId } = await searchParams;

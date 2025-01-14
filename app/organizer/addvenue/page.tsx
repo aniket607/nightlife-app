@@ -5,7 +5,7 @@ import VenueFormSection from "@/components/VenueFormSection";
 export default async function Page() {
   const session = await auth();
   if (!session?.user) {
-    redirect("/organizer/login");
+    redirect("/login");
   }
 
   return (

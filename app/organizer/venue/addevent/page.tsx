@@ -6,7 +6,7 @@ import React from 'react'
 export default async function Page({ searchParams }: { searchParams: Promise<{ id: string }> }) {
   const session = await auth();
   if (!session?.user) {
-    redirect("/organizer/login");
+    redirect("/login");
   }
   const userId = session.user.id;
   const { id: venueId } = await searchParams;

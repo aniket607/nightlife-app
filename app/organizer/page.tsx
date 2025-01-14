@@ -8,7 +8,7 @@ import { fetchVenues } from "../../actions/fetchVenues";
 export default async function Page() {
   const session = await auth();
   if (!session?.user) {
-    redirect("/organizer/login");
+    redirect("/login");
   }
 
   const userId = session.user.id;

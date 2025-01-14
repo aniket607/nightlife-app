@@ -15,7 +15,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
 
   pages: {
-    signIn: "/organizer/login",
+    signIn: "/login",
   }
 })
 
