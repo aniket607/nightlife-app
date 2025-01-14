@@ -1,6 +1,7 @@
 "use client"
 import { useState, useRef } from "react";
 import { uploadFile } from "@/actions/uploadFile";
+import Image from "next/image";
 
 export default function UploadForm({ 
     setImageUrl, 
@@ -95,7 +96,14 @@ export default function UploadForm({
                 )}
                 {preview && !uploading && !uploadedImageUrl && (
                     <div className="relative">
-                        <img src={preview} alt="Preview" className="max-w-full max-h-48 mx-auto rounded" />
+                        <Image
+                            src={preview}
+                            alt="Preview"
+                            width={500}
+                            height={192}
+                            className="max-w-full max-h-48 mx-auto rounded"
+                            style={{ objectFit: 'contain' }}
+                        />
                         <button 
                             type="button" 
                             onClick={handleRemove} 
@@ -132,7 +140,14 @@ export default function UploadForm({
             {uploadedImageUrl && (
                 <div className="mt-4">
                     <p className="text-center font-semibold text-green-500">File uploaded successfully!</p>
-                    <img src={uploadedImageUrl} alt="Uploaded" className="max-w-full mt-2 rounded" />
+                    <Image
+                        src={uploadedImageUrl}
+                        alt="Uploaded"
+                        width={500}
+                        height={300}
+                        className="max-w-full mt-2 rounded"
+                        style={{ objectFit: 'contain' }}
+                    />
                 </div>
             )}
         </div>    
