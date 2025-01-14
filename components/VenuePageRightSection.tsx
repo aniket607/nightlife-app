@@ -8,6 +8,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import EventCardSkeleton from "./EventCardSkeleton";
+import AddEventButton from "./AddEventButton";
 import { useState, useEffect } from "react";
 
 interface Event {
@@ -45,25 +46,13 @@ export default function VenuePageRightSection({
     return () => clearTimeout(timer);
   }, []);
 
-  const handleAddEvent = () => {
-    if (venueId) {
-      // Redirect to /organizer/venue/addevent with the same 'id' param
-      window.location.href = `/organizer/venue/addevent?id=${venueId}`;
-    }
-  };
-
   return (
     <div className="w-full bg-transparent">
       <div className="flex w-full mb-4 sm:mb-6 justify-between items-center p-4 sm:p-6">
         <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold text-gray-200">
           Events
         </h2>
-        <button
-          className="bg-gray-700 text-gray-200 hover:bg-gray-600 px-3 sm:px-4 py-1.5 sm:py-2 rounded-md text-sm sm:text-base font-normal transition-colors"
-          onClick={handleAddEvent}
-        >
-          Add Event
-        </button>
+        <AddEventButton venueId={venueId} />
       </div>
 
       <div className="px-2 sm:px-4 md:px-6 space-y-4 sm:space-y-6">
@@ -261,12 +250,9 @@ export default function VenuePageRightSection({
                 ) : upcomingEvents.length === 0 ? (
                   <div className="text-center py-8">
                     <p className="text-gray-400">No upcoming events</p>
-                    <button
-                      onClick={handleAddEvent}
-                      className="mt-4 text-sm text-gray-400 hover:text-gray-300 transition-colors"
-                    >
-                      + Add an event
-                    </button>
+                    <div className="mt-4">
+                      <AddEventButton venueId={venueId} />
+                    </div>
                   </div>
                 ) : (
                   upcomingEvents.map((event: Event) => (

@@ -71,10 +71,12 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ i
 
       {/* Desktop View */}
       <div className="hidden md:grid md:grid-cols-[400px_1fr] min-h-screen">
-        <div className="h-full bg-secondary">
-          <VenuePageLeftSection venue={venue} />
+        <div className="sticky top-[72px] h-fit bg-secondary">
+          <div className="h-[calc(100vh-72px)]">
+            <VenuePageLeftSection venue={venue} />
+          </div>
         </div>
-        <div className="min-h-screen">
+        <div className="min-h-screen overflow-y-auto">
           <VenuePageRightSection
             venueId={venueId}
             pastEvents={pastEvents}

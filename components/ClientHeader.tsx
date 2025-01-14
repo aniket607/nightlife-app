@@ -50,8 +50,10 @@ export default function ClientHeader({imageUrl, email}: {imageUrl: string | unde
 
     return (
         <header className="sticky top-0 z-50 bg-transparent text-gray-100">
-            <div className="max-w-6xl mx-auto px-2 sm:px-6 lg:px-8 py-2 sm:py-4">
-                <div className="bg-gradient-to-t from-[#151515] via-[#151817] to-[#181A1A] rounded-full px-3 sm:px-6 py-2 border border-gray-700">
+            <div className="max-w-3xl mx-auto px-2 sm:px-6 lg:px-8 py-2 sm:py-4">
+                <div className="bg-[linear-gradient(110deg,rgba(0,0,0,0.9)_0%,rgba(20,20,20,0.95)_50%,rgba(0,0,0,0.9)_100%)] rounded-full px-1 sm:px-6 py-2 border border-gray-800/40 relative">
+                    {/* Subtle texture overlay */}
+                    <div className="absolute inset-0 rounded-full opacity-[0.03] pointer-events-none bg-[radial-gradient(circle_at_center,_white_0%,_transparent_70%)]" />
                     <div className="flex justify-between items-center">
                         <div className="flex items-center space-x-2 sm:space-x-4">
                             {!isOnDashboard && (

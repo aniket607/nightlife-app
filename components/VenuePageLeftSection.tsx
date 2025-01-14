@@ -15,7 +15,7 @@ interface Venue {
 
 export default function VenuePageLeftSection({ venue }: { venue: Venue | null }) {
   return (
-    <div className="w-full h-full bg-gradient-to-r from-gray-900/90 via-gray-800/90 to-gray-900/90 p-4 sm:p-6 md:p-8 border-b md:border-b-0 md:border-r border-gray-700/50 relative">
+    <div className="w-full h-full bg-gradient-to-r from-gray-900/90 via-gray-800/90 to-gray-900/90 p-4 sm:p-6 md:p-8 border-b md:border-b-0 md:border-r border-gray-700/50 relative flex flex-col">
       
       {/* Decorative Pattern */}
       <div className="absolute inset-0 opacity-5 pointer-events-none" 
@@ -25,7 +25,7 @@ export default function VenuePageLeftSection({ venue }: { venue: Venue | null })
       ></div>
 
       {/* Content with relative positioning */}
-      <div className="relative z-10">
+      <div className="relative z-10 flex-1 flex flex-col">
         {/* Venue Image */}
         <div className="w-full h-32 sm:h-48 md:h-60 rounded-md overflow-hidden relative">
           <Image
@@ -38,7 +38,7 @@ export default function VenuePageLeftSection({ venue }: { venue: Venue | null })
         </div>
 
         {/* Venue Info */}
-        <div className="mt-4">
+        <div className="mt-4 flex-1">
           <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold text-gray-200">
             {venue?.venueName || "Venue Name"}
           </h1>
