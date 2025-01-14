@@ -3,7 +3,8 @@ import { redirect } from "next/navigation";
 import { fetchVenueById } from "@/actions/fetchvenuedata";
 import VenuePageLeftSection from "@/components/VenuePageLeftSection";
 import VenuePageRightSection from "@/components/VenuePageRightSection";
-import { fetchEventByVenueId } from "@/actions/fetchEventData";
+import { fetchUpcomingEventByVenueId } from "@/actions/fetchUpcomingEventData";
+import { fetchPastEventByVenueId } from "@/actions/fetchPastEventData";
 
 interface Event {
   eventId: number; // Assuming `Int` maps to `number`
@@ -36,11 +37,20 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ i
     // Handle error
   }
 
-  let events: Event[] = [];
+  let upcomingEvents: Event[] = [];
   try {
-    const response = await fetchEventByVenueId(venueId);
-    events = response || []
-    console.log(events)
+    const response = await fetchUpcomingEventByVenueId(venueId);
+    upcomingEvents = response || []
+    console.log(upcomingEvents)
+  } catch (error) {
+    // Handle error
+  }
+  
+  let pastEvents: Event[] = [];
+  try {
+    const response = await fetchUpcomingEventByVenueId(venueId);
+    pastEvents = response || []
+    console.log(pastEvents)
   } catch (error) {
     // Handle error
   }
@@ -53,7 +63,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ i
           <VenuePageLeftSection venue={venue} />
         </div>
         <div className="w-full">
-          <VenuePageRightSection events={events} venueId={venueId} />
+          <VenuePageRightSection  pastEvents={pastEvents} upcomingEvents={upcomingEvents} venueId={venueId} />
         </div>
       </div>
 
@@ -66,7 +76,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ i
           {/* Spacer div to match fixed left section */}
         </div>
         <div className="w-2/3 overflow-y-auto">
-          <VenuePageRightSection events={events} venueId={venueId} />
+          <VenuePageRightSection pastEvents={pastEvents} upcomingEvents={upcomingEvents} venueId={venueId} />
         </div>
       </div>
     </div>
