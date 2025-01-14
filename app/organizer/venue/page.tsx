@@ -48,7 +48,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ i
   
   let pastEvents: Event[] = [];
   try {
-    const response = await fetchUpcomingEventByVenueId(venueId);
+    const response = await fetchPastEventByVenueId(venueId);
     pastEvents = response || []
     console.log(pastEvents)
   } catch (error) {
