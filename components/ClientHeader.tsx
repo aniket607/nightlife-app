@@ -113,7 +113,7 @@ export default function ClientHeader({imageUrl, email}: {imageUrl: string | unde
                                 {/* Mobile Dropdown */}
                                 {isDropdownOpen && (
                                     <div className="absolute right-0 mt-2 w-48 md:hidden bg-gray-800/95 backdrop-blur-sm rounded-lg shadow-lg transform origin-top-right transition-all duration-200 ease-out border border-gray-700/50">
-                                        <div className="py-2 px-1">
+                                        <div className="py-2 px-1 space-y-1">
                                             <Link href="/organizer/myevents">
                                                 <div className="block px-4 py-2 text-sm text-gray-200 rounded-lg transition-colors bg-white/5 border border-gray-600/30 mx-1 hover:bg-white/10">
                                                     <div className="flex items-center space-x-2">
@@ -124,7 +124,7 @@ export default function ClientHeader({imageUrl, email}: {imageUrl: string | unde
                                                     </div>
                                                 </div>
                                             </Link>
-                                            <div className="mt-1 px-1">
+                                            <div className="mx-1">
                                                 <SignoutButton />
                                             </div>
                                         </div>
