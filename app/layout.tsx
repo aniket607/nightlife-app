@@ -3,12 +3,11 @@ import { Poppins } from 'next/font/google';
 import "./globals.css";
 import Header from "@/components/Header";
 
-export const poppins = Poppins({
+const poppins = Poppins({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700'],
   variable: '--font-poppins',
 });
-
 
 export const metadata: Metadata = {
   title: "Create Next App",
