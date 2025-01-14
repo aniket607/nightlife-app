@@ -34,10 +34,9 @@ const VenueCardAdmin: React.FC<VenueCardAdminProps> = ({
          <Image
             src={venueImage || '/placeholder-image.jpg'}
             alt={name || "Venue Image"}
-            layout="fill"
-            objectFit="cover"
+            fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            className="rounded-t-lg"
+            className="rounded-t-lg object-cover"
           />
       </div>
 

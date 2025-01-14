@@ -68,12 +68,11 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ i
       </div>
 
       {/* Desktop View */}
-      <div className="hidden md:flex">
-        <div className="w-1/3 fixed top-[64px] bottom-0">
-          <VenuePageLeftSection venue={venue} />
-        </div>
-        <div className="w-1/3">
-          {/* Spacer div to match fixed left section */}
+      <div className="hidden md:flex h-[calc(100vh-64px)]">
+        <div className="w-1/3 h-full">
+          <div className="fixed w-1/3 h-[calc(100vh-64px)]">
+            <VenuePageLeftSection venue={venue} />
+          </div>
         </div>
         <div className="w-2/3 overflow-y-auto">
           <VenuePageRightSection pastEvents={pastEvents} upcomingEvents={upcomingEvents} venueId={venueId} />
