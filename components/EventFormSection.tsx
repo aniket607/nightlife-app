@@ -35,7 +35,12 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({ userId, venueId }) 
     }
 
     const formData = new FormData(event.currentTarget);
-    formData.append("eventDate", eventDate.toISOString().split("T")[0]); // Add formatted date
+    
+    // Format date as YYYY-MM-DD using local time
+    const year = eventDate.getFullYear();
+    const month = (eventDate.getMonth() + 1).toString().padStart(2, '0');
+    const day = eventDate.getDate().toString().padStart(2, '0');
+    formData.append("eventDate", `${year}-${month}-${day}`);
     
     // Format time as HH:mm
     const hours = eventTime.getHours().toString().padStart(2, '0');

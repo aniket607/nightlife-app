@@ -21,7 +21,6 @@ const start = startOfDay(now); // Normalize to start of the day
 
     // If no events are found, return an empty array or handle it as needed
     if (!events || events.length === 0) {
-      console.warn(`No upcoming events found for venue with id ${id}.`);
       return [];
     }
 

@@ -1,8 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
 import {
   Accordion,
   AccordionContent,
@@ -15,7 +13,7 @@ interface Event {
   eventName: string;
   eventDescription?: string | null; // Optional field
   eventDate: Date; // Maps to `DateTime`
-  eventTime: Date; // `DateTime @db.Time` also maps to `Date`
+  eventTime: Date; // Keep as Date since it comes from database as Date
   glCount: number;
   eventImgUrl?: string | null; // Optional field
   venueId: string;
@@ -34,174 +32,300 @@ export default function VenuePageRightSection({
   pastEvents,
   venueId,
 }: VenuePageRightSectionProps) {
-  const [selectedImage, setSelectedImage] = useState<string | null>();
-  const router = useRouter();
-
-  const handleImageClick = (image: string | null) => {
-    setSelectedImage(image);
-  };
-
-  const closePopup = () => {
-    setSelectedImage(null);
-  };
   const handleAddEvent = () => {
     if (venueId) {
       // Redirect to /organizer/venue/addevent with the same 'id' param
-      router.push(
-        `/organizer/venue/addevent?id=${encodeURIComponent(venueId)}`
-      );
+      window.location.href = `/organizer/venue/addevent?id=${venueId}`;
     }
   };
 
   return (
-    <div className="p-4 sm:p-6 md:p-10">
-      <div className="flex w-full mb-4 justify-between items-center px-2 sm:px-4 md:px-8">
-        <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-gray-800">
+    <div className="w-full bg-transparent">
+      <div className="flex w-full mb-4 sm:mb-6 justify-between items-center p-4 sm:p-6">
+        <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold text-gray-200">
           Events
         </h2>
         <button
-          className="bg-gray-600 text-white hover:bg-black px-3 sm:px-4 py-1.5 sm:py-2 rounded-md text-sm sm:text-base font-normal transition-colors"
+          className="bg-gray-700 text-gray-200 hover:bg-gray-600 px-3 sm:px-4 py-1.5 sm:py-2 rounded-md text-sm sm:text-base font-normal transition-colors"
           onClick={handleAddEvent}
         >
           Add Event
         </button>
       </div>
 
-      <Accordion type="single" collapsible>
-        <AccordionItem value="item-1">
-          <AccordionTrigger>PAST</AccordionTrigger>
-          <AccordionContent>
-            <div className="grid grid-cols-1 gap-4 px-2 sm:px-4 md:px-8">
-              {pastEvents.map((event: Event) => (
-                <div
-                  key={event?.eventId}
-                  className="flex flex-col sm:flex-row bg-purple-50 rounded-md shadow-md w-full sm:h-60"
-                >
-                  {/* Event Image */}
-                  <div className="w-full sm:w-1/3 h-48 sm:h-full rounded-t-md sm:rounded-l-md sm:rounded-t-none overflow-hidden relative">
-                    <Image
-                      src={event?.eventImgUrl || "/placeholder-image.jpg"}
-                      alt={event.eventName || "Event Image"}
-                      fill
-                      className="object-cover cursor-pointer rounded"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      onClick={() =>
-                        handleImageClick(event?.eventImgUrl || null)
-                      }
-                    />
+      <div className="px-2 sm:px-4 md:px-6 space-y-4 sm:space-y-6">
+        {/* Past Events */}
+        <Accordion type="single" collapsible className="bg-gray-800/50 rounded-lg px-4">
+          <AccordionItem value="item-1" className="border-gray-700">
+            <AccordionTrigger className="hover:no-underline group/title">
+              <div className="flex items-center space-x-3">
+                <span className="text-2xl font-bold bg-gradient-to-r from-gray-200 to-gray-400 bg-clip-text text-transparent group-hover/title:from-white group-hover/title:to-gray-300 transition-all">
+                  PAST
+                </span>
+                <div className="h-px flex-1 bg-gradient-to-r from-gray-700 to-transparent"></div>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent>
+              <div className="grid grid-cols-1 gap-4">
+                {pastEvents.length === 0 ? (
+                  <div className="text-center py-8">
+                    <p className="text-gray-400">No past events</p>
                   </div>
+                ) : (
+                  pastEvents.map((event: Event) => (
+                    <div
+                      key={event?.eventId}
+                      className="flex flex-col sm:flex-row bg-gradient-to-r from-gray-900/90 via-gray-800/90 to-gray-900/90 rounded-lg shadow-lg w-full overflow-hidden hover:shadow-xl transition-all sm:h-[200px] relative group"
+                    >
+                      {/* Decorative Pattern */}
+                      <div className="absolute inset-0 opacity-5 pointer-events-none" 
+                           style={{
+                             backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+                           }}
+                      ></div>
 
-                  {/* Event Info */}
-                  <div className="flex flex-col items-start p-4 w-full sm:w-2/3">
-                    <h3 className="text-xl sm:text-2xl md:text-3xl font-semibold text-gray-800 truncate w-full">
-                      {event.eventName}
-                    </h3>
-                    <p className="text-sm sm:text-base text-gray-600 mt-1">
-                      {event.eventDate.toISOString().split("T")[0]}
-                    </p>
-                    <p className="text-sm sm:text-base text-gray-600 mt-1">
-                      {/* Format and display event time */}
-                      {(() => {
-                        const date = new Date(event.eventTime);
-                        let hours = date.getHours();
-                        const minutes = date
-                          .getMinutes()
-                          .toString()
-                          .padStart(2, "0");
-                        const amPm = hours >= 12 ? "PM" : "AM";
-                        hours = hours % 12 || 12; // Convert to 12-hour format
-                        return `${hours}:${minutes} ${amPm}`;
-                      })()}
-                    </p>
-                    <p className="text-sm w-full sm:w-[80%] text-gray-600 mt-2 line-clamp-3">
-                      {event.eventDescription}
-                    </p>
+                      {/* Date and Time Section */}
+                      <div className="flex flex-row sm:flex-col items-center justify-between sm:justify-center p-4 sm:min-w-[100px] border-b sm:border-b-0 sm:border-r border-gray-700/50 bg-gray-900/50 relative z-10 backdrop-blur-sm">
+                        <div className="flex items-center sm:flex-col sm:items-center">
+                          <span className="text-gray-400 text-sm font-medium uppercase mr-2 sm:mr-0">
+                            {new Date(event.eventDate).toLocaleDateString('en-US', {
+                              month: 'short'
+                            })}
+                          </span>
+                          <span className="text-gray-200 text-2xl sm:text-3xl font-bold sm:mt-1">
+                            {new Date(event.eventDate).getDate()}
+                          </span>
+                        </div>
+                        <span className="text-gray-400 text-base sm:text-lg font-medium sm:mt-2">
+                          {(() => {
+                            const hours = event.eventTime.getUTCHours();
+                            const minutes = event.eventTime.getUTCMinutes().toString().padStart(2, '0');
+                            const amPm = hours >= 12 ? 'PM' : 'AM';
+                            const hours12 = hours % 12 || 12;
+                            return `${hours12}:${minutes} ${amPm}`;
+                          })()}
+                        </span>
+                      </div>
+
+                      {/* Content Section */}
+                      <div className="flex sm:flex-row flex-1">
+                        {/* Mobile: Side by side layout */}
+                        <div className="flex flex-row sm:hidden flex-1">
+                          {/* Event Image */}
+                          <div className="relative w-1/3 aspect-[3/4]">
+                            <Image
+                              src={event?.eventImgUrl || "/placeholder-image.jpg"}
+                              alt={event.eventName || "Event Image"}
+                              fill
+                              className="object-cover"
+                              sizes="(max-width: 640px) 33vw, 120px"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-r from-transparent to-gray-900/10"></div>
+                          </div>
+
+                          {/* Event Info */}
+                          <div className="flex flex-col p-4 flex-1">
+                            <h3 className="text-lg font-semibold text-gray-200 truncate">
+                              {event.eventName}
+                            </h3>
+                            <p className="text-sm text-gray-400 mt-2 line-clamp-3">
+                              {event.eventDescription}
+                            </p>
+                            <div className="mt-auto pt-2">
+                              <div className="inline-flex items-center px-2.5 py-1 rounded-full bg-gray-700/50 border border-gray-600/50 backdrop-blur-sm">
+                                <svg className="w-4 h-4 mr-1.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                                <span className="text-sm font-medium text-gray-300">
+                                  {event.glCount} slots available
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Desktop: Original layout */}
+                        <div className="hidden sm:flex sm:flex-row flex-1">
+                          {/* Event Image */}
+                          <div className="relative w-[120px] h-full">
+                            <Image
+                              src={event?.eventImgUrl || "/placeholder-image.jpg"}
+                              alt={event.eventName || "Event Image"}
+                              fill
+                              className="object-cover"
+                              sizes="120px"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-r from-transparent to-gray-900/10"></div>
+                          </div>
+
+                          {/* Event Info */}
+                          <div className="flex flex-col p-4 flex-1">
+                            <h3 className="text-xl font-semibold text-gray-200 truncate">
+                              {event.eventName}
+                            </h3>
+                            <p className="text-sm text-gray-400 mt-2 line-clamp-4">
+                              {event.eventDescription}
+                            </p>
+                            <div className="mt-auto pt-2">
+                              <div className="inline-flex items-center px-2.5 py-1 rounded-full bg-gray-700/50 border border-gray-600/50 backdrop-blur-sm">
+                                <svg className="w-4 h-4 mr-1.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                                <span className="text-sm font-medium text-gray-300">
+                                  {event.glCount} slots available
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+
+        {/* Upcoming Events */}
+        <Accordion type="single" collapsible defaultValue="item-1" className="bg-gray-800/50 rounded-lg px-4 mb-6">
+          <AccordionItem value="item-1" className="border-gray-700">
+            <AccordionTrigger className="hover:no-underline group/title">
+              <div className="flex items-center space-x-3">
+                <span className="text-2xl font-bold bg-gradient-to-r from-gray-200 to-gray-400 bg-clip-text text-transparent group-hover/title:from-white group-hover/title:to-gray-300 transition-all">
+                  UPCOMING
+                </span>
+                <div className="h-px flex-1 bg-gradient-to-r from-gray-700 to-transparent"></div>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent>
+              <div className="grid grid-cols-1 gap-4">
+                {upcomingEvents.length === 0 ? (
+                  <div className="text-center py-8">
+                    <p className="text-gray-400">No upcoming events</p>
+                    <button
+                      onClick={handleAddEvent}
+                      className="mt-4 text-sm text-gray-400 hover:text-gray-300 transition-colors"
+                    >
+                      + Add an event
+                    </button>
                   </div>
-                </div>
-              ))}
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
+                ) : (
+                  upcomingEvents.map((event: Event) => (
+                    <div
+                      key={event?.eventId}
+                      className="flex flex-col sm:flex-row bg-gradient-to-r from-gray-900/90 via-gray-800/90 to-gray-900/90 rounded-lg shadow-lg w-full overflow-hidden hover:shadow-xl transition-all sm:h-[200px] relative group"
+                    >
+                      {/* Decorative Pattern */}
+                      <div className="absolute inset-0 opacity-5 pointer-events-none" 
+                           style={{
+                             backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+                           }}
+                      ></div>
 
-      <Accordion type="single" collapsible defaultValue="item-1">
-        <AccordionItem value="item-1">
-          <AccordionTrigger>UPCOMING</AccordionTrigger>
-          <AccordionContent>
-            <div className="grid grid-cols-1 gap-4 px-2 sm:px-4 md:px-8">
-              {upcomingEvents.map((event: Event) => (
-                <div
-                  key={event?.eventId}
-                  className="flex flex-col sm:flex-row bg-purple-50 rounded-md shadow-md w-full sm:h-60"
-                >
-                  {/* Event Image */}
-                  <div className="w-full sm:w-1/3 h-48 sm:h-full rounded-t-md sm:rounded-l-md sm:rounded-t-none overflow-hidden relative">
-                    <Image
-                      src={event?.eventImgUrl || "/placeholder-image.jpg"}
-                      alt={event.eventName || "Event Image"}
-                      fill
-                      className="object-cover cursor-pointer rounded"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      onClick={() =>
-                        handleImageClick(event?.eventImgUrl || null)
-                      }
-                    />
-                  </div>
+                      {/* Date and Time Section */}
+                      <div className="flex flex-row sm:flex-col items-center justify-between sm:justify-center p-4 sm:min-w-[100px] border-b sm:border-b-0 sm:border-r border-gray-700/50 bg-gray-900/50 relative z-10 backdrop-blur-sm">
+                        <div className="flex items-center sm:flex-col sm:items-center">
+                          <span className="text-gray-400 text-sm font-medium uppercase mr-2 sm:mr-0">
+                            {new Date(event.eventDate).toLocaleDateString('en-US', {
+                              month: 'short'
+                            })}
+                          </span>
+                          <span className="text-gray-200 text-2xl sm:text-3xl font-bold sm:mt-1">
+                            {new Date(event.eventDate).getDate()}
+                          </span>
+                        </div>
+                        <span className="text-gray-400 text-base sm:text-lg font-medium sm:mt-2">
+                          {(() => {
+                            const hours = event.eventTime.getUTCHours();
+                            const minutes = event.eventTime.getUTCMinutes().toString().padStart(2, '0');
+                            const amPm = hours >= 12 ? 'PM' : 'AM';
+                            const hours12 = hours % 12 || 12;
+                            return `${hours12}:${minutes} ${amPm}`;
+                          })()}
+                        </span>
+                      </div>
 
-                  {/* Event Info */}
-                  <div className="flex flex-col items-start p-4 w-full sm:w-2/3">
-                    <h3 className="text-xl sm:text-2xl md:text-3xl font-semibold text-gray-800 truncate w-full">
-                      {event.eventName}
-                    </h3>
-                    <p className="text-sm sm:text-base text-gray-600 mt-1">
-                      {event.eventDate.toISOString().split("T")[0]}
-                    </p>
-                    <p className="text-sm sm:text-base text-gray-600 mt-1">
-                      {/* Format and display event time */}
-                      {(() => {
-                        const date = new Date(event.eventTime);
-                        let hours = date.getHours();
-                        const minutes = date
-                          .getMinutes()
-                          .toString()
-                          .padStart(2, "0");
-                        const amPm = hours >= 12 ? "PM" : "AM";
-                        hours = hours % 12 || 12; // Convert to 12-hour format
-                        return `${hours}:${minutes} ${amPm}`;
-                      })()}
-                    </p>
-                    <p className="text-sm w-full sm:w-[80%] text-gray-600 mt-2 line-clamp-3">
-                      {event.eventDescription}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
+                      {/* Content Section */}
+                      <div className="flex sm:flex-row flex-1">
+                        {/* Mobile: Side by side layout */}
+                        <div className="flex flex-row sm:hidden flex-1">
+                          {/* Event Image */}
+                          <div className="relative w-1/3 aspect-[3/4]">
+                            <Image
+                              src={event?.eventImgUrl || "/placeholder-image.jpg"}
+                              alt={event.eventName || "Event Image"}
+                              fill
+                              className="object-cover"
+                              sizes="(max-width: 640px) 33vw, 120px"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-r from-transparent to-gray-900/10"></div>
+                          </div>
 
-      {selectedImage && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="relative bg-white rounded-lg overflow-hidden w-full max-w-lg aspect-square">
-            <button
-              className="absolute top-2 right-2 text-gray-800 bg-gray-200 hover:bg-gray-300 rounded-full p-2 z-10"
-              onClick={closePopup}
-            >
-              ✕
-            </button>
-            <div className="relative w-full h-full">
-              <Image
-                src={selectedImage}
-                alt="Popup"
-                fill
-                className="object-contain"
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              />
-            </div>
-          </div>
-        </div>
-      )}
+                          {/* Event Info */}
+                          <div className="flex flex-col p-4 flex-1">
+                            <h3 className="text-lg font-semibold text-gray-200 truncate">
+                              {event.eventName}
+                            </h3>
+                            <p className="text-sm text-gray-400 mt-2 line-clamp-3">
+                              {event.eventDescription}
+                            </p>
+                            <div className="mt-auto pt-2">
+                              <div className="inline-flex items-center px-2.5 py-1 rounded-full bg-gray-700/50 border border-gray-600/50 backdrop-blur-sm">
+                                <svg className="w-4 h-4 mr-1.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                                <span className="text-sm font-medium text-gray-300">
+                                  {event.glCount} slots available
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Desktop: Original layout */}
+                        <div className="hidden sm:flex sm:flex-row flex-1">
+                          {/* Event Image */}
+                          <div className="relative w-[120px] h-full">
+                            <Image
+                              src={event?.eventImgUrl || "/placeholder-image.jpg"}
+                              alt={event.eventName || "Event Image"}
+                              fill
+                              className="object-cover"
+                              sizes="120px"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-r from-transparent to-gray-900/10"></div>
+                          </div>
+
+                          {/* Event Info */}
+                          <div className="flex flex-col p-4 flex-1">
+                            <h3 className="text-xl font-semibold text-gray-200 truncate">
+                              {event.eventName}
+                            </h3>
+                            <p className="text-sm text-gray-400 mt-2 line-clamp-4">
+                              {event.eventDescription}
+                            </p>
+                            <div className="mt-auto pt-2">
+                              <div className="inline-flex items-center px-2.5 py-1 rounded-full bg-gray-700/50 border border-gray-600/50 backdrop-blur-sm">
+                                <svg className="w-4 h-4 mr-1.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                                <span className="text-sm font-medium text-gray-300">
+                                  {event.glCount} slots available
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      </div>
     </div>
   );
 }

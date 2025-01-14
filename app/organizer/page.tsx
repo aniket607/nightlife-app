@@ -18,7 +18,7 @@ export default async function Page() {
   const myVenues = venueData.filter(venue => venue.userId === userId);
 
   return (
-    <div className="min-h-screen bg-gray-300 dark:bg-primary py-4 sm:py-8">
+    <div className="min-h-screen bg-gray-300 dark:bg-secondary py-4 sm:py-8">
       <div className="max-w-6xl mx-auto px-3 sm:px-6 lg:px-8">
         <div className="bg-white dark:bg-secondary rounded-lg shadow-md overflow-hidden">
           <div className="p-4 sm:p-6">

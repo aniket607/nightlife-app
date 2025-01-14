@@ -41,7 +41,6 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ i
   try {
     const response = await fetchUpcomingEventByVenueId(venueId);
     upcomingEvents = response || []
-    console.log(upcomingEvents)
   } catch (error) {
     // Handle error
   }
@@ -50,7 +49,6 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ i
   try {
     const response = await fetchPastEventByVenueId(venueId);
     pastEvents = response || []
-    console.log(pastEvents)
   } catch (error) {
     // Handle error
   }
@@ -58,24 +56,30 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ i
   return (
     <div className="min-h-screen bg-secondary">
       {/* Mobile View */}
-      <div className="md:hidden">
-        <div className="w-full">
+      <div className="block md:hidden">
+        <div className="bg-secondary">
           <VenuePageLeftSection venue={venue} />
         </div>
-        <div className="w-full">
-          <VenuePageRightSection  pastEvents={pastEvents} upcomingEvents={upcomingEvents} venueId={venueId} />
+        <div>
+          <VenuePageRightSection
+            venueId={venueId}
+            pastEvents={pastEvents}
+            upcomingEvents={upcomingEvents}
+          />
         </div>
       </div>
 
       {/* Desktop View */}
-      <div className="hidden md:flex h-[calc(100vh-64px)]">
-        <div className="w-1/3 h-full">
-          <div className="fixed w-1/3 h-[calc(100vh-64px)]">
-            <VenuePageLeftSection venue={venue} />
-          </div>
+      <div className="hidden md:grid md:grid-cols-[400px_1fr] min-h-screen">
+        <div className="h-full bg-secondary">
+          <VenuePageLeftSection venue={venue} />
         </div>
-        <div className="w-2/3 overflow-y-auto">
-          <VenuePageRightSection pastEvents={pastEvents} upcomingEvents={upcomingEvents} venueId={venueId} />
+        <div className="min-h-screen">
+          <VenuePageRightSection
+            venueId={venueId}
+            pastEvents={pastEvents}
+            upcomingEvents={upcomingEvents}
+          />
         </div>
       </div>
     </div>
