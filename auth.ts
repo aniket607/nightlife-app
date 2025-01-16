@@ -13,16 +13,20 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return true
     },
     redirect({ url, baseUrl }) {
-      // If the url is relative, prefix it with the base url
+      // Force clean redirect to dashboard for Configuration error
+      if (url.includes('error=Configuration')) {
+        return `${baseUrl}/organizer#` 
+      }
+      
+      // For all other cases, maintain the URL structure
       if (url.startsWith('/')) return `${baseUrl}${url}`
-      // If the url is absolute but on the same host, return it
-      else if (new URL(url).origin === baseUrl) return url
-      // Default to the organizer dashboard
+      if (new URL(url).origin === baseUrl) return url
       return `${baseUrl}/organizer`
     }
   },
 
   pages: {
     signIn: "/login",
+    error: '/organizer'
   }
 })

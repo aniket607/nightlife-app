@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import AddVenueButton from "@/components/AddVenueButton";
 import VenueCardAdmin from "@/components/VenueCardAdmin";
 import { SearchVenue } from "@/components/SearchVenue";
+import { useSearchParams, useRouter } from 'next/navigation';
 
 interface Venue {
   id: string;
@@ -22,6 +23,15 @@ interface OrganizerPageProps {
 }
 
 export default function OrganizerPage({ initialVenues, myVenues, hasAccess }: OrganizerPageProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    // Clean up error parameter from URL if it exists
+    if (searchParams.get('error')) {
+      router.replace('/organizer');
+    }
+  }, [searchParams, router]);
   const [searchParam, setSearchParam] = useState("");
   const searchVenue = searchParam.trim().length > 0
     ? initialVenues.filter(venue => venue.venueName.toLowerCase().includes(searchParam.toLowerCase()))
