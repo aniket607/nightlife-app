@@ -1,10 +1,14 @@
 "use server";
 import prisma from "@/lib/prisma"; // Adjust to your project structure
 import { startOfDay } from "date-fns";
+import { Event, Venue } from "@prisma/client";
 
+interface EventWithVenue extends Event {
+  venue: Venue;
+}
 interface EventsResult {
-  upcomingEvents: any[];
-  pastEvents: any[];
+  upcomingEvents: EventWithVenue[];
+  pastEvents: EventWithVenue[];
 }
 
 export async function fetchMyEvents(userId: string): Promise<EventsResult> {
@@ -26,7 +30,7 @@ export async function fetchMyEvents(userId: string): Promise<EventsResult> {
     });
 
     // Split events into upcoming and past arrays
-    const { upcomingEvents, pastEvents } = events.reduce((acc, event) => {
+    const { upcomingEvents, pastEvents } = events.reduce<EventsResult>((acc, event) => {
       if (new Date(event.eventDate) > start) {
         acc.upcomingEvents.push(event);
       } else {
@@ -34,7 +38,7 @@ export async function fetchMyEvents(userId: string): Promise<EventsResult> {
       }
       return acc;
     }, { upcomingEvents: [], pastEvents: [] } as EventsResult);
-
+    console.log(upcomingEvents, pastEvents);
     return { upcomingEvents, pastEvents };
   } catch (error) {
     console.error("[fetchMyEvents] Error fetching events:", error);
