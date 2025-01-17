@@ -20,7 +20,7 @@ async function page() {
         My Events
       </h1>
       <div className="grid grid-cols-1 gap-4 border rounded p-5 m-5">
-        {myEvents.map((event: Event) => (
+        {myEvents.pastEvents.map((event: Event) => (
           <div
             key={event?.eventId}
             className="flex flex-col sm:flex-row bg-gradient-to-r from-gray-900/90 via-gray-800/90 to-gray-900/90 rounded-lg shadow-lg w-full overflow-hidden hover:shadow-xl transition-all h-auto relative group"
