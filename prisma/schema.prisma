@@ -84,7 +84,7 @@ model Event {
   createdAt      DateTime @default(now())
   venue            Venue      @relation(fields: [venueId], references: [id])
   user             User       @relation(fields: [userId], references: [id]) // Added this line
-  guestlist        Guestlist?
+  guestlist        Guestlist[]
 }
 
 model Guestlist {
@@ -93,6 +93,6 @@ model Guestlist {
   guestAge    Int
   guestMobile BigInt
   guestEmail  String
-  eventId     Int    @unique
+  eventId     Int    
   event       Event  @relation(fields: [eventId], references: [eventId])
 }
