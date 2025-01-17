@@ -11,7 +11,7 @@ import EventCardSkeleton from "./EventCardSkeleton";
 import AddEventButton from "./AddEventButton";
 import { useState, useEffect } from "react";
 
-interface Event {
+export interface Event {
   eventId: number; // Assuming `Int` maps to `number`
   eventName: string;
   eventDescription?: string | null; // Optional field
