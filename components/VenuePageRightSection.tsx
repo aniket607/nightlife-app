@@ -232,10 +232,10 @@ export default function VenuePageRightSection({
         <Accordion
           type="single"
           collapsible
-          defaultValue="item-1"
+          defaultValue="upcoming"
           className="bg-gray-800/50 rounded-lg px-4 mb-6"
         >
-          <AccordionItem value="item-1" className="border-gray-700">
+          <AccordionItem value="upcoming" className="border-gray-700">
             <AccordionTrigger className="hover:no-underline group/title">
               <div className="flex items-center space-x-3">
                 <span className="text-2xl font-bold bg-gradient-to-r from-gray-200 to-gray-400 bg-clip-text text-transparent group-hover/title:from-white group-hover/title:to-gray-300 transition-all">

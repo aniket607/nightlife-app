@@ -1,6 +1,9 @@
-"use client";
-import React, { useState, useEffect } from "react";
+'use client';
+
 import Image from "next/image";
+import { Event, Venue } from "@prisma/client";
+import Link from "next/link";
+import { useState, useEffect } from "react";
 import {
   Accordion,
   AccordionContent,
@@ -8,34 +11,166 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 
-import EventCardSkeleton from "./EventCardSkeleton";
-
-export interface Event {
-  eventId: number; // Assuming `Int` maps to `number`
-  eventName: string;
-  eventDescription?: string | null; // Optional field
-  eventDate: Date; // Maps to `DateTime`
-  eventTime: Date; // Keep as Date since it comes from database as Date
-  glCount: number;
-  eventImgUrl?: string | null; // Optional field
-  venueId: string;
-  userId: string;
-  createdAt: Date; // Maps to `DateTime`
+interface EventWithVenue extends Event {
+  venue: Venue;
 }
 
 interface MyEventsCardProps {
-  upcomingEvents: Event[];
-  pastEvents: Event[];
+  pastEvents: EventWithVenue[];
+  upcomingEvents: EventWithVenue[];
 }
 
-export default function MyEventsCard({
-  pastEvents,
-  upcomingEvents,
-}: MyEventsCardProps) {
+function EventCard({ event }: { event: EventWithVenue }) {
+  return (
+    <div className="flex flex-col sm:flex-row bg-gradient-to-r from-gray-900/90 via-gray-800/90 to-gray-900/90 rounded-lg shadow-lg w-full overflow-hidden hover:shadow-xl transition-all h-auto relative group">
+      {/* Date and Time Section */}
+      <div className="flex flex-row sm:flex-col items-center justify-between sm:justify-center p-4 sm:min-w-[100px] border-b sm:border-b-0 sm:border-r border-gray-700/50 bg-gray-900/50 relative z-10 backdrop-blur-sm">
+        <div className="flex items-center sm:flex-col sm:items-center">
+          <span className="text-gray-400 text-sm font-medium uppercase mr-2 sm:mr-0">
+            {new Date(event.eventDate).toLocaleDateString("en-US", {
+              month: "short",
+            })}
+          </span>
+          <span className="text-gray-200 text-2xl sm:text-3xl font-bold sm:mt-1">
+            {new Date(event.eventDate).getDate()}
+          </span>
+        </div>
+        <span className="text-gray-400 text-base sm:text-lg font-medium sm:mt-2">
+          {(() => {
+            const hours = event.eventTime.getUTCHours();
+            const minutes = event.eventTime.getUTCMinutes().toString().padStart(2, "0");
+            const amPm = hours >= 12 ? "PM" : "AM";
+            const hours12 = hours % 12 || 12;
+            return `${hours12}:${minutes} ${amPm}`;
+          })()}
+        </span>
+      </div>
+
+      {/* Content Section */}
+      <div className="flex-1 flex flex-col sm:flex-row">
+        {/* Event Image */}
+        <div className="relative w-full sm:w-[120px] h-[200px] sm:h-auto">
+          <Image
+            src={event?.eventImgUrl || "/placeholder-image.jpg"}
+            alt={event.eventName}
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, 120px"
+          />
+        </div>
+
+        {/* Event Details */}
+        <div className="flex-1 p-4">
+          <div className="flex flex-col h-full">
+            {/* Event and Venue Names */}
+            <div>
+              <h3 className="text-xl font-semibold text-gray-200">{event.eventName}</h3>
+              <Link 
+                href={`/organizer/venue/?id=${event.venueId}`}
+                className="text-sm text-blue-400 hover:text-blue-300 transition-colors mt-1 inline-block"
+              >
+                @ {event.venue.venueName}
+              </Link>
+            </div>
+
+            {/* Description */}
+            <p className="text-sm text-gray-400 mt-2 flex-grow">
+              {event.eventDescription}
+            </p>
+
+            {/* Bottom Section */}
+            <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              {/* Slots Available */}
+              <div className="inline-flex items-center px-2.5 py-1 rounded-full bg-gray-700/50 border border-gray-600/50">
+                <svg
+                  className="w-4 h-4 mr-1.5 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                  />
+                </svg>
+                <span className="text-sm font-medium text-gray-300">
+                  {event.glCount} slots available
+                </span>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-3 w-full sm:w-auto">
+                <button 
+                  className="flex-1 sm:flex-none px-6 py-2.5 rounded-lg text-sm font-semibold
+                    bg-white/10 backdrop-blur-md border border-white/20
+                    text-white shadow-lg
+                    transition-all duration-300
+                    hover:bg-white/20 hover:border-white/30 hover:scale-105 hover:shadow-white/20
+                    active:scale-95 active:bg-white/25
+                    disabled:opacity-50 disabled:cursor-not-allowed
+                    group relative overflow-hidden"
+                >
+                  <span className="relative z-10 flex items-center justify-center gap-2">
+                    <svg 
+                      className="w-4 h-4 transition-transform group-hover:rotate-12" 
+                      fill="none" 
+                      stroke="currentColor" 
+                      viewBox="0 0 24 24"
+                    >
+                      <path 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round" 
+                        strokeWidth={2} 
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                      />
+                    </svg>
+                    Edit Event
+                  </span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/5 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </button>
+                <button 
+                  className="flex-1 sm:flex-none px-6 py-2.5 rounded-lg text-sm font-semibold
+                    bg-black/30 backdrop-blur-md border border-white/10
+                    text-white shadow-lg
+                    transition-all duration-300
+                    hover:bg-black/40 hover:border-white/20 hover:scale-105 hover:shadow-purple-500/20
+                    active:scale-95 active:bg-black/50
+                    disabled:opacity-50 disabled:cursor-not-allowed
+                    group relative overflow-hidden"
+                >
+                  <span className="relative z-10 flex items-center justify-center gap-2">
+                    <svg 
+                      className="w-4 h-4 transition-transform group-hover:-translate-y-0.5" 
+                      fill="none" 
+                      stroke="currentColor" 
+                      viewBox="0 0 24 24"
+                    >
+                      <path 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round" 
+                        strokeWidth={2} 
+                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                      />
+                    </svg>
+                    View Guestlist
+                  </span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-purple-500/0 via-purple-500/5 to-purple-500/0 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function MyEventsCard({ pastEvents, upcomingEvents }: MyEventsCardProps) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Set loading to false after a short delay to prevent flash
     const timer = setTimeout(() => {
       setIsLoading(false);
     }, 1000);
@@ -43,199 +178,82 @@ export default function MyEventsCard({
     return () => clearTimeout(timer);
   }, []);
 
-  console.log(pastEvents);
-  console.log(upcomingEvents);
-
   return (
-    <div>
-      <Accordion
-        type="single"
-        collapsible
-        className="bg-gray-800/50 rounded-lg px-4"
-      >
-        <AccordionItem value="item-1" className="border-gray-700">
-          <AccordionTrigger className="hover:no-underline group/title">
-            <div className="flex items-center space-x-3">
-              <span className="text-2xl font-bold bg-gradient-to-r from-gray-200 to-gray-400 bg-clip-text text-transparent group-hover/title:from-white group-hover/title:to-gray-300 transition-all">
-                PAST
-              </span>
-              <div className="h-px flex-1 bg-gradient-to-r from-gray-700 to-transparent"></div>
-            </div>
-          </AccordionTrigger>
-          <AccordionContent>
-            <div className="grid grid-cols-1 gap-4">
-              {isLoading ? (
-                // Show 2 skeleton cards while loading
-                Array(2)
-                  .fill(0)
-                  .map((_, index) => <EventCardSkeleton key={index} />)
-              ) : pastEvents?.length === 0 ? (
-                <div className="text-center py-8">
-                  <p className="text-gray-400">No past events</p>
+    <div className="max-w-4xl mx-auto">
+      <Accordion type="single" collapsible defaultValue="upcoming" className="space-y-4">
+          <AccordionItem value="past" className="border-none">
+              <AccordionTrigger className="hover:no-underline group">
+                <div className="flex items-center space-x-3">
+                  <span className="text-2xl font-bold bg-gradient-to-r from-gray-200 to-gray-400 bg-clip-text text-transparent group-hover:from-white group-hover:to-gray-300 transition-all">
+                    PAST
+                  </span>
+                  <div className="h-px flex-1 bg-gradient-to-r from-gray-700 to-transparent"></div>
                 </div>
-              ) : (
-                pastEvents?.map((event: Event) => (
-                  <div
-                    key={event?.eventId}
-                    className="flex flex-col sm:flex-row bg-gradient-to-r from-gray-900/90 via-gray-800/90 to-gray-900/90 rounded-lg shadow-lg w-full overflow-hidden hover:shadow-xl transition-all h-auto relative group"
-                  >
-                    {/* Decorative Pattern */}
-                    <div
-                      className="absolute inset-0 opacity-5 pointer-events-none"
-                      style={{
-                        backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-                      }}
-                    ></div>
-
-                    {/* Date and Time Section */}
-                    <div className="flex flex-row sm:flex-col items-center justify-between sm:justify-center p-4 sm:min-w-[100px] border-b sm:border-b-0 sm:border-r border-gray-700/50 bg-gray-900/50 relative z-10 backdrop-blur-sm">
-                      <div className="flex items-center sm:flex-col sm:items-center">
-                        <span className="text-gray-400 text-sm font-medium uppercase mr-2 sm:mr-0">
-                          {new Date(event.eventDate).toLocaleDateString(
-                            "en-US",
-                            {
-                              month: "short",
-                            }
-                          )}
-                        </span>
-                        <span className="text-gray-200 text-2xl sm:text-3xl font-bold sm:mt-1">
-                          {new Date(event.eventDate).getDate()}
-                        </span>
-                      </div>
-                      <span className="text-gray-400 text-base sm:text-lg font-medium sm:mt-2">
-                        {(() => {
-                          const hours = event.eventTime.getUTCHours();
-                          const minutes = event.eventTime
-                            .getUTCMinutes()
-                            .toString()
-                            .padStart(2, "0");
-                          const amPm = hours >= 12 ? "PM" : "AM";
-                          const hours12 = hours % 12 || 12;
-                          return `${hours12}:${minutes} ${amPm}`;
-                        })()}
-                      </span>
+              </AccordionTrigger>
+              <AccordionContent>
+                <div className="space-y-4 mt-4">
+                  {isLoading ? (
+                    Array(2).fill(0).map((_, index) => (
+                      <EventCard
+                        key={`past-skeleton-${index}`}
+                        event={{
+                          ...pastEvents[0],
+                          eventId: index,
+                          eventName: "Loading...",
+                          eventDescription: "Loading...",
+                          venue: { ...pastEvents[0]?.venue, venueName: "Loading..." }
+                        }}
+                      />
+                    ))
+                  ) : pastEvents.length === 0 ? (
+                    <div className="text-center py-8">
+                      <p className="text-gray-400">No past events</p>
                     </div>
+                  ) : (
+                    pastEvents.map((event) => (
+                      <EventCard key={event.eventId} event={event} />
+                    ))
+                  )}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
 
-                    {/* Content Section */}
-                    <div className="flex sm:flex-row flex-1">
-                      {/* Mobile: Side by side layout */}
-                      <div className="flex flex-row sm:hidden flex-1">
-                        {/* Event Image */}
-                        <div className="relative w-1/3 aspect-[3/4] bg-gradient-to-br from-gray-800/80 via-gray-900/90 to-black before:absolute before:inset-0 before:bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1),transparent_70%)] before:opacity-50">
-                          <Image
-                            src={event?.eventImgUrl || "/placeholder-image.jpg"}
-                            alt={event.eventName}
-                            fill
-                            sizes="(max-width: 768px) 33vw"
-                            className="object-cover transition-opacity duration-300"
-                            placeholder="blur"
-                            blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4eHRoaHSQtJSEkMjU1LC0yMi4xODY6Ojo4MS89PUFGRlJSUjI+SVlOUENOQ0pJUlL/2wBDAR0XFx0aHR4eHRoaHSQtJSEkMjU1LC0yMi4xODY6Ojo4MS89PUFGRlJSUjI+SVlOUENOQ0pJUlJSUlJSUlJSUlL/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
-                            loading="lazy"
-                          />
-                        </div>
-
-                        {/* Event Info */}
-                        <div className="flex flex-col p-4 flex-1">
-                          <h3 className="text-lg font-semibold text-gray-200 truncate">
-                            {event.eventName}
-                          </h3>
-                          <p className="text-sm text-gray-400 mt-2 line-clamp-3">
-                            {event.eventDescription}
-                          </p>
-
-                          <div className="mt-auto pt-2">
-                            <div className="inline-flex items-center px-2.5 py-1 rounded-full bg-gray-700/50 border border-gray-600/50 backdrop-blur-sm">
-                              <svg
-                                className="w-4 h-4 mr-1.5 text-gray-400"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                                />
-                              </svg>
-
-                              <span className="text-sm font-medium text-gray-300">
-                                {event.glCount} slots available
-                              </span>
-                            </div>
-                            <div className="flex mt-2">
-                              <button className="!bg-gray-600 !text-white text-xs sm:text-sm font-semibold hover:!bg-black !px-4 sm:!px-8 !py-1.5 sm:!py-2 rounded-md transition-colors duration-300 flex items-center gap-2 mr-5">
-                                Edit
-                              </button>
-                              <button className="!bg-gray-600 !text-white text-xs sm:text-sm font-semibold hover:!bg-black !px-4 sm:!px-8 !py-1.5 sm:!py-2 rounded-md transition-colors duration-300 flex items-center gap-2">
-                                Guestlist
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Desktop: Original layout */}
-                      <div className="hidden sm:flex sm:flex-row flex-1">
-                        {/* Event Image */}
-                        <div className="relative w-[120px] h-full bg-gradient-to-br from-gray-800/80 via-gray-900/90 to-black before:absolute before:inset-0 before:bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1),transparent_70%)] before:opacity-50">
-                          <Image
-                            src={event?.eventImgUrl || "/placeholder-image.jpg"}
-                            alt={event.eventName}
-                            fill
-                            sizes="120px"
-                            className="object-cover transition-opacity duration-300"
-                            placeholder="blur"
-                            blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4eHRoaHSQtJSEkMjU1LC0yMi4xODY6Ojo4MS89PUFGRlJSUjI+SVlOUENOQ0pJUlL/2wBDAR0XFx0aHR4eHRoaHSQtJSEkMjU1LC0yMi4xODY6Ojo4MS89PUFGRlJSUjI+SVlOUENOQ0pJUlJSUlJSUlJSUlL/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
-                            loading="lazy"
-                          />
-                        </div>
-
-                        {/* Event Info */}
-                        <div className="flex flex-col p-4 flex-1">
-                          <h3 className="text-xl font-semibold text-gray-200 truncate">
-                            {event.eventName}
-                          </h3>
-                          <p className="text-sm text-gray-400 mt-2 line-clamp-4">
-                            {event.eventDescription}
-                          </p>
-                          <div className="mt-auto pt-2 flex justify-between">
-                            <div className="inline-flex items-center px-2.5 py-1 rounded-full bg-gray-700/50 border border-gray-600/50 backdrop-blur-sm">
-                              <svg
-                                className="w-4 h-4 mr-1.5 text-gray-400"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                                />
-                              </svg>
-                              <span className="text-sm font-medium text-gray-300">
-                                {event.glCount} slots available
-                              </span>
-                            </div>
-                            <button className="!bg-gray-600 !text-white text-xs sm:text-sm font-semibold hover:!bg-black !px-4 sm:!px-8 !py-1.5 sm:!py-2 rounded-md transition-colors duration-300 flex items-center gap-2">
-                              Edit
-                            </button>
-                            <button className="!bg-gray-600 !text-white text-xs sm:text-sm font-semibold hover:!bg-black !px-4 sm:!px-8 !py-1.5 sm:!py-2 rounded-md transition-colors duration-300 flex items-center gap-2">
-                              Guestlist
-                            </button>
-                          </div>
-                        </div>
-                      </div>
+            <AccordionItem value="upcoming" className="border-none">
+              <AccordionTrigger className="hover:no-underline group">
+                <div className="flex items-center space-x-3">
+                  <span className="text-2xl font-bold bg-gradient-to-r from-gray-200 to-gray-400 bg-clip-text text-transparent group-hover:from-white group-hover:to-gray-300 transition-all">
+                    UPCOMING
+                  </span>
+                  <div className="h-px flex-1 bg-gradient-to-r from-gray-700 to-transparent"></div>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent>
+                <div className="space-y-4 mt-4">
+                  {isLoading ? (
+                    Array(2).fill(0).map((_, index) => (
+                      <EventCard
+                        key={`upcoming-skeleton-${index}`}
+                        event={{
+                          ...upcomingEvents[0],
+                          eventId: index,
+                          eventName: "Loading...",
+                          eventDescription: "Loading...",
+                          venue: { ...upcomingEvents[0]?.venue, venueName: "Loading..." }
+                        }}
+                      />
+                    ))
+                  ) : upcomingEvents.length === 0 ? (
+                    <div className="text-center py-8">
+                      <p className="text-gray-400">No upcoming events</p>
                     </div>
-                  </div>
-                ))
-              )}
-            </div>
-          </AccordionContent>
-        </AccordionItem>
+                  ) : (
+                    upcomingEvents.map((event) => (
+                      <EventCard key={event.eventId} event={event} />
+                    ))
+                  )}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
       </Accordion>
     </div>
   );

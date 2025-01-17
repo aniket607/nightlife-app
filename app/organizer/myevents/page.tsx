@@ -1,8 +1,7 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { fetchMyEvents } from "@/actions/fetchMyEvents";
-import { Event } from "@/components/VenuePageRightSection";
-import Image from "next/image";
+
 import MyEventsCard from "@/components/MyEventsCard";
 
 async function page() {
@@ -14,15 +13,14 @@ async function page() {
   const id: string = session?.user?.id ?? "";
 
   const myEvents = await fetchMyEvents(id);
-  console.log(myEvents)
   const {pastEvents, upcomingEvents} = myEvents
 
   return (
-    <div className="m-auto">
-      <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-200 to-gray-400 bg-clip-text text-transparent group-hover/title:from-white group-hover/title:to-gray-300 transition-all my-10">
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold text-center mb-8 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
         My Events
       </h1>
-      <div className="grid grid-cols-1 gap-4 border rounded p-5 m-5">
+      <div>
         <MyEventsCard pastEvents={pastEvents} upcomingEvents={upcomingEvents}/>
       </div>
     </div>
