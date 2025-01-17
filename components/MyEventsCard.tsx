@@ -4,6 +4,8 @@ import Image from "next/image";
 import { Event, Venue } from "@prisma/client";
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import EventCardSkeleton from "./EventCardSkeleton";
 import {
   Accordion,
   AccordionContent,
@@ -20,7 +22,9 @@ interface MyEventsCardProps {
   upcomingEvents: EventWithVenue[];
 }
 
-function EventCard({ event }: { event: EventWithVenue }) {
+function EventCard({ event, isPast }: { event: EventWithVenue, isPast?: boolean }) {
+  const router = useRouter();
+  
   return (
     <div className="flex flex-col sm:flex-row bg-gradient-to-r from-gray-900/90 via-gray-800/90 to-gray-900/90 rounded-lg shadow-lg w-full overflow-hidden hover:shadow-xl transition-all h-auto relative group">
       {/* Date and Time Section */}
@@ -103,14 +107,16 @@ function EventCard({ event }: { event: EventWithVenue }) {
               {/* Action Buttons */}
               <div className="flex gap-3 w-full sm:w-auto">
                 <button 
+                  disabled={isPast}
                   className="flex-1 sm:flex-none px-6 py-2.5 rounded-lg text-sm font-semibold
                     bg-white/10 backdrop-blur-md border border-white/20
                     text-white shadow-lg
                     transition-all duration-300
                     hover:bg-white/20 hover:border-white/30 hover:scale-105 hover:shadow-white/20
                     active:scale-95 active:bg-white/25
-                    disabled:opacity-50 disabled:cursor-not-allowed
+                    disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:bg-white/10
                     group relative overflow-hidden"
+                  onClick={() => router.push(`/organizer/myevents/edit?id=${event.eventId}`)}
                 >
                   <span className="relative z-10 flex items-center justify-center gap-2">
                     <svg 
@@ -139,6 +145,7 @@ function EventCard({ event }: { event: EventWithVenue }) {
                     active:scale-95 active:bg-black/50
                     disabled:opacity-50 disabled:cursor-not-allowed
                     group relative overflow-hidden"
+                  onClick={() => router.push(`/organizer/myevents/guestlist?id=${event.eventId}`)}
                 >
                   <span className="relative z-10 flex items-center justify-center gap-2">
                     <svg 
@@ -173,7 +180,7 @@ export default function MyEventsCard({ pastEvents, upcomingEvents }: MyEventsCar
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 1000);
+    }, 500);
 
     return () => clearTimeout(timer);
   }, []);
@@ -194,16 +201,7 @@ export default function MyEventsCard({ pastEvents, upcomingEvents }: MyEventsCar
                 <div className="space-y-4 mt-4">
                   {isLoading ? (
                     Array(2).fill(0).map((_, index) => (
-                      <EventCard
-                        key={`past-skeleton-${index}`}
-                        event={{
-                          ...pastEvents[0],
-                          eventId: index,
-                          eventName: "Loading...",
-                          eventDescription: "Loading...",
-                          venue: { ...pastEvents[0]?.venue, venueName: "Loading..." }
-                        }}
-                      />
+                      <EventCardSkeleton key={`past-skeleton-${index}`} />
                     ))
                   ) : pastEvents.length === 0 ? (
                     <div className="text-center py-8">
@@ -211,7 +209,7 @@ export default function MyEventsCard({ pastEvents, upcomingEvents }: MyEventsCar
                     </div>
                   ) : (
                     pastEvents.map((event) => (
-                      <EventCard key={event.eventId} event={event} />
+                      <EventCard key={event.eventId} event={event} isPast={true} />
                     ))
                   )}
                 </div>
@@ -231,16 +229,7 @@ export default function MyEventsCard({ pastEvents, upcomingEvents }: MyEventsCar
                 <div className="space-y-4 mt-4">
                   {isLoading ? (
                     Array(2).fill(0).map((_, index) => (
-                      <EventCard
-                        key={`upcoming-skeleton-${index}`}
-                        event={{
-                          ...upcomingEvents[0],
-                          eventId: index,
-                          eventName: "Loading...",
-                          eventDescription: "Loading...",
-                          venue: { ...upcomingEvents[0]?.venue, venueName: "Loading..." }
-                        }}
-                      />
+                      <EventCardSkeleton key={`upcoming-skeleton-${index}`} />
                     ))
                   ) : upcomingEvents.length === 0 ? (
                     <div className="text-center py-8">
@@ -248,7 +237,7 @@ export default function MyEventsCard({ pastEvents, upcomingEvents }: MyEventsCar
                     </div>
                   ) : (
                     upcomingEvents.map((event) => (
-                      <EventCard key={event.eventId} event={event} />
+                      <EventCard key={event.eventId} event={event} isPast={false} />
                     ))
                   )}
                 </div>
