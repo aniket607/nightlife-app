@@ -12,13 +12,23 @@ interface Guestlist {
   eventId: number;
 }
 
-interface PageProps {
-  params: { [key: string]: string | string[] | undefined };
+type Props = {
   searchParams: { [key: string]: string | string[] | undefined };
 }
 
-export default async function Page({ searchParams }: PageProps) {
-  const eventId = parseInt(searchParams.eventId as string, 10);
+export default async function Page({ searchParams }: Props) {
+  const eventIdStr = searchParams.eventId;
+  if (!eventIdStr) {
+    return (
+      <div className="container mx-auto p-4">
+        <div className="text-center p-4 bg-red-50 rounded-lg">
+          <p className="text-red-600">Event ID is required</p>
+        </div>
+      </div>
+    );
+  }
+
+  const eventId = parseInt(typeof eventIdStr === 'string' ? eventIdStr : eventIdStr[0], 10);
   
   const hasaccess = await checkEventAccess(eventId);
 
@@ -42,7 +52,7 @@ export default async function Page({ searchParams }: PageProps) {
     );
   }
 
-  let guestlist: Guestlist[] = []; // Initialize with an empty array
+  let guestlist: Guestlist[] = [];
   try {
     guestlist = await fetchGuestlist(eventId);
     console.log("Fetched guestlist:", guestlist);
