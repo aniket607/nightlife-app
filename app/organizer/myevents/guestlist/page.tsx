@@ -1,8 +1,7 @@
 import { fetchGuestlist } from '@/actions/fetchGuestlist';
 import GuestListTable from '@/components/GuestListTable';
 import React from 'react';
-import { auth } from "@/auth";
-import { redirect } from "next/navigation";
+import { checkEventAccess } from '@/actions/checkEventAccess';
 
 interface Guestlist {
   glId: number;
@@ -14,14 +13,22 @@ interface Guestlist {
 }
 
 export default async function Page({ searchParams }: { searchParams: { eventId: string } }) {
-  const session = await auth();
-  if (!session?.user) {
-    redirect("/login");
-  }
+
 
   // Await the searchParams
   const params = await searchParams;
   const eventId = parseInt(params.eventId, 10);
+  const hasaccess=await checkEventAccess(eventId);
+
+  if (!hasaccess) {
+    return (
+      <div className="container mx-auto p-4">
+        <div className="text-center p-4 bg-red-50 rounded-lg">
+          <p className="text-red-600">You don&apos;t have access to this event</p>
+        </div>
+      </div>
+    );
+  }
   
   if (isNaN(eventId)) {
     return (
