@@ -12,12 +12,9 @@ interface Guestlist {
   eventId: number;
 }
 
-type Props = {
-  searchParams: { [key: string]: string | string[] | undefined };
-}
-
-export default async function Page({ searchParams }: Props) {
-  const eventIdStr = searchParams.eventId;
+export default async function Page({ searchParams }: { searchParams: Promise<{ eventId: string }> }) {
+  const { eventId: eventIdStr } = await searchParams;
+  
   if (!eventIdStr) {
     return (
       <div className="container mx-auto p-4">
@@ -28,7 +25,7 @@ export default async function Page({ searchParams }: Props) {
     );
   }
 
-  const eventId = parseInt(typeof eventIdStr === 'string' ? eventIdStr : eventIdStr[0], 10);
+  const eventId = parseInt(eventIdStr, 10);
   
   const hasaccess = await checkEventAccess(eventId);
 
