@@ -38,7 +38,6 @@ export async function fetchMyEvents(userId: string): Promise<EventsResult> {
       }
       return acc;
     }, { upcomingEvents: [], pastEvents: [] } as EventsResult);
-    console.log(upcomingEvents, pastEvents);
     return { upcomingEvents, pastEvents };
   } catch (error) {
     console.error("[fetchMyEvents] Error fetching events:", error);
