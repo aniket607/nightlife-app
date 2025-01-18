@@ -17,11 +17,13 @@ export interface Event {
   eventDescription?: string | null; // Optional field
   eventDate: Date; // Maps to `DateTime`
   eventTime: Date; // Keep as Date since it comes from database as Date
-  glCount: number;
+  stagGlCount: number;
+  coupleGlCount: number | null;
   eventImgUrl?: string | null; // Optional field
   venueId: string;
   userId: string;
   createdAt: Date; // Maps to `DateTime`
+  eventType: string;
 }
 
 interface VenuePageRightSectionProps {
@@ -29,6 +31,10 @@ interface VenuePageRightSectionProps {
   pastEvents: Event[];
   venueId: string;
 }
+
+const getEventTypeStyles = () => {
+  return "bg-gradient-to-r from-gray-800/80 to-gray-700/80 text-white border border-white/10 shadow-lg hover:from-gray-700/80 hover:to-gray-600/80 transition-all duration-300";
+};
 
 export default function VenuePageRightSection({
   upcomingEvents,
@@ -142,13 +148,24 @@ export default function VenuePageRightSection({
 
                           {/* Event Info */}
                           <div className="flex flex-col p-4 flex-1">
+                            {/* Event Type Badge */}
+                            <div className="flex items-center gap-2 mb-3">
+                              <div className={`
+                                px-3 py-1.5 rounded-md backdrop-blur-sm
+                                text-sm font-medium tracking-wide
+                                ${getEventTypeStyles()}
+                              `}>
+                                {event.eventType}
+                              </div>
+                            </div>
+                            
                             <h3 className="text-lg font-semibold text-gray-200 truncate">
                               {event.eventName}
                             </h3>
                             <p className="text-sm text-gray-400 mt-2 line-clamp-3">
                               {event.eventDescription}
                             </p>
-                            <div className="mt-auto pt-2">
+                            <div className="mt-auto pt-2 flex gap-2">
                               <div className="inline-flex items-center px-2.5 py-1 rounded-full bg-gray-700/50 border border-gray-600/50 backdrop-blur-sm">
                                 <svg
                                   className="w-4 h-4 mr-1.5 text-gray-400"
@@ -165,9 +182,31 @@ export default function VenuePageRightSection({
                                   />
                                 </svg>
                                 <span className="text-sm font-medium text-gray-300">
-                                  {event.glCount} slots available
+                                  {event.stagGlCount} stag
                                 </span>
                               </div>
+                              
+                              {event.coupleGlCount !== null && (
+                                <div className="inline-flex items-center px-2.5 py-1 rounded-full bg-gray-700/50 border border-gray-600/50 backdrop-blur-sm">
+                                  <svg
+                                    className="w-4 h-4 mr-1.5 text-gray-400"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+                                    />
+                                  </svg>
+                                  <span className="text-sm font-medium text-gray-300">
+                                    {event.coupleGlCount} couple
+                                  </span>
+                                </div>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -190,13 +229,24 @@ export default function VenuePageRightSection({
 
                           {/* Event Info */}
                           <div className="flex flex-col p-4 flex-1">
+                            {/* Event Type Badge */}
+                            <div className="flex items-center gap-2 mb-3">
+                              <div className={`
+                                px-3 py-1.5 rounded-md backdrop-blur-sm
+                                text-sm font-medium tracking-wide
+                                ${getEventTypeStyles()}
+                              `}>
+                                {event.eventType}
+                              </div>
+                            </div>
+
                             <h3 className="text-xl font-semibold text-gray-200 truncate">
                               {event.eventName}
                             </h3>
                             <p className="text-sm text-gray-400 mt-2 line-clamp-4">
                               {event.eventDescription}
                             </p>
-                            <div className="mt-auto pt-2">
+                            <div className="mt-auto pt-2 flex gap-2">
                               <div className="inline-flex items-center px-2.5 py-1 rounded-full bg-gray-700/50 border border-gray-600/50 backdrop-blur-sm">
                                 <svg
                                   className="w-4 h-4 mr-1.5 text-gray-400"
@@ -213,9 +263,31 @@ export default function VenuePageRightSection({
                                   />
                                 </svg>
                                 <span className="text-sm font-medium text-gray-300">
-                                  {event.glCount} slots available
+                                  {event.stagGlCount} stag
                                 </span>
                               </div>
+                              
+                              {event.coupleGlCount !== null && (
+                                <div className="inline-flex items-center px-2.5 py-1 rounded-full bg-gray-700/50 border border-gray-600/50 backdrop-blur-sm">
+                                  <svg
+                                    className="w-4 h-4 mr-1.5 text-gray-400"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+                                    />
+                                  </svg>
+                                  <span className="text-sm font-medium text-gray-300">
+                                    {event.coupleGlCount} couple
+                                  </span>
+                                </div>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -322,13 +394,24 @@ export default function VenuePageRightSection({
 
                           {/* Event Info */}
                           <div className="flex flex-col p-4 flex-1">
+                            {/* Event Type Badge */}
+                            <div className="flex items-center gap-2 mb-3">
+                              <div className={`
+                                px-3 py-1.5 rounded-md backdrop-blur-sm
+                                text-sm font-medium tracking-wide
+                                ${getEventTypeStyles()}
+                              `}>
+                                {event.eventType}
+                              </div>
+                            </div>
+                            
                             <h3 className="text-lg font-semibold text-gray-200 truncate">
                               {event.eventName}
                             </h3>
                             <p className="text-sm text-gray-400 mt-2 line-clamp-3">
                               {event.eventDescription}
                             </p>
-                            <div className="mt-auto pt-2">
+                            <div className="mt-auto pt-2 flex gap-2">
                               <div className="inline-flex items-center px-2.5 py-1 rounded-full bg-gray-700/50 border border-gray-600/50 backdrop-blur-sm">
                                 <svg
                                   className="w-4 h-4 mr-1.5 text-gray-400"
@@ -345,9 +428,31 @@ export default function VenuePageRightSection({
                                   />
                                 </svg>
                                 <span className="text-sm font-medium text-gray-300">
-                                  {event.glCount} slots available
+                                  {event.stagGlCount} stag
                                 </span>
                               </div>
+                              
+                              {event.coupleGlCount !== null && (
+                                <div className="inline-flex items-center px-2.5 py-1 rounded-full bg-gray-700/50 border border-gray-600/50 backdrop-blur-sm">
+                                  <svg
+                                    className="w-4 h-4 mr-1.5 text-gray-400"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+                                    />
+                                  </svg>
+                                  <span className="text-sm font-medium text-gray-300">
+                                    {event.coupleGlCount} couple
+                                  </span>
+                                </div>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -370,13 +475,24 @@ export default function VenuePageRightSection({
 
                           {/* Event Info */}
                           <div className="flex flex-col p-4 flex-1">
+                            {/* Event Type Badge */}
+                            <div className="flex items-center gap-2 mb-3">
+                              <div className={`
+                                px-3 py-1.5 rounded-md backdrop-blur-sm
+                                text-sm font-medium tracking-wide
+                                ${getEventTypeStyles()}
+                              `}>
+                                {event.eventType}
+                              </div>
+                            </div>
+
                             <h3 className="text-xl font-semibold text-gray-200 truncate">
                               {event.eventName}
                             </h3>
                             <p className="text-sm text-gray-400 mt-2 line-clamp-4">
                               {event.eventDescription}
                             </p>
-                            <div className="mt-auto pt-2">
+                            <div className="mt-auto pt-2 flex gap-2">
                               <div className="inline-flex items-center px-2.5 py-1 rounded-full bg-gray-700/50 border border-gray-600/50 backdrop-blur-sm">
                                 <svg
                                   className="w-4 h-4 mr-1.5 text-gray-400"
@@ -393,9 +509,31 @@ export default function VenuePageRightSection({
                                   />
                                 </svg>
                                 <span className="text-sm font-medium text-gray-300">
-                                  {event.glCount} slots available
+                                  {event.stagGlCount} stag
                                 </span>
                               </div>
+                              
+                              {event.coupleGlCount !== null && (
+                                <div className="inline-flex items-center px-2.5 py-1 rounded-full bg-gray-700/50 border border-gray-600/50 backdrop-blur-sm">
+                                  <svg
+                                    className="w-4 h-4 mr-1.5 text-gray-400"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+                                    />
+                                  </svg>
+                                  <span className="text-sm font-medium text-gray-300">
+                                    {event.coupleGlCount} couple
+                                  </span>
+                                </div>
+                              )}
                             </div>
                           </div>
                         </div>

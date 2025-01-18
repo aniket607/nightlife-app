@@ -77,22 +77,40 @@ model Event {
   eventDescription String?
   eventDate        DateTime
   eventTime      DateTime @db.Time
-  glCount          Int
+  stagGlCount          Int
+  coupleGl            Boolean
+  coupleGlCount        Int?
   eventImgUrl      String?
+  eventType        String
   venueId          String
   userId           String     
   createdAt      DateTime @default(now())
   venue            Venue      @relation(fields: [venueId], references: [id])
-  user             User       @relation(fields: [userId], references: [id]) // Added this line
-  guestlist        Guestlist[]
+  user             User       @relation(fields: [userId], references: [id]) 
+  stagGuestlist        StagGuestlist[]
+  coupleGuestlist        CoupleGuestlist[]
 }
 
-model Guestlist {
-  glId        Int    @id @default(autoincrement())
+model StagGuestlist {
+  glId        Int     @id @default(autoincrement())
   guestName   String
   guestAge    Int
-  guestMobile BigInt
+  guestMobile String
   guestEmail  String
   eventId     Int    
-  event       Event  @relation(fields: [eventId], references: [eventId])
+  event       Event   @relation(fields: [eventId], references: [eventId])
+}
+
+model CoupleGuestlist {
+  glId          Int     @id @default(autoincrement())
+  maleName      String
+  femaleName    String
+  maleAge       Int
+  femaleAge     Int
+  maleMobile    String
+  femaleMobile  String
+  maleEmail     String
+  femaleEmail   String?
+  eventId       Int    
+  event         Event   @relation(fields: [eventId], references: [eventId])
 }

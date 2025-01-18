@@ -100,7 +100,7 @@ function EventCard({ event, isPast }: { event: EventWithVenue, isPast?: boolean 
                   />
                 </svg>
                 <span className="text-sm font-medium text-gray-300">
-                  {event.glCount} slots available
+                  {event.stagGlCount} slots available
                 </span>
               </div>
 

@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useTransition, FormEvent } from "react";
+import { useState, useTransition, FormEvent, useEffect } from "react";
 import UploadForm from "@/components/UploadForm";
 import { putEventData } from "@/actions/putEventData"; // Action for submitting event data
 import toast, { Toaster } from "react-hot-toast";
-import { ZodIssue } from "zod";
 import DatePicker from "react-datepicker"; // React Datepicker for date selection
 import "react-datepicker/dist/react-datepicker.css"; // Import datepicker styles
 
@@ -13,6 +12,16 @@ interface EventFormSectionProps {
   venueId: string;
 }
 
+const EVENT_TYPES = [
+  "Regular Night",
+  "Ladies Night",
+  "Bollywood Night",
+  "EDM Night",
+  "Live Music",
+  "Special Event",
+  "Private Party",
+] as const;
+
 const EventFormSection: React.FC<EventFormSectionProps> = ({ userId, venueId }) => {
   const [imageUrl, setImageUrl] = useState(""); // For storing event image URL
   const [isImageUploaded, setIsImageUploaded] = useState(false);
@@ -20,6 +29,29 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({ userId, venueId }) 
   const [isDisabled, setIsDisabled] = useState(false); // Disable form after submission
   const [eventDate, setEventDate] = useState<Date | null>(null); // State for selected date
   const [eventTime, setEventTime] = useState<Date | null>(null); // Changed to Date type for DatePicker
+
+  useEffect(() => {
+    // Add event listener to radio buttons
+    const radioButtons = document.querySelectorAll('input[name="coupleGl"]');
+    const coupleGlCountContainer = document.getElementById('coupleGlCountContainer');
+    const coupleGlCountInput = document.querySelector('[name="coupleGlCount"]') as HTMLInputElement;
+
+    radioButtons.forEach(radio => {
+      radio.addEventListener('change', (e) => {
+        const target = e.target as HTMLInputElement;
+        if (coupleGlCountContainer && coupleGlCountInput) {
+          if (target.value === 'true') {
+            coupleGlCountContainer.classList.remove('hidden');
+            coupleGlCountInput.required = true;
+          } else {
+            coupleGlCountContainer.classList.add('hidden');
+            coupleGlCountInput.required = false;
+            coupleGlCountInput.value = '';
+          }
+        }
+      });
+    });
+  }, []);
 
   const handleFormSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault(); // Prevent default form submit & reload
@@ -52,20 +84,21 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({ userId, venueId }) 
         const result = await putEventData(formData, userId, venueId);
 
         if (result.success) {
-          setIsDisabled(true); // Disable all inputs and buttons
+          setIsDisabled(true);
           toast.success("Event Added Successfully!");
 
-          // Redirect after a delay
           setTimeout(() => {
             window.location.href = `/organizer/venue?id=${encodeURIComponent(venueId)}`;
-          }, 2000); // Redirect after 2 seconds
+          }, 2000);
         } else if (result.errors) {
-          // Handle validation errors from Zod
-          const errorMessages = result.errors.map((issue: ZodIssue) => issue.message).join("\n");
+          // Updated error handling for Zod validation errors
+          const errorMessages = (result.errors as Array<{ message: string }>)
+            .map(issue => issue.message)
+            .join("\n");
           toast.error(`Validation errors:\n${errorMessages}`);
         } else if (result.error) {
-          // Handle server-side errors like duplicate event names
-          toast.error(result.error); // Display the error returned by the server
+          // Handle server-side errors
+          toast.error(result.error);
         }
       } catch (error) {
         console.error("Unexpected Error:", error);
@@ -126,58 +159,135 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({ userId, venueId }) 
                 ></textarea>
               </div>
   
-              {/* Event Date */}
-              <div>
-                <label htmlFor="eventDate" className="block text-sm font-medium text-gray-300 mb-1">
-                  Event Date
-                </label>
-                <DatePicker
-                  selected={eventDate}
-                  onChange={(date: Date | null) => setEventDate(date)}
-                  dateFormat="MMMM d, yyyy"
-                  placeholderText="Select Event Date"
-                  minDate={new Date()}
-                  className="w-full bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-600"
-                  disabled={isDisabled}
-                  calendarClassName="bg-gray-800 border-gray-700 text-gray-200"
-                  dayClassName={date => 
-                    "hover:bg-gray-700 rounded-full"
-                  }
-                />
-              </div>
+              {/* Date and Time Container */}
+              <div className="grid grid-cols-2 gap-4">
+                {/* Event Date */}
+                <div>
+                  <label htmlFor="eventDate" className="block text-sm font-medium text-gray-300 mb-1">
+                    Event Date
+                  </label>
+                  <DatePicker
+                    selected={eventDate}
+                    onChange={(date: Date | null) => setEventDate(date)}
+                    dateFormat="MMMM d, yyyy"
+                    placeholderText="Select Date"
+                    minDate={new Date()}
+                    className="w-full bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-600"
+                    disabled={isDisabled}
+                    calendarClassName="bg-gray-800 border-gray-700 text-gray-200"
+                    dayClassName={() => "hover:bg-gray-700 rounded-full"}
+                  />
+                </div>
   
-              {/* Event Time */}
-              <div>
-                <label htmlFor="eventTime" className="block text-sm font-medium text-gray-300 mb-1">
-                  Event Time
-                </label>
-                <DatePicker
-                  selected={eventTime}
-                  onChange={(time: Date | null) => setEventTime(time)}
-                  showTimeSelect
-                  showTimeSelectOnly
-                  timeIntervals={15}
-                  timeCaption="Time"
-                  dateFormat="h:mm aa"
-                  placeholderText="Select Event Time"
-                  className="w-full bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-600"
-                  disabled={isDisabled}
-                  calendarClassName="bg-gray-800 border-gray-700 text-gray-200"
-                />
+                {/* Event Time */}
+                <div>
+                  <label htmlFor="eventTime" className="block text-sm font-medium text-gray-300 mb-1">
+                    Event Time
+                  </label>
+                  <DatePicker
+                    selected={eventTime}
+                    onChange={(time: Date | null) => setEventTime(time)}
+                    showTimeSelect
+                    showTimeSelectOnly
+                    timeIntervals={15}
+                    timeCaption="Time"
+                    dateFormat="h:mm aa"
+                    placeholderText="Select Time"
+                    className="w-full bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-600"
+                    disabled={isDisabled}
+                    calendarClassName="bg-gray-800 border-gray-700 text-gray-200"
+                  />
+                </div>
               </div>
-  
-              {/* Guest List Count */}
+
+              {/* Event Type */}
               <div>
-                <label htmlFor="glCount" className="block text-sm font-medium text-gray-300 mb-1">
-                  Guest List Count (GL Count)
+                <label htmlFor="eventType" className="block text-sm font-medium text-gray-300 mb-1">
+                  Event Type
+                </label>
+                <select
+                  name="eventType"
+                  id="eventType"
+                  required
+                  disabled={isDisabled}
+                  className="w-full bg-gray-800 border-gray-700 text-gray-200 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-600"
+                >
+                  <option value="" className="bg-gray-800">Select Event Type</option>
+                  {EVENT_TYPES.map((type) => (
+                    <option key={type} value={type} className="bg-gray-800">
+                      {type}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Stag Guest List Count */}
+              <div>
+                <label htmlFor="stagGlCount" className="block text-sm font-medium text-gray-300 mb-1">
+                  Stag Guest List Count
                 </label>
                 <input
                   type="number"
-                  name="glCount"
-                  id="glCount"
+                  name="stagGlCount"
+                  id="stagGlCount"
                   min={0}
-                  placeholder="Enter GL Count"
+                  placeholder="Enter Stag GL Count"
                   required
+                  disabled={isDisabled}
+                  className="w-full bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-600"
+                />
+              </div>
+
+              {/* Couple GL Option */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">
+                  Allow Couple Guest List?
+                </label>
+                <div className="flex gap-4">
+                  <label className="inline-flex items-center">
+                    <input
+                      type="radio"
+                      name="coupleGl"
+                      value="true"
+                      onChange={(e) => {
+                        const form = e.target.form;
+                        if (form) {
+                          const coupleCountInput = form.querySelector('[name="coupleGlCount"]') as HTMLInputElement;
+                          if (coupleCountInput) {
+                            coupleCountInput.required = e.target.checked;
+                          }
+                        }
+                      }}
+                      disabled={isDisabled}
+                      className="form-radio text-gray-600 bg-gray-800 border-gray-700"
+                    />
+                    <span className="ml-2 text-gray-300">Yes</span>
+                  </label>
+                  <label className="inline-flex items-center">
+                    <input
+                      type="radio"
+                      name="coupleGl"
+                      value="false"
+                      defaultChecked
+                      disabled={isDisabled}
+                      className="form-radio text-gray-600 bg-gray-800 border-gray-700"
+                    />
+                    <span className="ml-2 text-gray-300">No</span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Couple GL Count - Conditionally rendered */}
+              <div id="coupleGlCountContainer" className="hidden">
+                <label htmlFor="coupleGlCount" className="block text-sm font-medium text-gray-300 mb-1">
+                  Couple Guest List Count
+                </label>
+                <input
+                  type="number"
+                  name="coupleGlCount"
+                  id="coupleGlCount"
+                  min={0}
+                  placeholder="Enter Couple GL Count"
                   disabled={isDisabled}
                   className="w-full bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-600"
                 />

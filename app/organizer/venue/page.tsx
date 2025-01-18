@@ -12,9 +12,11 @@ interface Event {
   eventDescription?: string | null; // Optional field
   eventDate: Date; // Maps to `DateTime`
   eventTime: Date; // `DateTime @db.Time` also maps to `Date`
-  glCount: number;
+  stagGlCount: number;
+  coupleGlCount: number | null;
   eventImgUrl?: string | null; // Optional field
   venueId: string;
+  eventType: string;
   userId: string;
   createdAt: Date; // Maps to `DateTime`
 }

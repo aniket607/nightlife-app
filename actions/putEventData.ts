@@ -11,8 +11,11 @@ const formSchema = z.object({
     message: "Invalid date format",
   }),
   eventTime: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, "Invalid time format (HH:mm)"),
-  glCount: z.coerce.number().min(0, "Guest list count must be a positive number"),
+  stagGlCount: z.coerce.number().min(0, "Stag guest list count must be a positive number"),
+  coupleGl: z.coerce.boolean(),
+  coupleGlCount: z.coerce.number().min(0, "Couple guest list count must be a positive number").optional(),
   eventImgUrl: z.string().url("Invalid image URL"),
+  eventType: z.string().default("Regular"), // You might want to add specific validation for event types
 });
 
 export async function putEventData(formData: FormData, userId: string, venueId: string) {
@@ -29,19 +32,30 @@ export async function putEventData(formData: FormData, userId: string, venueId: 
       return { success: false, errors: validatedData.error.errors };
     }
 
+    // Additional validation for coupleGlCount
+    if (validatedData.data.coupleGl === true && !validatedData.data.coupleGlCount) {
+      return {
+        success: false,
+        errors: [{ message: "Couple guest list count is required when couple GL is enabled" }],
+      };
+    }
+
     // Convert eventTime from string to a UTC Date object
     const [hours, minutes] = validatedData.data.eventTime.split(":").map(Number);
-    const eventTimeAsUTCDate = new Date(Date.UTC(1970, 0, 1, hours, minutes)); // Use UTC explicitly
+    const eventTimeAsUTCDate = new Date(Date.UTC(1970, 0, 1, hours, minutes));
 
     // Insert into the database
     const createdEvent = await prisma.event.create({
       data: {
         eventName: validatedData.data.eventName,
         eventDescription: validatedData.data.eventDescription || null,
-        eventDate: new Date(validatedData.data.eventDate), // Convert string to Date object
-        eventTime: eventTimeAsUTCDate, // Store time as a UTC Date object
-        glCount: validatedData.data.glCount,
+        eventDate: new Date(validatedData.data.eventDate),
+        eventTime: eventTimeAsUTCDate,
+        stagGlCount: validatedData.data.stagGlCount,
+        coupleGl: validatedData.data.coupleGl,
+        coupleGlCount: validatedData.data.coupleGl ? validatedData.data.coupleGlCount : null,
         eventImgUrl: validatedData.data.eventImgUrl,
+        eventType: validatedData.data.eventType,
         userId,
         venueId,
       },
