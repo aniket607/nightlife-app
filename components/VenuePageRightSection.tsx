@@ -252,7 +252,7 @@ export default function VenuePageRightSection({
                     .fill(0)
                     .map((_, index) => <EventCardSkeleton key={index} />)
                 ) : upcomingEvents.length === 0 ? (
-                  <div className="text-center py-8">
+                  <div className="text-center py-8 flex flex-col items-center">
                     <p className="text-gray-400">No upcoming events</p>
                     <div className="mt-4">
                       <AddEventButton venueId={venueId} />
