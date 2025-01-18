@@ -13,28 +13,42 @@ interface Guestlist {
   eventId: number;
 }
 
-export default async function Page({ searchParams }: { searchParams: { id: number } }) {
+export default async function Page({ searchParams }: { searchParams: { eventId: string } }) {
+  const session = await auth();
+  if (!session?.user) {
+    redirect("/login");
+  }
 
-      const session = await auth();
-      if (!session?.user) {
-        redirect("/login");
-      }
-    
-     // const id: string = session?.user?.id ?? "";
-
-  const eventId = searchParams?.id;
+  // Await the searchParams
+  const params = await searchParams;
+  const eventId = parseInt(params.eventId, 10);
+  
+  if (isNaN(eventId)) {
+    return (
+      <div className="container mx-auto p-4">
+        <div className="text-center p-4 bg-red-50 rounded-lg">
+          <p className="text-red-600">Invalid event ID</p>
+        </div>
+      </div>
+    );
+  }
 
   let guestlist: Guestlist[] = []; // Initialize with an empty array
   try {
-    guestlist = await fetchGuestlist(eventId); // Fetch data
+    guestlist = await fetchGuestlist(eventId);
   } catch (error) {
     console.error('Error fetching guestlist:', error);
   }
 
   return (
-    <div>
-      
-      <GuestListTable guestlist={guestlist} />
+    <div className="container mx-auto p-4">
+      {guestlist.length > 0 ? (
+        <GuestListTable guestlist={guestlist} />
+      ) : (
+        <div className="text-center p-4 bg-gray-50 rounded-lg">
+          <p className="text-gray-600">No guests in guestlist</p>
+        </div>
+      )}
     </div>
   );
 }
