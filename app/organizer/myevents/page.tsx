@@ -1,8 +1,6 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { fetchMyEvents } from "@/actions/fetchMyEvents";
-import { Event } from "@/components/VenuePageRightSection";
-import Image from "next/image";
 import MyEventsCard from "@/components/MyEventsCard";
 
 async function page() {
