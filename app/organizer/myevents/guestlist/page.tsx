@@ -12,13 +12,15 @@ interface Guestlist {
   eventId: number;
 }
 
-export default async function Page({ searchParams }: { searchParams: { eventId: string } }) {
+interface PageProps {
+  params: { [key: string]: string | string[] | undefined };
+  searchParams: { [key: string]: string | string[] | undefined };
+}
 
-
-  // Await the searchParams
-  const params = await searchParams;
-  const eventId = parseInt(params.eventId, 10);
-  const hasaccess=await checkEventAccess(eventId);
+export default async function Page({ searchParams }: PageProps) {
+  const eventId = parseInt(searchParams.eventId as string, 10);
+  
+  const hasaccess = await checkEventAccess(eventId);
 
   if (!hasaccess) {
     return (
@@ -43,6 +45,7 @@ export default async function Page({ searchParams }: { searchParams: { eventId: 
   let guestlist: Guestlist[] = []; // Initialize with an empty array
   try {
     guestlist = await fetchGuestlist(eventId);
+    console.log("Fetched guestlist:", guestlist);
   } catch (error) {
     console.error('Error fetching guestlist:', error);
   }
