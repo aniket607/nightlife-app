@@ -52,7 +52,6 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ e
   let guestlist: Guestlist[] = [];
   try {
     guestlist = await fetchGuestlist(eventId);
-    console.log("Fetched guestlist:", guestlist);
   } catch (error) {
     console.error('Error fetching guestlist:', error);
   }
