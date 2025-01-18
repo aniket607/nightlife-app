@@ -68,7 +68,19 @@ function EventCard({ event, isPast }: { event: EventWithVenue, isPast?: boolean 
           <div className="flex flex-col h-full">
             {/* Event and Venue Names */}
             <div>
-              <h3 className="text-xl font-semibold text-gray-200">{event.eventName}</h3>
+              <div className="flex items-center gap-3">
+                <h3 className="text-xl font-semibold text-gray-200">{event.eventName}</h3>
+                <span className="px-2.5 py-1 text-xs font-medium rounded-full 
+                  bg-gray-800/80 border border-gray-700/50 text-gray-300 
+                  backdrop-blur-sm
+                  transition-all duration-300
+                  hover:bg-gray-700/80 hover:border-gray-600/50 
+                  hover:text-gray-200 hover:scale-105 
+                  hover:shadow-md hover:shadow-gray-900/50
+                  group-hover:border-gray-500/50">
+                  {event.eventType}
+                </span>
+              </div>
               <Link 
                 href={`/organizer/venue/?id=${event.venueId}`}
                 className="text-sm text-blue-400 hover:text-blue-300 transition-colors mt-1 inline-block"
@@ -84,24 +96,47 @@ function EventCard({ event, isPast }: { event: EventWithVenue, isPast?: boolean 
 
             {/* Bottom Section */}
             <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-              {/* Slots Available */}
-              <div className="inline-flex items-center px-2.5 py-1 rounded-full bg-gray-700/50 border border-gray-600/50">
-                <svg
-                  className="w-4 h-4 mr-1.5 text-gray-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                  />
-                </svg>
-                <span className="text-sm font-medium text-gray-300">
-                  {event.stagGlCount} slots available
-                </span>
+              {/* Slots Available - Now with both stag and couple */}
+              <div className="flex gap-2">
+                <div className="inline-flex items-center px-2.5 py-1 rounded-full bg-gray-700/50 border border-gray-600/50">
+                  <svg
+                    className="w-4 h-4 mr-1.5 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                    />
+                  </svg>
+                  <span className="text-sm font-medium text-gray-300">
+                    {event.stagGlCount} stag
+                  </span>
+                </div>
+
+                {event.coupleGlCount !== null && (
+                  <div className="inline-flex items-center px-2.5 py-1 rounded-full bg-gray-700/50 border border-gray-600/50">
+                    <svg
+                      className="w-4 h-4 mr-1.5 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+                      />
+                    </svg>
+                    <span className="text-sm font-medium text-gray-300">
+                      {event.coupleGlCount} couple
+                    </span>
+                  </div>
+                )}
               </div>
 
               {/* Action Buttons */}
