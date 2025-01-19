@@ -8,43 +8,93 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-interface Guestlist {
+interface StagGuest {
+  type: 'stag';
   glId: number;
   guestName: string;
   guestAge: number;
-  guestMobile: bigint;
+  guestMobile: string;
   guestEmail: string;
   eventId: number;
 }
 
-interface GuestListTableProps {
-  guestlist: Guestlist[];
+interface CoupleGuest {
+  type: 'couple';
+  glId: number;
+  maleName: string;
+  femaleName: string;
+  maleAge: number;
+  femaleAge: number;
+  maleMobile: string;
+  femaleMobile: string;
+  maleEmail: string;
+  femaleEmail: string | null;
+  eventId: number;
 }
 
-export default function GuestListTable({ guestlist }: GuestListTableProps) {
+interface GuestListTableProps {
+  stagGuests: StagGuest[];
+  coupleGuests: CoupleGuest[];
+  activeList: 'stag' | 'couple';
+}
+
+export default function GuestListTable({ stagGuests, coupleGuests, activeList }: GuestListTableProps) {
   const downloadCSV = () => {
-    // Convert table data to CSV format
-    const headers = ["S.No", "Name", "Age", "Mobile", "Email"];
-    const rows = guestlist?.map((item, index) => [
+    // Common headers for both types
+    const stagHeaders = ["S.No", "Sex", "Name", "Age", "Mobile", "Email"];
+    
+    // Convert stag guests to rows
+    const stagRows = stagGuests.map((guest, index) => [
       index + 1,
-      item.guestName,
-      item.guestAge,
-      item.guestMobile.toString(),
-      item.guestEmail,
+      "Male",  // Adding sex for stag guests
+      guest.guestName,
+      guest.guestAge,
+      guest.guestMobile,
+      guest.guestEmail,
     ]);
 
-    // Create CSV content
-    const csvContent =
-      [headers.join(","), ...rows.map((row) => row.join(","))].join("\n");
+    // Convert couple guests to rows (two rows per couple)
+    const coupleRows = coupleGuests.flatMap((guest, index) => [
+      // Male row
+      [
+        index + 1,
+        "Male",
+        guest.maleName,
+        guest.maleAge,
+        guest.maleMobile,
+        guest.maleEmail,
+      ],
+      // Female row
+      [
+        index + 1,
+        "Female",
+        guest.femaleName,
+        guest.femaleAge,
+        guest.femaleMobile,
+        guest.femaleEmail || '',
+      ]
+    ]);
 
-    // Create a Blob and URL for download
+    // Combine with spacing between sections
+    const csvContent = [
+      // Stag section
+      "STAG GUESTS",
+      stagHeaders.join(","),
+      ...stagRows.map(row => row.join(",")),
+      "", // Empty line for spacing
+      "", // Empty line for spacing
+      // Couple section
+      "COUPLE GUESTS",
+      stagHeaders.join(","),  // Using same headers for consistency
+      ...coupleRows.map(row => row.join(","))
+    ].join("\n");
+
+    // Create and trigger download
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
-
-    // Create an invisible link to trigger download
     const link = document.createElement("a");
     link.href = url;
-    link.setAttribute("download", "guestlist.csv");
+    link.setAttribute("download", "complete_guestlist.csv");
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -55,10 +105,10 @@ export default function GuestListTable({ guestlist }: GuestListTableProps) {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 my-5">
         <h1 className="flex items-center gap-3">
           <span className="text-white text-xl sm:text-2xl font-bold font-poppins">
-            Guest List
+            {activeList === 'stag' ? 'Stag Guest List' : 'Couple Guest List'}
           </span>
           <span className="text-white/40 text-sm sm:text-base font-normal">
-            {guestlist.length} guests
+            {activeList === 'stag' ? stagGuests.length : coupleGuests.length} guests
           </span>
         </h1>
         <button
@@ -81,7 +131,7 @@ export default function GuestListTable({ guestlist }: GuestListTableProps) {
               d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" 
             />
           </svg>
-          Download
+          Download Complete List
         </button>
       </div>
 
@@ -89,46 +139,70 @@ export default function GuestListTable({ guestlist }: GuestListTableProps) {
         <Table className="min-w-full backdrop-blur-sm bg-white/5 border border-white/20 rounded-xl shadow-xl">
           <TableHeader>
             <TableRow className="border-b border-white/20">
-              <TableCell className="px-3 sm:px-6 py-3 sm:py-4 font-medium text-white/80 bg-white/5 whitespace-nowrap">
-                S.No
-              </TableCell>
-              <TableCell className="px-3 sm:px-6 py-3 sm:py-4 font-medium text-white/80 bg-white/5 whitespace-nowrap">
-                Name
-              </TableCell>
-              <TableCell className="px-3 sm:px-6 py-3 sm:py-4 font-medium text-white/80 bg-white/5 whitespace-nowrap">
-                Age
-              </TableCell>
-              <TableCell className="px-3 sm:px-6 py-3 sm:py-4 font-medium text-white/80 bg-white/5 whitespace-nowrap">
-                Mobile
-              </TableCell>
-              <TableCell className="px-3 sm:px-6 py-3 sm:py-4 font-medium text-white/80 bg-white/5 whitespace-nowrap">
-                Email
-              </TableCell>
+              {activeList === 'stag' ? (
+                <>
+                  <TableCell className="px-3 sm:px-6 py-3 sm:py-4 font-medium text-white/80 bg-white/5">S.No</TableCell>
+                  <TableCell className="px-3 sm:px-6 py-3 sm:py-4 font-medium text-white/80 bg-white/5">Name</TableCell>
+                  <TableCell className="px-3 sm:px-6 py-3 sm:py-4 font-medium text-white/80 bg-white/5">Age</TableCell>
+                  <TableCell className="px-3 sm:px-6 py-3 sm:py-4 font-medium text-white/80 bg-white/5">Mobile</TableCell>
+                  <TableCell className="px-3 sm:px-6 py-3 sm:py-4 font-medium text-white/80 bg-white/5">Email</TableCell>
+                </>
+              ) : (
+                <>
+                  <TableCell className="px-3 sm:px-6 py-3 sm:py-4 font-medium text-white/80 bg-white/5">S.No</TableCell>
+                  <TableCell className="px-3 sm:px-6 py-3 sm:py-4 font-medium text-white/80 bg-white/5">Gender</TableCell>
+                  <TableCell className="px-3 sm:px-6 py-3 sm:py-4 font-medium text-white/80 bg-white/5">Name</TableCell>
+                  <TableCell className="px-3 sm:px-6 py-3 sm:py-4 font-medium text-white/80 bg-white/5">Age</TableCell>
+                  <TableCell className="px-3 sm:px-6 py-3 sm:py-4 font-medium text-white/80 bg-white/5">Mobile</TableCell>
+                  <TableCell className="px-3 sm:px-6 py-3 sm:py-4 font-medium text-white/80 bg-white/5">Email</TableCell>
+                </>
+              )}
             </TableRow>
           </TableHeader>
           <TableBody>
-            {guestlist?.map((item, index) => (
-              <TableRow
-                key={item.glId}
-                className="border-b border-white/10 hover:bg-white/5 transition-colors duration-200"
-              >
-                <TableCell className="px-3 sm:px-6 py-3 sm:py-4 text-white/70 text-sm sm:text-base">
-                  {index + 1}
-                </TableCell>
-                <TableCell className="px-3 sm:px-6 py-3 sm:py-4 text-white/70 text-sm sm:text-base">
-                  {item.guestName}
-                </TableCell>
-                <TableCell className="px-3 sm:px-6 py-3 sm:py-4 text-white/70 text-sm sm:text-base">
-                  {item.guestAge}
-                </TableCell>
-                <TableCell className="px-3 sm:px-6 py-3 sm:py-4 text-white/70 text-sm sm:text-base">
-                  {item.guestMobile.toString()}
-                </TableCell>
-                <TableCell className="px-3 sm:px-6 py-3 sm:py-4 text-white/70 text-sm sm:text-base break-all">
-                  {item.guestEmail}
-                </TableCell>
-              </TableRow>
-            ))}
+            {activeList === 'stag' ? (
+              stagGuests.map((guest, index) => (
+                <TableRow key={guest.glId} className="border-b border-white/10 hover:bg-white/5">
+                  <TableCell className="px-3 sm:px-6 py-3 sm:py-4 text-white/70">{index + 1}</TableCell>
+                  <TableCell className="px-3 sm:px-6 py-3 sm:py-4 text-white/70">{guest.guestName}</TableCell>
+                  <TableCell className="px-3 sm:px-6 py-3 sm:py-4 text-white/70">{guest.guestAge}</TableCell>
+                  <TableCell className="px-3 sm:px-6 py-3 sm:py-4 text-white/70">{guest.guestMobile}</TableCell>
+                  <TableCell className="px-3 sm:px-6 py-3 sm:py-4 text-white/70 break-all">{guest.guestEmail}</TableCell>
+                </TableRow>
+              ))
+            ) : (
+              coupleGuests.map((guest, index) => (
+                <React.Fragment key={guest.glId}>
+                  {/* Male Row */}
+                  <TableRow className="border-b border-white/10 hover:bg-white/5 group">
+                    <TableCell rowSpan={2} className="px-3 sm:px-6 py-3 sm:py-4 text-white/70 align-middle text-center bg-white/5">
+                      {index + 1}
+                    </TableCell>
+                    <TableCell className="px-3 sm:px-6 py-2 text-white/70">
+                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-500/20 text-blue-300">
+                        Male
+                      </span>
+                    </TableCell>
+                    <TableCell className="px-3 sm:px-6 py-2 text-white/70">{guest.maleName}</TableCell>
+                    <TableCell className="px-3 sm:px-6 py-2 text-white/70">{guest.maleAge}</TableCell>
+                    <TableCell className="px-3 sm:px-6 py-2 text-white/70">{guest.maleMobile}</TableCell>
+                    <TableCell className="px-3 sm:px-6 py-2 text-white/70 break-all">{guest.maleEmail}</TableCell>
+                  </TableRow>
+                  {/* Female Row */}
+                  <TableRow className="border-b border-white/10 hover:bg-white/5 group">
+                    <TableCell className="px-3 sm:px-6 py-2 text-white/70">
+                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-pink-500/20 text-pink-300">
+                        Female
+                      </span>
+                    </TableCell>
+                    <TableCell className="px-3 sm:px-6 py-2 text-white/70">{guest.femaleName}</TableCell>
+                    <TableCell className="px-3 sm:px-6 py-2 text-white/70">{guest.femaleAge}</TableCell>
+                    <TableCell className="px-3 sm:px-6 py-2 text-white/70">{guest.femaleMobile}</TableCell>
+                    <TableCell className="px-3 sm:px-6 py-2 text-white/70 break-all">{guest.femaleEmail}</TableCell>
+                  </TableRow>
+                </React.Fragment>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>
