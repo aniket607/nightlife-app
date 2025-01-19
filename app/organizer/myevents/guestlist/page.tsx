@@ -1,7 +1,7 @@
 "use client";
 import { fetchGuestlist } from '@/actions/fetchGuestlist';
 import GuestListTable from '@/components/GuestListTable';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { checkEventAccess } from '@/actions/checkEventAccess';
 import { useSearchParams } from 'next/navigation';
 
@@ -31,7 +31,8 @@ interface CoupleGuest {
   eventId: number;
 }
 
-export default function Page() {
+// Create a separate component for the main content
+function GuestListContent() {
   const searchParams = useSearchParams();
   const eventId = searchParams.get('eventId');
   
@@ -149,5 +150,20 @@ export default function Page() {
         />
       )}
     </div>
+  );
+}
+
+// Main page component with Suspense
+export default function Page() {
+  return (
+    <Suspense fallback={
+      <div className="container mx-auto p-4">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto"></div>
+        </div>
+      </div>
+    }>
+      <GuestListContent />
+    </Suspense>
   );
 }
