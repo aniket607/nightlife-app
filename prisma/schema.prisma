@@ -67,6 +67,7 @@ model Venue {
   locationUrl String?
   userId      String
   venueImgUrl String
+  featuredVenue    Boolean?  @default(false)
   users       User    @relation(fields: [userId], references: [id])
   events      Event[]
 }
@@ -83,7 +84,8 @@ model Event {
   eventImgUrl      String?
   eventType        String
   venueId          String
-  userId           String     
+  userId           String 
+  featuredEvent   Boolean?  @default(false)    
   createdAt      DateTime @default(now())
   venue            Venue      @relation(fields: [venueId], references: [id])
   user             User       @relation(fields: [userId], references: [id]) 
