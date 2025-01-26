@@ -51,8 +51,12 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
   const [eventDescription, setEventDescription] = useState(
     eventData?.eventDescription ?? ""
   );
-  const [eventDate, setEventDate] = useState(eventData?.eventDate);
-  const [eventTime, setEventTime] = useState(eventData?.eventTime);
+  const [eventDate, setEventDate] = useState<Date | null>(
+    eventData?.eventDate ? new Date(eventData.eventDate) : null
+  );
+  const [eventTime, setEventTime] = useState<Date | null>(
+    eventData?.eventTime ? new Date(eventData.eventTime) : null
+  );
   const [eventType, setEventType] = useState(eventData?.eventType);
   const [stagGlCount, setStagGlCount] = useState(eventData?.stagGlCount);
   const [coupleGl, setCoupleGl] = useState<boolean>(() => {
@@ -232,7 +236,7 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
             setIsDisabled(true);
 
             // Add error handling for navigation
-            const redirectUrl = `/organizer/venue?id=${encodeURIComponent(eventData.venueId)}`;
+            const redirectUrl = `/organizer/myevents`;
             setTimeout(() => {
               try {
                 window.location.href = redirectUrl;
@@ -393,7 +397,6 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
                   </label>
                   <DatePicker
                     selected={eventDate}
-                    value={eventDate}
                     onChange={(date: Date | null) => setEventDate(date)}
                     dateFormat="MMMM d, yyyy"
                     placeholderText="Select Date"
@@ -415,7 +418,6 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
                   </label>
                   <DatePicker
                     selected={eventTime}
-                    value={eventTime}
                     onChange={(time: Date | null) => setEventTime(time)}
                     showTimeSelect
                     showTimeSelectOnly
