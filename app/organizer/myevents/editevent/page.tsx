@@ -3,17 +3,25 @@ import { checkEventAccess } from "@/actions/checkEventAccess";
 import UpdateEventForm from '@/components/UpdateEventForm';
 import { notFound } from 'next/navigation';
 
+interface PageProps {
+  searchParams: {
+    [key: string]: string | string[] | undefined;
+  };
+}
+
 export default async function EditEventPage({
   searchParams,
-}: {
-  searchParams: { eventId: string };
-}) {
-  const { eventId } = await searchParams
-  if (!eventId) {
+}: PageProps) {
+  const {eventId} = await searchParams;
+  
+  if (!eventId || Array.isArray(eventId)) {
     notFound();
   }
+
   const parsedEventId = parseInt(eventId, 10);
-    console.log("eventId:",parsedEventId)
+  if (isNaN(parsedEventId)) {
+    notFound();
+  }
 
   // Check if user has access to this event
   const hasAccess = await checkEventAccess(parsedEventId);
