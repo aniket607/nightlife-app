@@ -151,7 +151,7 @@ function EventCard({ event, isPast }: { event: EventWithVenue, isPast?: boolean 
                     active:scale-95 active:bg-white/25
                     disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:bg-white/10
                     group relative overflow-hidden"
-                  onClick={() => router.push(`/organizer/myevents/edit?eventId=${event.eventId}`)}
+                  onClick={() => router.push(`/organizer/myevents/editevent?eventId=${event.eventId}`)}
                 >
                   <span className="relative z-10 flex items-center justify-center gap-2">
                     <svg 
