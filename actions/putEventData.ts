@@ -12,7 +12,7 @@ const formSchema = z.object({
   }),
   eventTime: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, "Invalid time format (HH:mm)"),
   stagGlCount: z.coerce.number().min(0, "Stag guest list count must be a positive number"),
-  coupleGl: z.coerce.boolean(),
+  coupleGl: z.enum(['true', 'false']).transform(val => val === 'true'),
   coupleGlCount: z.coerce.number().min(0, "Couple guest list count must be a positive number").optional(),
   eventImgUrl: z.string().url("Invalid image URL"),
   eventType: z.string().default("Regular"), // You might want to add specific validation for event types
@@ -21,12 +21,12 @@ const formSchema = z.object({
 export async function putEventData(formData: FormData, userId: string, venueId: string) {
   // Convert FormData to an object
   const data = Object.fromEntries(formData);
-  console.log("[putEventData] Incoming form data:", data);
+  // console.log("[putEventData] Incoming form data:", data);
 
   try {
     // Run Zod validation
     const validatedData = formSchema.safeParse(data);
-
+    // console.log("[putEventData] Validated data:", validatedData);
     if (!validatedData.success) {
       console.error("[putEventData] Validation errors:", validatedData.error.errors);
       return { success: false, errors: validatedData.error.errors };
