@@ -6,12 +6,14 @@ import {
   FormEvent,
   useEffect,
   useCallback,
+  useMemo,
 } from "react";
 import UploadForm from "@/components/UploadForm";
 import toast, { Toaster } from "react-hot-toast";
 import DatePicker from "react-datepicker"; // React Datepicker for date selection
 import "react-datepicker/dist/react-datepicker.css"; // Import datepicker styles
 import { updateEventData } from "@/actions/updateEventData";
+import Image from "next/image";
 
 interface Event {
   eventId: number; // Assuming `Int` maps to `number`
@@ -54,19 +56,22 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
   const [eventDate, setEventDate] = useState<Date | null>(
     eventData?.eventDate ? new Date(eventData.eventDate) : null
   );
-  const [eventTime, setEventTime] = useState<Date | null>(() => {
-    if (!eventData?.eventTime) return null;
-    const time = new Date(eventData.eventTime);
-    const hours = time.getUTCHours();
-    const minutes = time.getUTCMinutes();
-    console.log(hours, minutes)
-    // Create new date with UTC hours and minutes
+
+  // Move time parsing logic to a separate function
+  const parseEventTime = (timeData: Date | null) => {
+    if (!timeData) return null;
+    const time = new Date(timeData);
     const localDate = new Date();
-    localDate.setHours(hours, minutes, 0, 0); // Set the hours and minutes to match the event time
-  
-    return localDate; 
-  });
-  console.log(eventDate?.getUTCHours)
+    localDate.setHours(time.getUTCHours(), time.getUTCMinutes(), 0, 0);
+    return localDate;
+  };
+
+  // Use useMemo for the initial time value
+  const initialTime = useMemo(() => parseEventTime(eventData?.eventTime ?? null), [eventData?.eventTime]);
+
+  // Use the memoized value in useState
+  const [eventTime, setEventTime] = useState<Date | null>(initialTime);
+
   const [eventType, setEventType] = useState(eventData?.eventType);
   const [stagGlCount, setStagGlCount] = useState(eventData?.stagGlCount);
   const [coupleGl, setCoupleGl] = useState<boolean>(() => {
@@ -204,9 +209,9 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
       const day = eventDate.getDate().toString().padStart(2, "0");
       formData.append("eventDate", `${year}-${month}-${day}`);
 
-      // Format time as HH:mm using UTC
-      const hours = eventTime.getUTCHours().toString().padStart(2, "0");
-      const minutes = eventTime.getUTCMinutes().toString().padStart(2, "0");
+      // Format time as HH:mm in local time instead of UTC
+      const hours = eventTime.getHours().toString().padStart(2, "0");
+      const minutes = eventTime.getMinutes().toString().padStart(2, "0");
       formData.append("eventTime", `${hours}:${minutes}`);
 
       formData.append("eventName", eventName ?? "");
@@ -286,20 +291,23 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
           Update Event
         </h2>
 
-        <div className="flex flex-col md:flex-row gap-8 items-center">
+        <div className="flex flex-col md:flex-row gap-8">
           {/* Image Upload Section */}
-          <div className="w-full md:w-1/2">
+          <div className="w-full md:w-1/2 h-96 flex flex-col items-center my-10">
             <h3 className="text-lg font-semibold text-gray-300 mb-4">
               Event Image
             </h3>
             
             {/* Show current image */}
             {currentImageUrl && !isImageUpdated && (
-              <div className="mb-4">
-                <img 
+              <div className="mb-4 h-72 w-56 flex flex-col items-center justify-center">
+                <Image
                   src={currentImageUrl} 
                   alt="Current event" 
-                  className="w-full h-48 object-cover rounded-lg mb-2"
+                  className="w-full rounded-lg mb-2"
+                  layout="responsive" 
+                  width={10}
+                  height={10} 
                 />
                 <button
                   type="button"
@@ -313,7 +321,7 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
 
             {/* Show upload form when user wants to update image */}
             {isImageUpdated && (
-              <div>
+              <div className="flex flex-col items-center justify-center">
                 <UploadForm
                   setImageUrl={(url: string) => {
                     if (url) {
@@ -338,7 +346,7 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
                     setNewImageUrl("");
                     setImageUploadError(null);
                   }}
-                  className="mt-2 px-4 py-2 bg-gray-700 text-gray-200 rounded hover:bg-gray-600 transition"
+                  className="mt-4 px-4 py-2 bg-red-700/40 text-gray-200 rounded hover:bg-red-600/70 transition"
                 >
                   Cancel Image Change
                 </button>
