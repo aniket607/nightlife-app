@@ -54,9 +54,19 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
   const [eventDate, setEventDate] = useState<Date | null>(
     eventData?.eventDate ? new Date(eventData.eventDate) : null
   );
-  const [eventTime, setEventTime] = useState<Date | null>(
-    eventData?.eventTime ? new Date(eventData.eventTime) : null
-  );
+  const [eventTime, setEventTime] = useState<Date | null>(() => {
+    if (!eventData?.eventTime) return null;
+    const time = new Date(eventData.eventTime);
+    const hours = time.getUTCHours();
+    const minutes = time.getUTCMinutes();
+    console.log(hours, minutes)
+    // Create new date with UTC hours and minutes
+    const localDate = new Date();
+    localDate.setHours(hours, minutes, 0, 0); // Set the hours and minutes to match the event time
+  
+    return localDate; 
+  });
+  console.log(eventDate?.getUTCHours)
   const [eventType, setEventType] = useState(eventData?.eventType);
   const [stagGlCount, setStagGlCount] = useState(eventData?.stagGlCount);
   const [coupleGl, setCoupleGl] = useState<boolean>(() => {
@@ -194,9 +204,9 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
       const day = eventDate.getDate().toString().padStart(2, "0");
       formData.append("eventDate", `${year}-${month}-${day}`);
 
-      // Format time as HH:mm
-      const hours = eventTime.getHours().toString().padStart(2, "0");
-      const minutes = eventTime.getMinutes().toString().padStart(2, "0");
+      // Format time as HH:mm using UTC
+      const hours = eventTime.getUTCHours().toString().padStart(2, "0");
+      const minutes = eventTime.getUTCMinutes().toString().padStart(2, "0");
       formData.append("eventTime", `${hours}:${minutes}`);
 
       formData.append("eventName", eventName ?? "");
