@@ -102,9 +102,18 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
       eventDate.toISOString() !== new Date(eventData.eventDate).toISOString() : 
       false;
     
-    const hasTimeChanged = eventTime && eventData?.eventTime ? 
-      eventTime.toISOString() !== new Date(eventData.eventTime).toISOString() : 
-      false;
+      const time = new Date(eventData?.eventTime??"");
+      const hours = time.getUTCHours();
+      const minutes = time.getUTCMinutes();
+      // Create new date with UTC hours and minutes
+      const localDate = new Date();
+      localDate.setHours(hours, minutes, 0, 0);
+  
+      const hasTimeChanged =
+        eventTime && localDate
+          ? eventTime.toISOString() !==
+          localDate.toISOString()
+          : false;
 
     return (
       eventName !== eventData?.eventName ||
