@@ -26,7 +26,7 @@ function EventCard({ event, isPast }: { event: EventWithVenue, isPast?: boolean 
   const router = useRouter();
   
   return (
-    <div className="flex flex-col sm:flex-row bg-gradient-to-r from-gray-900/90 via-gray-800/90 to-gray-900/90 rounded-lg shadow-lg w-full overflow-hidden hover:shadow-xl transition-all h-auto relative group">
+    <div className="flex flex-col md:flex-row bg-gradient-to-r from-gray-900/90 via-gray-800/90 to-gray-900/90 rounded-3xl shadow-lg w-full overflow-clip hover:shadow-xl transition-all h-auto relative group">
       {/* Date and Time Section */}
       <div className="flex flex-row sm:flex-col items-center justify-between sm:justify-center p-4 sm:min-w-[100px] border-b sm:border-b-0 sm:border-r border-gray-700/50 bg-gray-900/50 relative z-10 backdrop-blur-sm">
         <div className="flex items-center sm:flex-col sm:items-center">
@@ -51,9 +51,9 @@ function EventCard({ event, isPast }: { event: EventWithVenue, isPast?: boolean 
       </div>
 
       {/* Content Section */}
-      <div className="flex-1 flex flex-col sm:flex-row">
+      <div className="flex-1 flex flex-col md:flex-row">
         {/* Event Image */}
-        <div className="relative w-full sm:w-[120px] h-[200px] sm:h-auto">
+        <div className="relative w-40 md:w-[120px] h-[250px] md:h-auto">
           <Image
             src={event?.eventImgUrl || "/placeholder-image.jpg"}
             alt={event.eventName}
@@ -68,7 +68,7 @@ function EventCard({ event, isPast }: { event: EventWithVenue, isPast?: boolean 
           <div className="flex flex-col h-full">
             {/* Event and Venue Names */}
             <div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center flex-col md:flex-row gap-3">
                 <h3 className="text-xl font-semibold text-gray-200">{event.eventName}</h3>
                 <span className="px-2.5 py-1 text-xs font-medium rounded-full 
                   bg-gray-800/80 border border-gray-700/50 text-gray-300 
@@ -99,19 +99,9 @@ function EventCard({ event, isPast }: { event: EventWithVenue, isPast?: boolean 
               {/* Slots Available - Now with both stag and couple */}
               <div className="flex gap-2">
                 <div className="inline-flex items-center px-2.5 py-1 rounded-full bg-gray-700/50 border border-gray-600/50">
-                  <svg
-                    className="w-4 h-4 mr-1.5 text-gray-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                    />
-                  </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
                   <span className="text-sm font-medium text-gray-300">
                     {event.stagGlCount} stag
                   </span>
@@ -223,61 +213,51 @@ export default function MyEventsCard({ pastEvents, upcomingEvents }: MyEventsCar
   return (
     <div className="max-w-4xl mx-auto">
       <Accordion type="single" collapsible defaultValue="upcoming" className="space-y-4">
-          <AccordionItem value="past" className="border-none">
-              <AccordionTrigger className="hover:no-underline group">
-                <div className="flex items-center space-x-3">
-                  <span className="text-2xl font-bold bg-gradient-to-r from-gray-200 to-gray-400 bg-clip-text text-transparent group-hover:from-white group-hover:to-gray-300 transition-all">
-                    PAST
-                  </span>
-                  <div className="h-px flex-1 bg-gradient-to-r from-gray-700 to-transparent"></div>
+        <AccordionItem value="past" className="border-none">
+          <AccordionTrigger className="flex items-center justify-between p-4 bg-gradient-to-r from-slate-900/40 via-zinc-900/40 to-slate-900/50 text-white rounded-lg shadow-lg backdrop-blur-md transition-transform transform hover:scale-105">
+            <span className="text-lg font-bold">PAST</span>
+          </AccordionTrigger>
+          <AccordionContent className="p-2 md:p-4 bg-gradient-to-br from-slate-950/40 via-zinc-900/40 to-slate-950/40 backdrop-blur-md rounded-lg shadow-md">
+            <div className="space-y-4 mt-4">
+              {isLoading ? (
+                Array(2).fill(0).map((_, index) => (
+                  <EventCardSkeleton key={`past-skeleton-${index}`} />
+                ))
+              ) : pastEvents.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-gray-400">No past events</p>
                 </div>
-              </AccordionTrigger>
-              <AccordionContent>
-                <div className="space-y-4 mt-4">
-                  {isLoading ? (
-                    Array(2).fill(0).map((_, index) => (
-                      <EventCardSkeleton key={`past-skeleton-${index}`} />
-                    ))
-                  ) : pastEvents.length === 0 ? (
-                    <div className="text-center py-8">
-                      <p className="text-gray-400">No past events</p>
-                    </div>
-                  ) : (
-                    pastEvents.map((event) => (
-                      <EventCard key={event.eventId} event={event} isPast={true} />
-                    ))
-                  )}
-                </div>
-              </AccordionContent>
-            </AccordionItem>
+              ) : (
+                pastEvents.map((event) => (
+                  <EventCard key={event.eventId} event={event} isPast={true} />
+                ))
+              )}
+            </div>
+          </AccordionContent>
+        </AccordionItem>
 
-            <AccordionItem value="upcoming" className="border-none">
-              <AccordionTrigger className="hover:no-underline group">
-                <div className="flex items-center space-x-3">
-                  <span className="text-2xl font-bold bg-gradient-to-r from-gray-200 to-gray-400 bg-clip-text text-transparent group-hover:from-white group-hover:to-gray-300 transition-all">
-                    UPCOMING
-                  </span>
-                  <div className="h-px flex-1 bg-gradient-to-r from-gray-700 to-transparent"></div>
+        <AccordionItem value="upcoming" className="border-none">
+          <AccordionTrigger className="flex items-center justify-between p-4 bg-gradient-to-r from-slate-900/40 via-zinc-900/40 to-slate-900/50 text-white rounded-lg shadow-lg backdrop-blur-md transition-transform transform hover:scale-105">
+            <span className="text-lg font-bold">UPCOMING</span>
+          </AccordionTrigger>
+          <AccordionContent className="p-4 bg-gradient-to-br from-slate-950/30 via-zinc-900/30 to-slate-950/30 backdrop-blur-md rounded-lg shadow-md">
+            <div className="space-y-4 mt-4">
+              {isLoading ? (
+                Array(2).fill(0).map((_, index) => (
+                  <EventCardSkeleton key={`upcoming-skeleton-${index}`} />
+                ))
+              ) : upcomingEvents.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-gray-400">No upcoming events</p>
                 </div>
-              </AccordionTrigger>
-              <AccordionContent>
-                <div className="space-y-4 mt-4">
-                  {isLoading ? (
-                    Array(2).fill(0).map((_, index) => (
-                      <EventCardSkeleton key={`upcoming-skeleton-${index}`} />
-                    ))
-                  ) : upcomingEvents.length === 0 ? (
-                    <div className="text-center py-8">
-                      <p className="text-gray-400">No upcoming events</p>
-                    </div>
-                  ) : (
-                    upcomingEvents.map((event) => (
-                      <EventCard key={event.eventId} event={event} isPast={false} />
-                    ))
-                  )}
-                </div>
-              </AccordionContent>
-            </AccordionItem>
+              ) : (
+                upcomingEvents.map((event) => (
+                  <EventCard key={event.eventId} event={event} isPast={false} />
+                ))
+              )}
+            </div>
+          </AccordionContent>
+        </AccordionItem>
       </Accordion>
     </div>
   );
