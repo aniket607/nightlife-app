@@ -3,23 +3,7 @@ import { redirect } from "next/navigation";
 import { fetchVenueById } from "@/actions/fetchvenuedata";
 import VenuePageLeftSection from "@/components/VenuePageLeftSection";
 import VenuePageRightSection from "@/components/VenuePageRightSection";
-import { fetchUpcomingEventByVenueId } from "@/actions/fetchUpcomingEventData";
-import { fetchPastEventByVenueId } from "@/actions/fetchPastEventData";
-
-interface Event {
-  eventId: number; // Assuming `Int` maps to `number`
-  eventName: string;
-  eventDescription?: string | null; // Optional field
-  eventDate: Date; // Maps to `DateTime`
-  eventTime: Date; // `DateTime @db.Time` also maps to `Date`
-  stagGlCount: number;
-  coupleGlCount: number | null;
-  eventImgUrl?: string | null; // Optional field
-  venueId: string;
-  eventType: string;
-  userId: string;
-  createdAt: Date; // Maps to `DateTime`
-}
+import { fetchEventsOfVenue } from "@/actions/fetchEventsOfVenue";
 
 export default async function Page({ searchParams }: { searchParams: Promise<{ id: string }> }) {
   const session = await auth();
@@ -32,28 +16,17 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ i
 
   if(!venueId) redirect("/organizer/");
 
-  let venue = null;
-  try {
-    venue = await fetchVenueById(venueId);
-  } catch (error) {
-    // Handle error
+  // Fetch venue and events data in parallel
+  const [venue, eventsResult] = await Promise.all([
+    fetchVenueById(venueId).catch(() => null),
+    fetchEventsOfVenue(venueId).catch(() => ({ upcomingEvents: [], pastEvents: [] }))
+  ]);
+
+  if (!venue) {
+    redirect("/organizer/");
   }
 
-  let upcomingEvents: Event[] = [];
-  try {
-    const response = await fetchUpcomingEventByVenueId(venueId);
-    upcomingEvents = response || []
-  } catch (error) {
-    // Handle error
-  }
-  
-  let pastEvents: Event[] = [];
-  try {
-    const response = await fetchPastEventByVenueId(venueId);
-    pastEvents = response || []
-  } catch (error) {
-    // Handle error
-  }
+  const { upcomingEvents, pastEvents } = eventsResult;
 
   return (
     <div className="min-h-screen bg-secondary">

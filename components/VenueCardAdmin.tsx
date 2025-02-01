@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import { useRouter } from "next/navigation"; // Import useRouter for navigation
 import Image from "next/image";
 
@@ -21,6 +21,11 @@ const VenueCardAdmin: React.FC<VenueCardAdminProps> = ({
   address,
 }) => {
   const router = useRouter(); // Initialize Next.js router
+
+  // Prefetch the venue page data when component mounts
+  useEffect(() => {
+    router.prefetch(`/organizer/venue?id=${encodeURIComponent(venueId)}`);
+  }, [router, venueId]);
 
   // Function to handle button click and redirect
   const handleViewVenue = () => {
