@@ -1,12 +1,19 @@
 "use client";
 
-import { useState, useTransition, FormEvent } from "react";
-import UploadForm from "@/components/UploadForm";
+import { useState, useTransition, FormEvent, Suspense, lazy } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { putVenueData } from "@/actions/putVenueData";
-import toast, { Toaster } from "react-hot-toast";
+import DynamicUploadForm from "./DynamicUploadForm";
 import { ZodIssue } from "zod";
+
+// Lazy load toast
+const Toaster = lazy(() => import('react-hot-toast').then(mod => ({ 
+  default: mod.Toaster 
+})));
+const toast = lazy(() => import('react-hot-toast').then(mod => ({ 
+  default: mod.default 
+})));
 
 export default function VenueFormSection() {
   const [imageUrl, setImageUrl] = useState("");
@@ -53,7 +60,9 @@ export default function VenueFormSection() {
 
   return (
     <div className="w-full max-w-4xl bg-secondary rounded-xl shadow-2xl overflow-hidden">
-      <Toaster position="top-right" />
+      <Suspense fallback={null}>
+        <Toaster position="top-right" />
+      </Suspense>
   
       <div className="flex flex-col md:flex-row">
         {/* Image Upload Section */}
@@ -62,7 +71,7 @@ export default function VenueFormSection() {
             Upload Venue Image
           </h2>
           <div className="max-w-sm mx-auto">
-            <UploadForm
+            <DynamicUploadForm
               setImageUrl={setImageUrl}
               setIsImageUploaded={setIsImageUploaded}
             />

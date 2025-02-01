@@ -2,11 +2,16 @@
 
 import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
-export default function AddEventButton() {
+export default function AddVenueButton() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+
+  // Prefetch the add venue page when component mounts
+  useEffect(() => {
+    router.prefetch('/organizer/addvenue');
+  }, [router]);
 
   const handleClick = () => {
     setIsLoading(true);
