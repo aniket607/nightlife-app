@@ -1,31 +1,24 @@
 "use client";
 
-import { useState, useTransition, FormEvent, Suspense, lazy } from "react";
+import { useState, useTransition, FormEvent } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { putVenueData } from "@/actions/putVenueData";
 import DynamicUploadForm from "./DynamicUploadForm";
 import { ZodIssue } from "zod";
-
-// Lazy load toast
-const Toaster = lazy(() => import('react-hot-toast').then(mod => ({ 
-  default: mod.Toaster 
-})));
-const toast = lazy(() => import('react-hot-toast').then(mod => ({ 
-  default: mod.default 
-})));
+import { toast, DynamicToaster } from './DynamicToast';
 
 export default function VenueFormSection() {
   const [imageUrl, setImageUrl] = useState("");
   const [isImageUploaded, setIsImageUploaded] = useState(false);
   const [isPending, startTransition] = useTransition();
-  const [isDisabled, setIsDisabled] = useState(false); // New state to manage click disabling
+  const [isDisabled, setIsDisabled] = useState(false);
 
-  const handleFormSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault(); // Prevent default form submit & reload
+  const handleFormSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
 
     if (!isImageUploaded) {
-      toast.error("Please upload an image before submitting the form.");
+      toast.error("Please upload an image before submitting the form");
       return;
     }
 
@@ -36,33 +29,28 @@ export default function VenueFormSection() {
         const result = await putVenueData(formData);
 
         if (result.success) {
-          setIsDisabled(true); // Disable all inputs and buttons
+          setIsDisabled(true);
           toast.success("Venue Added Successfully! Redirecting back to dashboard...");
 
-          // Redirect after a delay
           setTimeout(() => {
             window.location.href = "/organizer";
-          }, 3000); // Redirect after 3 seconds
+          }, 3000);
         } else if (result.errors) {
-          // Handle validation errors from Zod
           const errorMessages = result.errors.map((issue: ZodIssue) => issue.message).join("\n");
           toast.error(`Validation errors:\n${errorMessages}`);
         } else if (result.error) {
-          // Handle server-side errors like duplicate venue names
-          toast.error(result.error); // Display the error returned by the server
+          toast.error(result.error);
         }
       } catch (error) {
-        console.error("Unexpected Error:", error);
-        toast.error("An unexpected error occurred while submitting the form.");
+        toast.error("An unexpected error occurred while adding the venue.");
+        console.error(error);
       }
     });
   };
 
   return (
     <div className="w-full max-w-4xl bg-secondary rounded-xl shadow-2xl overflow-hidden">
-      <Suspense fallback={null}>
-        <Toaster position="top-right" />
-      </Suspense>
+      <DynamicToaster position="top-right" />
   
       <div className="flex flex-col md:flex-row">
         {/* Image Upload Section */}
