@@ -41,9 +41,9 @@ export async function putEventData(formData: FormData, userId: string, venueId: 
     }
 
     // Convert eventTime from string to a Date object in local time
-    const [hours, minutes] = validatedData.data.eventTime.split(":").map(Number);
-    const eventTimeAsDate = new Date();
-    eventTimeAsDate.setHours(hours, minutes, 0, 0);
+    // const [hours, minutes] = validatedData.data.eventTime.split(":").map(Number);
+    // const eventTimeAsDate = new Date();
+    // eventTimeAsDate.setHours(hours, minutes, 0, 0);
 
     // Insert into the database
     const createdEvent = await prisma.event.create({
@@ -51,7 +51,7 @@ export async function putEventData(formData: FormData, userId: string, venueId: 
         eventName: validatedData.data.eventName,
         eventDescription: validatedData.data.eventDescription || null,
         eventDate: new Date(validatedData.data.eventDate),
-        eventTime: eventTimeAsDate,
+        eventTime: new Date(Date.UTC(1970, 0, 1, ...validatedData.data.eventTime.split(':').map(Number))),
         stagGlCount: validatedData.data.stagGlCount,
         coupleGl: validatedData.data.coupleGl,
         coupleGlCount: validatedData.data.coupleGl ? validatedData.data.coupleGlCount : null,
