@@ -1,7 +1,7 @@
 "use client";
 import { fetchGuestlist } from '@/actions/fetchGuestlist';
 import GuestListTable from '@/components/GuestListTable';
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, Suspense, useCallback, useRef } from 'react';
 import { checkEventAccess } from '@/actions/checkEventAccess';
 import { useSearchParams } from 'next/navigation';
 
@@ -31,7 +31,6 @@ interface CoupleGuest {
   eventId: number;
 }
 
-// Create a separate component for the main content
 function GuestListContent() {
   const searchParams = useSearchParams();
   const eventId = searchParams.get('eventId');
@@ -45,45 +44,101 @@ function GuestListContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const loadGuestlist = async () => {
-      if (!eventId) {
-        setError("Event ID is required");
-        setIsLoading(false);
-        return;
-      }
+  // Ref to store the polling interval
+  const pollingIntervalRef = useRef<NodeJS.Timeout | undefined>(undefined);
+  const lastFetchTimeRef = useRef<number>(0);
+  const POLLING_INTERVAL = 5000; // 5 seconds
+  const DEBOUNCE_DELAY = 300; // 300ms
 
-      const parsedEventId = parseInt(eventId, 10);
-      if (isNaN(parsedEventId)) {
-        setError("Invalid event ID");
-        setIsLoading(false);
-        return;
-      }
+  const loadGuestlist = useCallback(async (isInitialLoad = false) => {
+    if (!eventId) {
+      setError("Event ID is required");
+      setIsLoading(false);
+      return;
+    }
 
-      try {
+    const parsedEventId = parseInt(eventId, 10);
+    if (isNaN(parsedEventId)) {
+      setError("Invalid event ID");
+      setIsLoading(false);
+      return;
+    }
+
+    // Debounce check - skip if last fetch was too recent (except for initial load)
+    const now = Date.now();
+    if (!isInitialLoad && now - lastFetchTimeRef.current < DEBOUNCE_DELAY) {
+      return;
+    }
+    lastFetchTimeRef.current = now;
+
+    try {
+      if (isInitialLoad) {
         const hasAccess = await checkEventAccess(parsedEventId);
         if (!hasAccess) {
           setError("You don't have access to this event");
           setIsLoading(false);
           return;
         }
+      }
 
-        const result = await fetchGuestlist(parsedEventId);
-        if (result.success) {
-          setGuestlistData(result.data);
-        } else {
-          setError(result.error || "Failed to fetch guestlist");
-        }
-      } catch (error) {
-        console.error('Error fetching guestlist:', error);
+      const result = await fetchGuestlist(parsedEventId);
+      if (result.success) {
+        setGuestlistData(prevData => {
+          // Only update if data has actually changed
+          if (JSON.stringify(prevData) !== JSON.stringify(result.data)) {
+            return result.data;
+          }
+          return prevData;
+        });
+      } else {
+        console.error('Failed to fetch guestlist:', result.error);
+      }
+    } catch (error) {
+      console.error('Error fetching guestlist:', error);
+      if (isInitialLoad) {
         setError("An error occurred while fetching the guestlist");
-      } finally {
+      }
+    } finally {
+      if (isInitialLoad) {
         setIsLoading(false);
+      }
+    }
+  }, [eventId]);
+
+  // Initial load effect
+  useEffect(() => {
+    loadGuestlist(true);
+  }, [loadGuestlist]);
+
+  // Polling effect
+  useEffect(() => {
+    // Start polling
+    pollingIntervalRef.current = setInterval(() => {
+      loadGuestlist(false);
+    }, POLLING_INTERVAL);
+
+    // Cleanup on unmount
+    return () => {
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current);
+      }
+    };
+  }, [loadGuestlist]);
+
+  // Tab visibility effect
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        // Immediate refresh when tab becomes visible
+        loadGuestlist(false);
       }
     };
 
-    loadGuestlist();
-  }, [eventId]);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [loadGuestlist]);
 
   if (isLoading) {
     return (
