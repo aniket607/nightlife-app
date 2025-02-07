@@ -6,6 +6,11 @@ import { putEventData } from "@/actions/putEventData"; // Action for submitting 
 import toast, { Toaster } from "react-hot-toast";
 import DatePicker from "react-datepicker"; // React Datepicker for date selection
 import "react-datepicker/dist/react-datepicker.css"; // Import datepicker styles
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Underline from "@tiptap/extension-underline";
+import { FaBold, FaItalic, FaUnderline, FaListUl, FaListOl } from "react-icons/fa";
+import Placeholder from "@tiptap/extension-placeholder"; 
 
 interface EventFormSectionProps {
   userId: string;
@@ -22,36 +27,63 @@ const EVENT_TYPES = [
   "Private Party",
 ] as const;
 
-const EventFormSection: React.FC<EventFormSectionProps> = ({ userId, venueId }) => {
+const EventFormSection: React.FC<EventFormSectionProps> = ({
+  userId,
+  venueId,
+}) => {
   const [imageUrl, setImageUrl] = useState(""); // For storing event image URL
   const [isImageUploaded, setIsImageUploaded] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [isDisabled, setIsDisabled] = useState(false); // Disable form after submission
   const [eventDate, setEventDate] = useState<Date | null>(null); // State for selected date
   const [eventTime, setEventTime] = useState<Date | null>(null); // Changed to Date type for DatePicker
+  const [content, setContent] = useState(""); // State to store editor content
+  const [description, setDescription] = useState("")
 
   useEffect(() => {
     // Add event listener to radio buttons
     const radioButtons = document.querySelectorAll('input[name="coupleGl"]');
-    const coupleGlCountContainer = document.getElementById('coupleGlCountContainer');
-    const coupleGlCountInput = document.querySelector('[name="coupleGlCount"]') as HTMLInputElement;
+    const coupleGlCountContainer = document.getElementById(
+      "coupleGlCountContainer"
+    );
+    const coupleGlCountInput = document.querySelector(
+      '[name="coupleGlCount"]'
+    ) as HTMLInputElement;
 
-    radioButtons.forEach(radio => {
-      radio.addEventListener('change', (e) => {
+    radioButtons.forEach((radio) => {
+      radio.addEventListener("change", (e) => {
         const target = e.target as HTMLInputElement;
         if (coupleGlCountContainer && coupleGlCountInput) {
-          if (target.value === 'true') {
-            coupleGlCountContainer.classList.remove('hidden');
+          if (target.value === "true") {
+            coupleGlCountContainer.classList.remove("hidden");
             coupleGlCountInput.required = true;
           } else {
-            coupleGlCountContainer.classList.add('hidden');
+            coupleGlCountContainer.classList.add("hidden");
             coupleGlCountInput.required = false;
-            coupleGlCountInput.value = '';
+            coupleGlCountInput.value = "";
           }
         }
       });
     });
   }, []);
+
+  const editor = useEditor({
+    extensions: [StarterKit, Underline, Placeholder.configure({
+      placeholder: "Start typing here...",
+    }),], // Includes basic formatting options
+    content: "",
+    onUpdate: ({ editor }) => {
+      setContent(editor.getHTML());
+    },
+  });
+
+  useEffect(() => {
+    setDescription(content);
+  }, [content]);
+
+  if (!editor) {
+    return null;
+  }
 
   const handleFormSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault(); // Prevent default form submit & reload
@@ -67,17 +99,19 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({ userId, venueId }) 
     }
 
     const formData = new FormData(event.currentTarget);
-    
+
     // Format date as YYYY-MM-DD using local time
     const year = eventDate.getFullYear();
-    const month = (eventDate.getMonth() + 1).toString().padStart(2, '0');
-    const day = eventDate.getDate().toString().padStart(2, '0');
+    const month = (eventDate.getMonth() + 1).toString().padStart(2, "0");
+    const day = eventDate.getDate().toString().padStart(2, "0");
     formData.append("eventDate", `${year}-${month}-${day}`);
-    
+
     // Format time as HH:mm
-    const hours = eventTime.getHours().toString().padStart(2, '0');
-    const minutes = eventTime.getMinutes().toString().padStart(2, '0');
+    const hours = eventTime.getHours().toString().padStart(2, "0");
+    const minutes = eventTime.getMinutes().toString().padStart(2, "0");
     formData.append("eventTime", `${hours}:${minutes}`);
+
+    formData.append("eventDescription", description)
 
     startTransition(async () => {
       try {
@@ -88,12 +122,14 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({ userId, venueId }) 
           toast.success("Event Added Successfully!");
 
           setTimeout(() => {
-            window.location.href = `/organizer/venue?id=${encodeURIComponent(venueId)}`;
+            window.location.href = `/organizer/venue?id=${encodeURIComponent(
+              venueId
+            )}`;
           }, 2000);
         } else if (result.errors) {
           // Updated error handling for Zod validation errors
           const errorMessages = (result.errors as Array<{ message: string }>)
-            .map(issue => issue.message)
+            .map((issue) => issue.message)
             .join("\n");
           toast.error(`Validation errors:\n${errorMessages}`);
         } else if (result.error) {
@@ -109,17 +145,24 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({ userId, venueId }) 
   return (
     <div className="flex justify-center items-center min-h-screen bg-primary">
       <Toaster position="top-right" />
-  
+
       <div className="w-full max-w-4xl p-8 bg-secondary rounded-lg shadow-2xl">
-        <h2 className="text-2xl font-bold text-center mb-6 text-gray-200">Add New Event</h2>
-  
+        <h2 className="text-2xl font-bold text-center mb-6 text-gray-200">
+          Add New Event
+        </h2>
+
         <div className="flex flex-col md:flex-row gap-8 items-center">
           {/* Upload Section */}
           <div className="w-full md:w-1/2">
-            <h3 className="text-lg font-semibold text-gray-300 mb-4">Upload Event Image</h3>
-            <UploadForm setImageUrl={setImageUrl} setIsImageUploaded={setIsImageUploaded} />
+            <h3 className="text-lg font-semibold text-gray-300 mb-4">
+              Upload Event Image
+            </h3>
+            <UploadForm
+              setImageUrl={setImageUrl}
+              setIsImageUploaded={setIsImageUploaded}
+            />
           </div>
-  
+
           {/* Form Section */}
           <div className="w-full md:w-1/2">
             <form
@@ -127,10 +170,13 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({ userId, venueId }) 
               onSubmit={handleFormSubmit}
             >
               <input type="hidden" name="eventImgUrl" value={imageUrl} />
-  
+
               {/* Event Name */}
               <div>
-                <label htmlFor="eventName" className="block text-sm font-medium text-gray-300 mb-1">
+                <label
+                  htmlFor="eventName"
+                  className="block text-sm font-medium text-gray-300 mb-1"
+                >
                   Event Name
                 </label>
                 <input
@@ -143,27 +189,88 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({ userId, venueId }) 
                   className="w-full bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-600"
                 />
               </div>
-  
+
               {/* Event Description */}
+              
+
               <div>
-                <label htmlFor="eventDescription" className="block text-sm font-medium text-gray-300 mb-1">
+              <label
+                  htmlFor="eventDescription"
+                  className="block text-sm font-medium text-gray-300 mb-1"
+                >
                   Event Description
                 </label>
-                <textarea
-                  name="eventDescription"
-                  id="eventDescription"
-                  placeholder="Enter Event Description"
-                  required
-                  disabled={isDisabled}
-                  className="w-full bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-600"
-                ></textarea>
+                <div className="">
+                  {/* Formatting Buttons */}
+                  <div className="flex gap-2 mb-2 outline-none">
+                    <button
+                      onClick={() => editor.chain().focus().toggleBold().run()}
+                      className={`px-3 py-1 border rounded ${
+                        editor.isActive("bold") ? "bg-gray-300" : ""
+                      }`}
+                    >
+                      <FaBold className="text-white"/>
+                    </button>
+                    <button
+                      onClick={() =>
+                        editor.chain().focus().toggleItalic().run()
+                      }
+                      className={`px-3 py-1 border rounded ${
+                        editor.isActive("italic") ? "bg-gray-300" : ""
+                      }`}
+                    >
+                      <FaItalic className="text-white"/>
+                    </button>
+
+                    <button
+                      onClick={() =>
+                        editor.chain().focus().toggleUnderline().run()
+                      }
+                      className={`px-3 py-1 border rounded ${
+                        editor?.isActive("underline")
+                          ? "bg-gray-300"
+                          : ""
+                      }`}
+                    >
+                      <FaUnderline className="text-white"/>
+                    </button>
+                    <button
+                      onClick={() =>
+                        editor.chain().focus().toggleBulletList().run()
+                      }
+                      className={`px-3 py-1 border rounded ${
+                        editor.isActive("bulletList") ? "bg-gray-300" : ""
+                      }`}
+                    >
+                      <FaListUl className="text-white"/>
+                    </button>
+                    <button
+                      onClick={() =>
+                        editor.chain().focus().toggleOrderedList().run()
+                      }
+                      className={`px-3 py-1 border rounded ${
+                        editor.isActive("orderedList") ? "bg-gray-300" : ""
+                      }`}
+                    >
+                      <FaListOl className="text-white"/>
+                    </button>
+                  </div>
+
+                  {/* Editor Content */}
+                  <div className=" mt-2 prose prose-p:m-0 prose-li:m-0 prose-ul:m-0 prose-ol:m-0 prose-ol:text-white text-white [&_strong]:text-white">
+                    <EditorContent placeholder="Enter Event Description" editor={editor} className="w-full bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 rounded  focus:outline-nonefocus:ring-gray-600"/>
+                  </div>
+                </div>
               </div>
-  
+
               {/* Date and Time Container */}
               <div className="grid grid-cols-2 gap-4">
                 {/* Event Date */}
                 <div>
-                  <label htmlFor="eventDate" className="block text-sm font-medium text-gray-300 mb-1">
+                  <label
+                    htmlFor="eventDate"
+                    className="block text-sm font-medium text-gray-300 mb-1"
+                  >
                     Event Date
                   </label>
                   <DatePicker
@@ -178,10 +285,13 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({ userId, venueId }) 
                     dayClassName={() => "hover:bg-gray-700 rounded-full"}
                   />
                 </div>
-  
+
                 {/* Event Time */}
                 <div>
-                  <label htmlFor="eventTime" className="block text-sm font-medium text-gray-300 mb-1">
+                  <label
+                    htmlFor="eventTime"
+                    className="block text-sm font-medium text-gray-300 mb-1"
+                  >
                     Event Time
                   </label>
                   <DatePicker
@@ -202,7 +312,10 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({ userId, venueId }) 
 
               {/* Event Type */}
               <div>
-                <label htmlFor="eventType" className="block text-sm font-medium text-gray-300 mb-1">
+                <label
+                  htmlFor="eventType"
+                  className="block text-sm font-medium text-gray-300 mb-1"
+                >
                   Event Type
                 </label>
                 <select
@@ -212,7 +325,9 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({ userId, venueId }) 
                   disabled={isDisabled}
                   className="w-full bg-gray-800 border-gray-700 text-gray-200 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-600"
                 >
-                  <option value="" className="bg-gray-800">Select Event Type</option>
+                  <option value="" className="bg-gray-800">
+                    Select Event Type
+                  </option>
                   {EVENT_TYPES.map((type) => (
                     <option key={type} value={type} className="bg-gray-800">
                       {type}
@@ -223,7 +338,10 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({ userId, venueId }) 
 
               {/* Stag Guest List Count */}
               <div>
-                <label htmlFor="stagGlCount" className="block text-sm font-medium text-gray-300 mb-1">
+                <label
+                  htmlFor="stagGlCount"
+                  className="block text-sm font-medium text-gray-300 mb-1"
+                >
                   Stag Guest List Count
                 </label>
                 <input
@@ -252,7 +370,9 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({ userId, venueId }) 
                       onChange={(e) => {
                         const form = e.target.form;
                         if (form) {
-                          const coupleCountInput = form.querySelector('[name="coupleGlCount"]') as HTMLInputElement;
+                          const coupleCountInput = form.querySelector(
+                            '[name="coupleGlCount"]'
+                          ) as HTMLInputElement;
                           if (coupleCountInput) {
                             coupleCountInput.required = e.target.checked;
                           }
@@ -279,7 +399,10 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({ userId, venueId }) 
 
               {/* Couple GL Count - Conditionally rendered */}
               <div id="coupleGlCountContainer" className="hidden">
-                <label htmlFor="coupleGlCount" className="block text-sm font-medium text-gray-300 mb-1">
+                <label
+                  htmlFor="coupleGlCount"
+                  className="block text-sm font-medium text-gray-300 mb-1"
+                >
                   Couple Guest List Count
                 </label>
                 <input
@@ -292,7 +415,7 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({ userId, venueId }) 
                   className="w-full bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-600"
                 />
               </div>
-  
+
               {/* Submit Button */}
               <button
                 type="submit"
@@ -311,7 +434,6 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({ userId, venueId }) 
       </div>
     </div>
   );
-  
 };
 
 export default EventFormSection;

@@ -12,6 +12,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import parse from "html-react-parser";
 
 interface EventWithVenue extends Event {
   venue: Venue;
@@ -91,7 +92,7 @@ function EventCard({ event, isPast }: { event: EventWithVenue, isPast?: boolean 
 
             {/* Description */}
             <p className="text-sm text-gray-400 mt-2 flex-grow">
-              {event.eventDescription}
+              {parse(event?.eventDescription??"")}
             </p>
 
             {/* Bottom Section */}

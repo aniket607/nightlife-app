@@ -14,6 +14,17 @@ import DatePicker from "react-datepicker"; // React Datepicker for date selectio
 import "react-datepicker/dist/react-datepicker.css"; // Import datepicker styles
 import { updateEventData } from "@/actions/updateEventData";
 import Image from "next/image";
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Underline from "@tiptap/extension-underline";
+import {
+  FaBold,
+  FaItalic,
+  FaUnderline,
+  FaListUl,
+  FaListOl,
+} from "react-icons/fa";
+import Placeholder from "@tiptap/extension-placeholder";
 
 interface Event {
   eventId: number; // Assuming `Int` maps to `number`
@@ -56,6 +67,7 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
   const [eventDate, setEventDate] = useState<Date | null>(
     eventData?.eventDate ? new Date(eventData.eventDate) : null
   );
+  const [content, setContent] = useState(""); // State to store editor content
 
   // Move time parsing logic to a separate function
   const parseEventTime = (timeData: Date | null) => {
@@ -67,7 +79,10 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
   };
 
   // Use useMemo for the initial time value
-  const initialTime = useMemo(() => parseEventTime(eventData?.eventTime ?? null), [eventData?.eventTime]);
+  const initialTime = useMemo(
+    () => parseEventTime(eventData?.eventTime ?? null),
+    [eventData?.eventTime]
+  );
 
   // Use the memoized value in useState
   const [eventTime, setEventTime] = useState<Date | null>(initialTime);
@@ -79,7 +94,7 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
   });
   const [originalCoupleGlCount] = useState(eventData?.coupleGlCount || 0);
   const [coupleGlCount, setCoupleGlCount] = useState(() => {
-    return eventData?.coupleGl === true ? (eventData?.coupleGlCount || 0) : 0;
+    return eventData?.coupleGl === true ? eventData?.coupleGlCount || 0 : 0;
   });
 
   const [isSubmitEnabled, setIsSubmitEnabled] = useState(false);
@@ -92,28 +107,30 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
   // Function to check if any field has changed
   const checkIfFieldsChanged = useCallback(() => {
     // Improve image change detection with error handling
-    const hasImageChanged = isImageUpdated && 
-      newImageUrl !== "" && 
+    const hasImageChanged =
+      isImageUpdated &&
+      newImageUrl !== "" &&
       !imageUploadError &&
       newImageUrl !== eventData?.eventImgUrl;
-    
+
     // Add null checks for dates
-    const hasDateChanged = eventDate && eventData?.eventDate ? 
-      eventDate.toISOString() !== new Date(eventData.eventDate).toISOString() : 
-      false;
-    
-      const time = new Date(eventData?.eventTime??"");
-      const hours = time.getUTCHours();
-      const minutes = time.getUTCMinutes();
-      // Create new date with UTC hours and minutes
-      const localDate = new Date();
-      localDate.setHours(hours, minutes, 0, 0);
-  
-      const hasTimeChanged =
-        eventTime && localDate
-          ? eventTime.toISOString() !==
-          localDate.toISOString()
-          : false;
+    const hasDateChanged =
+      eventDate && eventData?.eventDate
+        ? eventDate.toISOString() !==
+          new Date(eventData.eventDate).toISOString()
+        : false;
+
+    const time = new Date(eventData?.eventTime ?? "");
+    const hours = time.getUTCHours();
+    const minutes = time.getUTCMinutes();
+    // Create new date with UTC hours and minutes
+    const localDate = new Date();
+    localDate.setHours(hours, minutes, 0, 0);
+
+    const hasTimeChanged =
+      eventTime && localDate
+        ? eventTime.toISOString() !== localDate.toISOString()
+        : false;
 
     return (
       eventName !== eventData?.eventName ||
@@ -138,18 +155,13 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
     coupleGlCount,
     isImageUpdated,
     newImageUrl,
-    imageUploadError
+    imageUploadError,
   ]);
 
   // Update submit button state based on field changes
   useEffect(() => {
     setIsSubmitEnabled(checkIfFieldsChanged());
-  }, [
-    checkIfFieldsChanged,
-    isImageUpdated,
-    newImageUrl,
-    imageUploadError
-  ]);
+  }, [checkIfFieldsChanged, isImageUpdated, newImageUrl, imageUploadError]);
 
   // Function to handle image upload status
   const handleImageUpload = (success: boolean, url: string) => {
@@ -191,7 +203,9 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
     // Enhanced image validation
     if (isImageUpdated) {
       if (!newImageUrl) {
-        toast.error("Image upload failed or is incomplete. Please try uploading again.");
+        toast.error(
+          "Image upload failed or is incomplete. Please try uploading again."
+        );
         return;
       }
       if (imageUploadError) {
@@ -207,10 +221,11 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
     console.log("Submitting form with coupleGlCount:", coupleGlCount);
 
     // Use new image URL if updated and valid, otherwise keep the current one
-    const finalImageUrl = isImageUpdated && newImageUrl && !imageUploadError 
-      ? newImageUrl 
-      : currentImageUrl;
-    
+    const finalImageUrl =
+      isImageUpdated && newImageUrl && !imageUploadError
+        ? newImageUrl
+        : currentImageUrl;
+
     try {
       // Format date as YYYY-MM-DD using local time
       const year = eventDate.getFullYear();
@@ -231,7 +246,7 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
       const coupleGlValue = coupleGl === true ? "true" : "false";
       console.log("Submitting coupleGl value:", coupleGlValue);
       formData.append("coupleGl", coupleGlValue);
-      
+
       // Only append coupleGlCount if coupleGl is true
       if (coupleGl === true) {
         console.log("Submitting coupleGlCount:", coupleGlCount);
@@ -272,7 +287,9 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
           } else {
             // Handle different types of errors
             if (result.errors) {
-              const errorMessages = (result.errors as Array<{ message: string }>)
+              const errorMessages = (
+                result.errors as Array<{ message: string }>
+              )
                 .map((issue) => issue.message)
                 .join("\n");
               toast.error(`Validation errors:\n${errorMessages}`);
@@ -282,7 +299,9 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
           }
         } catch (error) {
           console.error("Unexpected Error:", error);
-          toast.error("An unexpected error occurred while submitting the form.");
+          toast.error(
+            "An unexpected error occurred while submitting the form."
+          );
           setIsDisabled(false); // Re-enable form on error
         }
       });
@@ -291,6 +310,29 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
       toast.error("Error preparing form data");
     }
   };
+
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+      Underline,
+      Placeholder.configure({
+        placeholder: "Start typing here...",
+      }),
+    ], // Includes basic formatting options
+    content: eventDescription,
+    onUpdate: ({ editor }) => {
+      setContent(editor.getHTML());
+    },
+  });
+
+  useEffect(() => {
+    setEventDescription(content);
+  }, [content]);
+
+  if (!editor) {
+    return null;
+  }
+
   return (
     <div className="flex justify-center items-center min-h-screen bg-primary">
       <Toaster position="top-right" />
@@ -306,17 +348,17 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
             <h3 className="text-lg font-semibold text-gray-300 mb-4">
               Event Image
             </h3>
-            
+
             {/* Show current image */}
             {currentImageUrl && !isImageUpdated && (
               <div className="mb-4 h-72 w-56 flex flex-col items-center justify-center">
                 <Image
-                  src={currentImageUrl} 
-                  alt="Current event" 
+                  src={currentImageUrl}
+                  alt="Current event"
                   className="w-full rounded-lg mb-2"
-                  layout="responsive" 
+                  layout="responsive"
                   width={10}
-                  height={10} 
+                  height={10}
                 />
                 <button
                   type="button"
@@ -346,7 +388,9 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
                   }}
                 />
                 {imageUploadError && (
-                  <p className="text-red-500 text-sm mt-2">{imageUploadError}</p>
+                  <p className="text-red-500 text-sm mt-2">
+                    {imageUploadError}
+                  </p>
                 )}
                 <button
                   type="button"
@@ -400,16 +444,68 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
                 >
                   Event Description
                 </label>
-                <textarea
-                  name="eventDescription"
-                  id="eventDescription"
-                  placeholder="Enter Event Description"
-                  required
-                  disabled={isDisabled}
-                  className="w-full bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-600"
-                  value={eventDescription}
-                  onChange={(e) => setEventDescription(e.target.value)}
-                ></textarea>
+                <div className="">
+                  {/* Formatting Buttons */}
+                  <div className="flex gap-2 mb-2 outline-none">
+                    <button
+                      onClick={() => editor.chain().focus().toggleBold().run()}
+                      className={`px-3 py-1 border rounded ${
+                        editor.isActive("bold") ? "bg-gray-300" : ""
+                      }`}
+                    >
+                      <FaBold className="text-white" />
+                    </button>
+                    <button
+                      onClick={() =>
+                        editor.chain().focus().toggleItalic().run()
+                      }
+                      className={`px-3 py-1 border rounded ${
+                        editor.isActive("italic") ? "bg-gray-300" : ""
+                      }`}
+                    >
+                      <FaItalic className="text-white" />
+                    </button>
+
+                    <button
+                      onClick={() =>
+                        editor.chain().focus().toggleUnderline().run()
+                      }
+                      className={`px-3 py-1 border rounded ${
+                        editor?.isActive("underline") ? "bg-gray-300" : ""
+                      }`}
+                    >
+                      <FaUnderline className="text-white" />
+                    </button>
+                    <button
+                      onClick={() =>
+                        editor.chain().focus().toggleBulletList().run()
+                      }
+                      className={`px-3 py-1 border rounded ${
+                        editor.isActive("bulletList") ? "bg-gray-300" : ""
+                      }`}
+                    >
+                      <FaListUl className="text-white" />
+                    </button>
+                    <button
+                      onClick={() =>
+                        editor.chain().focus().toggleOrderedList().run()
+                      }
+                      className={`px-3 py-1 border rounded ${
+                        editor.isActive("orderedList") ? "bg-gray-300" : ""
+                      }`}
+                    >
+                      <FaListOl className="text-white" />
+                    </button>
+                  </div>
+                  {/* Editor Content */}
+                  <div className=" mt-2 prose prose-p:m-0 prose-li:m-0 prose-ul:m-0 prose-ol:m-0 prose-ol:text-white text-white [&_strong]:text-white">
+                    <EditorContent
+                      placeholder="Enter Event Description"
+                      editor={editor}
+                      className="w-full bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 rounded  focus:outline-nonefocus:ring-gray-600"
+                    />
+                  </div>
+                </div>
               </div>
 
               {/* Date and Time Container */}

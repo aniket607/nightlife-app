@@ -10,6 +10,7 @@ import {
 import EventCardSkeleton from "./EventCardSkeleton";
 import AddEventButton from "./AddEventButton";
 import { useState, useEffect } from "react";
+import parse from "html-react-parser";
 
 export interface Event {
   eventId: number; // Assuming `Int` maps to `number`
@@ -163,7 +164,7 @@ export default function VenuePageRightSection({
                               {event.eventName}
                             </h3>
                             <p className="text-sm text-gray-400 mt-2 line-clamp-3">
-                              {event.eventDescription}
+                              {parse(event?.eventDescription??"")}
                             </p>
                             <div className="mt-auto pt-2 flex gap-2">
                               <div className="inline-flex items-center px-2.5 py-1 rounded-full bg-gray-700/50 border border-gray-600/50 backdrop-blur-sm">
@@ -456,9 +457,9 @@ export default function VenuePageRightSection({
                             <h3 className="text-xl font-semibold text-gray-200 truncate">
                               {event.eventName}
                             </h3>
-                            <p className="text-sm text-gray-400 mt-2 line-clamp-4">
-                              {event.eventDescription}
-                            </p>
+                            <div className="text-sm text-gray-400 mt-2 line-clamp-4">
+                              {parse(event?.eventDescription??"")}
+                            </div>
                             <div className="mt-auto pt-2 flex gap-2">
                               <div className="inline-flex items-center px-2.5 py-1 rounded-full bg-gray-700/50 border border-gray-600/50 backdrop-blur-sm">
                               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">

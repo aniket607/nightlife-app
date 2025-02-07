@@ -9,6 +9,14 @@ export default {
   ],
   theme: {
   	extend: {
+		typography: {
+			DEFAULT: {
+			  css: {
+				"ol": { color: "white" },
+				"ol li::marker": { color: "white" },
+			  },
+			},
+		  },
   		colors: {
   			primary: {
   				DEFAULT: '#111827',
@@ -57,5 +65,5 @@ export default {
   		}
   	}
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [require("tailwindcss-animate"),require('@tailwindcss/typography')],
 } satisfies Config;
