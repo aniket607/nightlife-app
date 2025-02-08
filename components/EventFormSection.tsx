@@ -3,18 +3,37 @@
 import { useState, useTransition, FormEvent, useEffect } from "react";
 import UploadForm from "@/components/UploadForm";
 import { putEventData } from "@/actions/putEventData"; // Action for submitting event data
+import { fetchArtists } from "@/actions/fetchArtists";
 import toast, { Toaster } from "react-hot-toast";
 import DatePicker from "react-datepicker"; // React Datepicker for date selection
 import "react-datepicker/dist/react-datepicker.css"; // Import datepicker styles
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
-import { FaBold, FaItalic, FaUnderline, FaListUl, FaListOl } from "react-icons/fa";
-import Placeholder from "@tiptap/extension-placeholder"; 
+import {
+  FaBold,
+  FaItalic,
+  FaUnderline,
+  FaListUl,
+  FaListOl,
+} from "react-icons/fa";
+import { MdDelete } from "react-icons/md";
+import Placeholder from "@tiptap/extension-placeholder";
+import { upsertArtists } from "@/actions/upsertArtists";
 
 interface EventFormSectionProps {
   userId: string;
   venueId: string;
+}
+
+interface Artist {
+  id: number;
+  name: string;
+}
+
+interface Field {
+  id: number;
+  value: string;
 }
 
 const EVENT_TYPES = [
@@ -38,7 +57,10 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({
   const [eventDate, setEventDate] = useState<Date | null>(null); // State for selected date
   const [eventTime, setEventTime] = useState<Date | null>(null); // Changed to Date type for DatePicker
   const [content, setContent] = useState(""); // State to store editor content
-  const [description, setDescription] = useState("")
+  const [description, setDescription] = useState("");
+  const [fields, setFields] = useState<Field[]>([{ id: Date.now(), value: "" }]); // Initial input field
+  const [suggestions, setSuggestions] = useState<Record<number, Artist[]>>({}); // Fix: Explicitly define object type
+
 
   useEffect(() => {
     // Add event listener to radio buttons
@@ -67,10 +89,58 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({
     });
   }, []);
 
+  const fetchSuggestions = async (query:string, id:number) => {
+    if (!query.trim()) {
+      setSuggestions((prev) => ({ ...prev, [id]: [] }));
+      return;
+    }
+
+    try {
+      const res = await fetchArtists(query); // Replace with your API endpoint
+      // const data = res.map((item) => item.name);
+      setSuggestions((prev) => ({ ...prev, [id]: res }));
+    } catch (error) {
+      console.error("Error fetching artists:", error);
+    }
+  };
+
+  const handleInputChange = (id:number, value:string) => {
+    setFields((prev) =>
+      prev.map((field) => (field.id === id ? { ...field, value } : field))
+    );
+    fetchSuggestions(value, id);
+  };
+
+  const handleSuggestionClick = (id:number, name:string) => {
+    setFields((prev) =>
+      prev.map((field) => (field.id === id ? { ...field, value: name } : field))
+    );
+    setSuggestions((prev) => ({ ...prev, [id]: [] })); // Hide suggestions
+  };
+
+  const addField = () => {
+    if (fields.length < 4) {
+      setFields([...fields, { id: Date.now(), value: "" }]);
+    }
+  };
+
+  const removeField = (id:number) => {
+    setFields(fields.filter((field) => field.id !== id));
+    setSuggestions((prev) => {
+      const newSuggestions = { ...prev };
+      delete newSuggestions[id];
+      return newSuggestions;
+    });
+  };
+
   const editor = useEditor({
-    extensions: [StarterKit, Underline, Placeholder.configure({
-      placeholder: "Start typing here...",
-    }),], // Includes basic formatting options
+    extensions: [
+      StarterKit,
+      Underline,
+      Placeholder.configure({
+        placeholder: "Start typing here.ff..",
+      }),
+    ], // Includes basic formatting options
     content: "",
     onUpdate: ({ editor }) => {
       setContent(editor.getHTML());
@@ -111,7 +181,11 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({
     const minutes = eventTime.getMinutes().toString().padStart(2, "0");
     formData.append("eventTime", `${hours}:${minutes}`);
 
-    formData.append("eventDescription", description)
+    formData.append("eventDescription", description);
+
+    const selectedArtists = fields.map((field) => field.value).filter((name) => name.trim() !== "");
+    formData.append("artistNames", JSON.stringify(selectedArtists))
+    upsertArtists(selectedArtists)
 
     startTransition(async () => {
       try {
@@ -191,10 +265,9 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({
               </div>
 
               {/* Event Description */}
-              
 
               <div>
-              <label
+                <label
                   htmlFor="eventDescription"
                   className="block text-sm font-medium text-gray-300 mb-1"
                 >
@@ -209,7 +282,7 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({
                         editor.isActive("bold") ? "bg-gray-300" : ""
                       }`}
                     >
-                      <FaBold className="text-white"/>
+                      <FaBold className="text-white" />
                     </button>
                     <button
                       onClick={() =>
@@ -219,7 +292,7 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({
                         editor.isActive("italic") ? "bg-gray-300" : ""
                       }`}
                     >
-                      <FaItalic className="text-white"/>
+                      <FaItalic className="text-white" />
                     </button>
 
                     <button
@@ -227,12 +300,10 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({
                         editor.chain().focus().toggleUnderline().run()
                       }
                       className={`px-3 py-1 border rounded ${
-                        editor?.isActive("underline")
-                          ? "bg-gray-300"
-                          : ""
+                        editor?.isActive("underline") ? "bg-gray-300" : ""
                       }`}
                     >
-                      <FaUnderline className="text-white"/>
+                      <FaUnderline className="text-white" />
                     </button>
                     <button
                       onClick={() =>
@@ -242,7 +313,7 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({
                         editor.isActive("bulletList") ? "bg-gray-300" : ""
                       }`}
                     >
-                      <FaListUl className="text-white"/>
+                      <FaListUl className="text-white" />
                     </button>
                     <button
                       onClick={() =>
@@ -252,13 +323,17 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({
                         editor.isActive("orderedList") ? "bg-gray-300" : ""
                       }`}
                     >
-                      <FaListOl className="text-white"/>
+                      <FaListOl className="text-white" />
                     </button>
                   </div>
 
                   {/* Editor Content */}
                   <div className=" mt-2 prose prose-p:m-0 prose-li:m-0 prose-ul:m-0 prose-ol:m-0 prose-ol:text-white text-white [&_strong]:text-white">
-                    <EditorContent placeholder="Enter Event Description" editor={editor} className="w-full bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 rounded  focus:outline-nonefocus:ring-gray-600"/>
+                    <EditorContent
+                      placeholder="Enter Event Description"
+                      editor={editor}
+                      className="w-full bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 rounded  focus:outline-nonefocus:ring-gray-600"
+                    />
                   </div>
                 </div>
               </div>
@@ -414,6 +489,66 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({
                   disabled={isDisabled}
                   className="w-full bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-600"
                 />
+              </div>
+
+              <div>
+              <label
+                  className="block text-sm font-medium text-gray-300 mb-1"
+                >
+                  Artists
+                </label>
+
+                {fields.map((field) => (
+                  <div key={field.id} className="mb-4">
+                    <div className="flex justify-center items-center">
+                    <input
+                      type="text"
+                      value={field.value}
+                      onChange={(e) =>
+                        handleInputChange(field.id, e.target.value)
+                      }
+                      className="w-full bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-600"
+                      placeholder="Enter artist name"
+                    />
+                    {fields.length > 1 && (
+                      <button
+                        onClick={() => removeField(field.id)}
+                        className=" p-2 bg-red-500 text-white rounded ml-5"
+                      >
+                        <MdDelete/>
+                      </button>
+                    )}
+                    </div>
+
+                    {suggestions[field.id]?.length > 0 && (
+                      <ul className="border border-gray-300 mt-1 bg-white">
+                        {suggestions[field.id].map((artist) => (
+                          <li
+                            key={artist.id}
+                            onClick={() =>
+                              handleSuggestionClick(field.id, artist.name)
+                            }
+                            className="p-2 cursor-pointer hover:bg-gray-100"
+                          >
+                            {artist.name}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+
+                    
+                  </div>
+                ))}
+
+                {fields.length < 4 && (
+                  <button
+                    className="py-2 px-4 rounded transition duration-300 bg-gray-700 hover:bg-gray-600 text-gray-200"
+                    onClick={addField}
+                  >
+                    Add More Artist
+                  </button>
+                )}
+
               </div>
 
               {/* Submit Button */}

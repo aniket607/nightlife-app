@@ -91,6 +91,7 @@ model Event {
   user             User       @relation(fields: [userId], references: [id]) 
   stagGuestlist        StagGuestlist[]
   coupleGuestlist        CoupleGuestlist[]
+  artists          EventArtist[]
 }
 
 model StagGuestlist {
@@ -115,4 +116,21 @@ model CoupleGuestlist {
   femaleEmail   String?
   eventId       Int    
   event         Event   @relation(fields: [eventId], references: [eventId])
+}
+
+model Artist {
+  id    Int @id @default(autoincrement())
+  name  String
+
+  events EventArtist[]  // Many-to-many relation with Event
+}
+
+model EventArtist {
+  eventId  Int    @map("event_id")
+  artistId Int @map("artist_id")
+
+  event    Event  @relation(fields: [eventId], references: [eventId], onDelete: Cascade)
+  artist   Artist @relation(fields: [artistId], references: [id], onDelete: Cascade)
+
+  @@id([eventId, artistId]) // Composite primary key
 }

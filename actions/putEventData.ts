@@ -12,66 +12,82 @@ const formSchema = z.object({
   }),
   eventTime: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, "Invalid time format (HH:mm)"),
   stagGlCount: z.coerce.number().min(0, "Stag guest list count must be a positive number"),
-  coupleGl: z.enum(['true', 'false']).transform(val => val === 'true'),
+  coupleGl: z.enum(["true", "false"]).transform((val) => val === "true"),
   coupleGlCount: z.coerce.number().min(0, "Couple guest list count must be a positive number").optional(),
   eventImgUrl: z.string().url("Invalid image URL"),
-  eventType: z.string().default("Regular"), // You might want to add specific validation for event types
+  eventType: z.string().default("Regular"),
+  artistNames: z.array(z.string()).optional(), // Accepting artist names as an array
 });
 
 export async function putEventData(formData: FormData, userId: string, venueId: string) {
   // Convert FormData to an object
   const data = Object.fromEntries(formData);
-  // console.log("[putEventData] Incoming form data:", data);
 
   try {
     // Run Zod validation
-    const validatedData = formSchema.safeParse(data);
-    // console.log("[putEventData] Validated data:", validatedData);
+    const validatedData = formSchema.safeParse({
+      ...data,
+      artistNames: JSON.parse(formData.get("artistNames") as string),
+    });
+
     if (!validatedData.success) {
       console.error("[putEventData] Validation errors:", validatedData.error.errors);
       return { success: false, errors: validatedData.error.errors };
     }
 
-    // Additional validation for coupleGlCount
-    if (validatedData.data.coupleGl === true && !validatedData.data.coupleGlCount) {
-      return {
-        success: false,
-        errors: [{ message: "Couple guest list count is required when couple GL is enabled" }],
-      };
-    }
+    const { artistNames, ...eventData } = validatedData.data;
 
-    // Convert eventTime from string to a Date object in local time
-    // const [hours, minutes] = validatedData.data.eventTime.split(":").map(Number);
-    // const eventTimeAsDate = new Date();
-    // eventTimeAsDate.setHours(hours, minutes, 0, 0);
-
-    // Insert into the database
-    const createdEvent = await prisma.event.create({
-      data: {
-        eventName: validatedData.data.eventName,
-        eventDescription: validatedData.data.eventDescription || null,
-        eventDate: new Date(validatedData.data.eventDate),
-        eventTime: new Date(Date.UTC(1970, 0, 1, ...validatedData.data.eventTime.split(':').map(Number))),
-        stagGlCount: validatedData.data.stagGlCount,
-        coupleGl: validatedData.data.coupleGl,
-        coupleGlCount: validatedData.data.coupleGl ? validatedData.data.coupleGlCount : null,
-        eventImgUrl: validatedData.data.eventImgUrl,
-        eventType: validatedData.data.eventType,
-        userId,
-        venueId,
-      },
+    // Fetch existing artists by name
+    const existingArtists = await prisma.artist.findMany({
+      where: { name: { in: artistNames } },
     });
 
-    console.log("[putEventData] Successfully created event:", createdEvent);
+    // Determine new artists to create
+    const existingArtistNames = new Set(existingArtists.map((artist) => artist.name));
+    const newArtistNames = artistNames?.filter((name) => !existingArtistNames.has(name));
+
+    // Create new artists if necessary
+   // let newArtists = [];
+   if (Array.isArray(newArtistNames) && newArtistNames.length > 0) {
+    await prisma.artist.createMany({
+      data: newArtistNames.map((name) => ({ name })),
+      skipDuplicates: true,
+    });
+  }
+
+    // Fetch all artists (existing + newly created)
+    const allArtists = await prisma.artist.findMany({
+      where: { name: { in: artistNames } },
+      select: { id: true },
+    });
+
+    // Create the event and link artists
+    const createdEvent = await prisma.event.create({
+      data: {
+        eventName: eventData.eventName,
+        eventDescription: eventData.eventDescription || null,
+        eventDate: new Date(eventData.eventDate),
+        eventTime: new Date(Date.UTC(1970, 0, 1, ...eventData.eventTime.split(":").map(Number))),
+        stagGlCount: eventData.stagGlCount,
+        coupleGl: eventData.coupleGl,
+        coupleGlCount: eventData.coupleGl ? eventData.coupleGlCount : null,
+        eventImgUrl: eventData.eventImgUrl,
+        eventType: eventData.eventType,
+        userId,
+        venueId,
+        artists: {
+          create: allArtists.map((artist) => ({
+            artistId: artist.id, // Link artist by ID
+          })),
+        },
+      },
+      include: { artists: true },
+    });
+
+    console.log("[putEventData] Successfully created event with artists:", createdEvent);
     return { success: true, data: createdEvent };
   } catch (error) {
-    // Enhanced error logging
     console.error("[putEventData] Unexpected error:", error);
-
-    if (error instanceof TypeError) {
-      console.error("[putEventData] TypeError occurred. Check input values.");
-    }
-
     return { success: false, error: "An unexpected error occurred" };
   }
 }
