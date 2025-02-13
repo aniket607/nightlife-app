@@ -25,6 +25,10 @@ import {
   FaListOl,
 } from "react-icons/fa";
 import Placeholder from "@tiptap/extension-placeholder";
+import { MdDelete } from "react-icons/md";
+import { fetchArtists } from "@/actions/fetchArtists";
+import { upsertArtists } from "@/actions/upsertArtists";
+
 
 interface Event {
   eventId: number; // Assuming `Int` maps to `number`
@@ -40,10 +44,21 @@ interface Event {
   eventType: string;
   userId: string;
   createdAt: Date; // Maps to `DateTime`
+  artists: Artist[];
 }
 
 interface EventFormSectionProps {
   eventData: Event | null;
+}
+
+interface Field {
+  id: number;
+  value: string;
+}
+
+interface Artist {
+  id: number;
+  name: string;
 }
 
 const EVENT_TYPES = [
@@ -103,6 +118,62 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
   const [newImageUrl, setNewImageUrl] = useState<string>("");
   const [isImageUpdated, setIsImageUpdated] = useState(false);
   const [imageUploadError, setImageUploadError] = useState<string | null>(null);
+
+  const [fields, setFields] = useState<Artist[]>(
+    eventData?.artists && eventData.artists.length > 0
+      ? eventData.artists.map((artist) => ({
+          id: artist.id,
+          name: artist.name,
+        }))
+      : [{ id: Date.now(), name: "" }]
+  );
+  console.log(fields)
+
+   const [suggestions, setSuggestions] = useState<Record<number, Artist[]>>({});
+  
+    const fetchSuggestions = async (query:string, id:number) => {
+      if (!query.trim()) {
+        setSuggestions((prev) => ({ ...prev, [id]: [] }));
+        return;
+      }
+  
+      try {
+        const res = await fetchArtists(query); // Replace with your API endpoint
+        // const data = res.map((item) => item.name);
+        setSuggestions((prev) => ({ ...prev, [id]: res }));
+      } catch (error) {
+        console.error("Error fetching artists:", error);
+      }
+    };
+  
+    const handleInputChange = (id:number, name:string) => {
+      setFields((prev) =>
+        prev.map((field) => (field.id === id ? { ...field, name } : field))
+      );
+      fetchSuggestions(name, id);
+    };
+  
+    const handleSuggestionClick = (id:number, name:string) => {
+      setFields((prev) =>
+        prev.map((field) => (field.id === id ? { ...field, value: name } : field))
+      );
+      setSuggestions((prev) => ({ ...prev, [id]: [] })); // Hide suggestions
+    };
+  
+    const addField = () => {
+      if (fields.length < 4) {
+        setFields([...fields, { id: Date.now(), name: "" }]);
+      }
+    };
+  
+    const removeField = (id:number) => {
+      setFields(fields.filter((field) => field.id !== id));
+      setSuggestions((prev) => {
+        const newSuggestions = { ...prev };
+        delete newSuggestions[id];
+        return newSuggestions;
+      });
+    };
 
   // Function to check if any field has changed
   const checkIfFieldsChanged = useCallback(() => {
@@ -258,6 +329,10 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
 
       formData.append("eventImgUrl", finalImageUrl);
       formData.append("eventType", eventType ?? "");
+
+          const selectedArtists = fields.map((field) => field.name).filter((name) => name.trim() !== "");
+          formData.append("artistNames", JSON.stringify(selectedArtists))
+          upsertArtists(selectedArtists)
 
       console.log("Final form data:", Object.fromEntries(formData));
 
@@ -660,6 +735,61 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
                   />
                 </div>
               )}
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">
+                  Artists
+                </label>
+
+                {fields.map((field) => (
+                  <div key={field.id} className="mb-4">
+                    <div className="flex justify-center items-center">
+                      <input
+                        type="text"
+                        value={field.name}
+                        onChange={(e) =>
+                          handleInputChange(field.id, e.target.value)
+                        }
+                        className="w-full bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-600"
+                        placeholder="Enter artist name"
+                      />
+                      {fields.length > 1 && (
+                        <button
+                          onClick={() => removeField(field.id)}
+                          className="p-2 bg-red-500 text-white rounded ml-5"
+                        >
+                          <MdDelete />
+                        </button>
+                      )}
+                    </div>
+
+                    {suggestions[field.id]?.length > 0 && (
+                      <ul className="border border-gray-300 mt-1 bg-white">
+                        {suggestions[field.id].map((artist) => (
+                          <li
+                            key={artist.id}
+                            onClick={() =>
+                              handleSuggestionClick(field.id, artist.name)
+                            }
+                            className="p-2 cursor-pointer hover:bg-gray-100"
+                          >
+                            {artist.name}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                ))}
+
+                {fields.length < 4 && (
+                  <button
+                    className="py-2 px-4 rounded transition duration-300 bg-gray-700 hover:bg-gray-600 text-gray-200"
+                    onClick={addField}
+                  >
+                    Add More Artist
+                  </button>
+                )}
+              </div>
 
               {/* Submit Button */}
               <button

@@ -38,22 +38,22 @@ export async function putEventData(formData: FormData, userId: string, venueId: 
     const { artistNames, ...eventData } = validatedData.data;
 
     // Fetch existing artists by name
-    const existingArtists = await prisma.artist.findMany({
-      where: { name: { in: artistNames } },
-    });
+    // const existingArtists = await prisma.artist.findMany({
+    //   where: { name: { in: artistNames } },
+    // });
 
     // Determine new artists to create
-    const existingArtistNames = new Set(existingArtists.map((artist) => artist.name));
-    const newArtistNames = artistNames?.filter((name) => !existingArtistNames.has(name));
+    // const existingArtistNames = new Set(existingArtists.map((artist) => artist.name));
+    // const newArtistNames = artistNames?.filter((name) => !existingArtistNames.has(name));
 
     // Create new artists if necessary
    // let newArtists = [];
-   if (Array.isArray(newArtistNames) && newArtistNames.length > 0) {
-    await prisma.artist.createMany({
-      data: newArtistNames.map((name) => ({ name })),
-      skipDuplicates: true,
-    });
-  }
+  //  if (Array.isArray(newArtistNames) && newArtistNames.length > 0) {
+  //   await prisma.artist.createMany({
+  //     data: newArtistNames.map((name) => ({ name })),
+  //     skipDuplicates: true,
+  //   });
+  // }
 
     // Fetch all artists (existing + newly created)
     const allArtists = await prisma.artist.findMany({
