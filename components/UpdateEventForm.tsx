@@ -51,11 +51,6 @@ interface EventFormSectionProps {
   eventData: Event | null;
 }
 
-interface Field {
-  id: number;
-  value: string;
-}
-
 interface Artist {
   id: number;
   name: string;
@@ -155,7 +150,7 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
   
     const handleSuggestionClick = (id:number, name:string) => {
       setFields((prev) =>
-        prev.map((field) => (field.id === id ? { ...field, value: name } : field))
+        prev.map((field) => (field.id === id ? { ...field, name } : field))
       );
       setSuggestions((prev) => ({ ...prev, [id]: [] })); // Hide suggestions
     };
@@ -783,8 +778,12 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
 
                 {fields.length < 4 && (
                   <button
+                    type="button"
                     className="py-2 px-4 rounded transition duration-300 bg-gray-700 hover:bg-gray-600 text-gray-200"
-                    onClick={addField}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      addField();
+                    }}
                   >
                     Add More Artist
                   </button>

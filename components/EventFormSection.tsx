@@ -542,8 +542,12 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({
 
                 {fields.length < 4 && (
                   <button
+                    type="button"
                     className="py-2 px-4 rounded transition duration-300 bg-gray-700 hover:bg-gray-600 text-gray-200"
-                    onClick={addField}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      addField();
+                    }}
                   >
                     Add More Artist
                   </button>
