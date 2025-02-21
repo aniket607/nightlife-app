@@ -518,6 +518,7 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
                   {/* Formatting Buttons */}
                   <div className="flex gap-2 mb-2 outline-none">
                     <button
+                      type="button"
                       onClick={() => editor.chain().focus().toggleBold().run()}
                       className={`px-3 py-1 border rounded ${
                         editor.isActive("bold") ? "bg-gray-300" : ""
@@ -526,6 +527,7 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
                       <FaBold className="text-white" />
                     </button>
                     <button
+                      type="button"
                       onClick={() =>
                         editor.chain().focus().toggleItalic().run()
                       }
@@ -537,6 +539,7 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
                     </button>
 
                     <button
+                      type="button"
                       onClick={() =>
                         editor.chain().focus().toggleUnderline().run()
                       }
@@ -547,6 +550,7 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
                       <FaUnderline className="text-white" />
                     </button>
                     <button
+                      type="button"
                       onClick={() =>
                         editor.chain().focus().toggleBulletList().run()
                       }
@@ -557,6 +561,7 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
                       <FaListUl className="text-white" />
                     </button>
                     <button
+                      type="button"
                       onClick={() =>
                         editor.chain().focus().toggleOrderedList().run()
                       }
