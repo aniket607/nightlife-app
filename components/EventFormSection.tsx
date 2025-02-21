@@ -96,8 +96,7 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({
     }
 
     try {
-      const res = await fetchArtists(query); // Replace with your API endpoint
-      // const data = res.map((item) => item.name);
+      const res = await fetchArtists(query);
       setSuggestions((prev) => ({ ...prev, [id]: res }));
     } catch (error) {
       console.error("Error fetching artists:", error);
@@ -140,7 +139,7 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({
       Placeholder.configure({
         placeholder: "Start typing here.ff..",
       }),
-    ], // Includes basic formatting options
+    ], 
     content: "",
     onUpdate: ({ editor }) => {
       setContent(editor.getHTML());
