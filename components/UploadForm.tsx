@@ -109,14 +109,14 @@ export default function UploadForm({
                 )}
                 
                 {preview && !uploading && !uploadedImageUrl && (
-                    <div className="relative rounded-lg overflow-hidden">
-                        <div className="h-80 w-56">
+                    <div className="relative rounded-lg overflow-hidden mx-auto">
+                        <div className="w-56 h-80 relative">
                             <Image
                                 src={preview}
                                 alt="Preview"
-                                width={800}
-                                height={800}
-                                className="w-full object-cover"
+                                fill
+                                className="object-contain"
+                                sizes="(max-width: 224px) 100vw, 224px"
                             />
                         </div>
                         <button 
@@ -165,14 +165,16 @@ export default function UploadForm({
             
             {uploadedImageUrl && (
                 <div className="p-5 sm:p-6 space-y-4">
-                    <div className="rounded-lg overflow-hidden">
-                        <Image
-                            src={uploadedImageUrl}
-                            alt="Uploaded"
-                            width={500}
-                            height={300}
-                            className="w-full h-56 sm:h-64 object-cover"
-                        />
+                    <div className="rounded-lg overflow-hidden flex justify-center">
+                        <div className="w-56 h-80 relative">
+                            <Image
+                                src={uploadedImageUrl}
+                                alt="Uploaded"
+                                fill
+                                className="object-contain"
+                                sizes="(max-width: 224px) 100vw, 224px"
+                            />
+                        </div>
                     </div>
                     <p className="text-sm sm:text-base font-medium text-green-500 text-center">
                         Image uploaded successfully!
