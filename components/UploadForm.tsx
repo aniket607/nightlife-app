@@ -5,10 +5,12 @@ import Image from "next/image";
 
 export default function UploadForm({ 
     setImageUrl, 
-    setIsImageUploaded
+    setIsImageUploaded,
+    disabled = false
   }: { 
     setImageUrl: (url: string) => void,
-    setIsImageUploaded: (isUploaded: boolean) => void
+    setIsImageUploaded: (isUploaded: boolean) => void,
+    disabled?: boolean
   })  {
     const [file, setFile] = useState<File | undefined>(undefined);
     const [preview, setPreview] = useState<string | null>(null);
@@ -131,10 +133,10 @@ export default function UploadForm({
                 {!isUploaded && (
                     <button 
                         type="submit" 
-                        disabled={!file || uploading} 
+                        disabled={!file || uploading || disabled} 
                         className={`mt-1 px-5 py-2.5 rounded-lg text-sm font-medium transition-all ${
-                            !file || uploading 
-                                ? 'bg-gray-600 text-gray-400 cursor-not-allowed' 
+                            !file || uploading || disabled
+                                ? 'bg-gray-800 text-gray-500 cursor-not-allowed opacity-50' 
                                 : 'bg-blue-600 hover:bg-blue-700 text-white hover:shadow-lg'
                         }`}
                     >

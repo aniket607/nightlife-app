@@ -77,7 +77,7 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
   const [eventDate, setEventDate] = useState<Date | null>(
     eventData?.eventDate ? new Date(eventData.eventDate) : null
   );
-  const [content, setContent] = useState(""); // State to store editor content
+  const [content, setContent] = useState(eventData?.eventDescription ?? ""); // Initialize content with eventDescription
 
   // Move time parsing logic to a separate function
   const parseEventTime = (timeData: Date | null) => {
@@ -198,6 +198,14 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
         ? eventTime.toISOString() !== localDate.toISOString()
         : false;
 
+    // Check if artists have changed
+    const currentArtists = fields.map(field => field.name).filter(name => name.trim() !== "");
+    const originalArtists = eventData?.artists?.map(artist => artist.name) || [];
+    
+    const hasArtistsChanged = 
+      currentArtists.length !== originalArtists.length ||
+      currentArtists.some((artist, index) => artist !== originalArtists[index]);
+
     return (
       eventName !== eventData?.eventName ||
       eventDescription !== eventData?.eventDescription ||
@@ -207,7 +215,8 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
       stagGlCount !== eventData.stagGlCount ||
       coupleGl !== eventData.coupleGl ||
       coupleGlCount !== (eventData.coupleGlCount || 0) ||
-      hasImageChanged
+      hasImageChanged ||
+      hasArtistsChanged
     );
   }, [
     eventData,
@@ -222,6 +231,7 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
     isImageUpdated,
     newImageUrl,
     imageUploadError,
+    fields // Add fields to the dependency array
   ]);
 
   // Update submit button state based on field changes
@@ -388,16 +398,14 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
       Placeholder.configure({
         placeholder: "Start typing here...",
       }),
-    ], // Includes basic formatting options
-    content: eventDescription,
+    ],
+    content: eventData?.eventDescription ?? "", // Set initial content
     onUpdate: ({ editor }) => {
-      setContent(editor.getHTML());
+      const newContent = editor.getHTML();
+      setContent(newContent);
+      setEventDescription(newContent); // Update both states together
     },
   });
-
-  useEffect(() => {
-    setEventDescription(content);
-  }, [content]);
 
   if (!editor) {
     return null;
@@ -433,7 +441,12 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
                 <button
                   type="button"
                   onClick={() => setIsImageUpdated(true)}
-                  className="mt-2 px-4 py-2 bg-gray-700 text-gray-200 rounded hover:bg-gray-600 transition"
+                  disabled={isPending || isDisabled}
+                  className={`mt-2 px-4 py-2 rounded text-sm font-semibold transition-all duration-300 ${
+                    isPending || isDisabled
+                      ? "bg-gray-800 text-gray-500 cursor-not-allowed opacity-50 hover:bg-gray-800"
+                      : "bg-gray-700 text-gray-200 hover:bg-gray-600"
+                  }`}
                 >
                   Change Image
                 </button>
@@ -456,6 +469,7 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
                       handleImageUpload(false, "");
                     }
                   }}
+                  disabled={isPending || isDisabled}
                 />
                 {imageUploadError && (
                   <p className="text-red-500 text-sm mt-2">
@@ -573,12 +587,14 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
                     </button>
                   </div>
                   {/* Editor Content */}
-                  <div className=" mt-2 prose prose-p:m-0 prose-li:m-0 prose-ul:m-0 prose-ol:m-0 prose-ol:text-white text-white [&_strong]:text-white">
-                    <EditorContent
-                      placeholder="Enter Event Description"
-                      editor={editor}
-                      className="w-full bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 rounded  focus:outline-nonefocus:ring-gray-600"
-                    />
+                  <div className="mt-2 prose prose-p:m-0 prose-li:m-0 prose-ul:m-0 prose-ol:m-0 prose-ol:text-white text-white [&_strong]:text-white">
+                    <div className="w-full bg-gray-800 border border-gray-700 rounded group focus-within:ring-2 focus-within:ring-gray-600 focus-within:border-gray-600">
+                      <EditorContent
+                        placeholder="Enter Event Description"
+                        editor={editor}
+                        className="w-full text-gray-200 placeholder:text-gray-500 p-3 [&_.ProseMirror]:outline-none [&_.ProseMirror]:min-h-[100px]"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -784,11 +800,16 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
                 {fields.length < 4 && (
                   <button
                     type="button"
-                    className="py-2 px-4 rounded transition duration-300 bg-gray-700 hover:bg-gray-600 text-gray-200"
+                    className={`py-2 px-4 rounded transition duration-300 ${
+                      isPending || isDisabled
+                        ? "bg-gray-800 text-gray-500 cursor-not-allowed opacity-50 hover:bg-gray-800"
+                        : "bg-gray-700 hover:bg-gray-600 text-gray-200"
+                    }`}
                     onClick={(e) => {
                       e.preventDefault();
                       addField();
                     }}
+                    disabled={isPending || isDisabled}
                   >
                     Add More Artist
                   </button>

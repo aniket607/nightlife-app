@@ -59,35 +59,20 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({
   const [content, setContent] = useState(""); // State to store editor content
   const [description, setDescription] = useState("");
   const [fields, setFields] = useState<Field[]>([{ id: Date.now(), value: "" }]); // Initial input field
-  const [suggestions, setSuggestions] = useState<Record<number, Artist[]>>({}); // Fix: Explicitly define object type
-
+  const [suggestions, setSuggestions] = useState<Record<number, Artist[]>>({});
+  const [coupleGl, setCoupleGl] = useState(false);
+  const [coupleGlCount, setCoupleGlCount] = useState<number>(0);
 
   useEffect(() => {
-    // Add event listener to radio buttons
-    const radioButtons = document.querySelectorAll('input[name="coupleGl"]');
-    const coupleGlCountContainer = document.getElementById(
-      "coupleGlCountContainer"
-    );
-    const coupleGlCountInput = document.querySelector(
-      '[name="coupleGlCount"]'
-    ) as HTMLInputElement;
+    setDescription(content);
+  }, [content]);
 
-    radioButtons.forEach((radio) => {
-      radio.addEventListener("change", (e) => {
-        const target = e.target as HTMLInputElement;
-        if (coupleGlCountContainer && coupleGlCountInput) {
-          if (target.value === "true") {
-            coupleGlCountContainer.classList.remove("hidden");
-            coupleGlCountInput.required = true;
-          } else {
-            coupleGlCountContainer.classList.add("hidden");
-            coupleGlCountInput.required = false;
-            coupleGlCountInput.value = "";
-          }
-        }
-      });
-    });
-  }, []);
+  const handleCoupleGlToggle = (enabled: boolean) => {
+    setCoupleGl(enabled);
+    if (!enabled) {
+      setCoupleGlCount(0);
+    }
+  };
 
   const fetchSuggestions = async (query:string, id:number) => {
     if (!query.trim()) {
@@ -145,10 +130,6 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({
       setContent(editor.getHTML());
     },
   });
-
-  useEffect(() => {
-    setDescription(content);
-  }, [content]);
 
   if (!editor) {
     return null;
@@ -327,12 +308,14 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({
                   </div>
 
                   {/* Editor Content */}
-                  <div className=" mt-2 prose prose-p:m-0 prose-li:m-0 prose-ul:m-0 prose-ol:m-0 prose-ol:text-white text-white [&_strong]:text-white">
-                    <EditorContent
-                      placeholder="Enter Event Description"
-                      editor={editor}
-                      className="w-full bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 rounded  focus:outline-nonefocus:ring-gray-600"
-                    />
+                  <div className="mt-2 prose prose-p:m-0 prose-li:m-0 prose-ul:m-0 prose-ol:m-0 prose-ol:text-white text-white [&_strong]:text-white">
+                    <div className="w-full bg-gray-800 border border-gray-700 rounded group focus-within:ring-2 focus-within:ring-gray-600 focus-within:border-gray-600">
+                      <EditorContent
+                        placeholder="Enter Event Description"
+                        editor={editor}
+                        className="w-full text-gray-200 placeholder:text-gray-500 p-3 [&_.ProseMirror]:outline-none [&_.ProseMirror]:min-h-[100px]"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -441,17 +424,8 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({
                       type="radio"
                       name="coupleGl"
                       value="true"
-                      onChange={(e) => {
-                        const form = e.target.form;
-                        if (form) {
-                          const coupleCountInput = form.querySelector(
-                            '[name="coupleGlCount"]'
-                          ) as HTMLInputElement;
-                          if (coupleCountInput) {
-                            coupleCountInput.required = e.target.checked;
-                          }
-                        }
-                      }}
+                      checked={coupleGl === true}
+                      onChange={() => handleCoupleGlToggle(true)}
                       disabled={isDisabled}
                       className="form-radio text-gray-600 bg-gray-800 border-gray-700"
                     />
@@ -462,7 +436,8 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({
                       type="radio"
                       name="coupleGl"
                       value="false"
-                      defaultChecked
+                      checked={coupleGl === false}
+                      onChange={() => handleCoupleGlToggle(false)}
                       disabled={isDisabled}
                       className="form-radio text-gray-600 bg-gray-800 border-gray-700"
                     />
@@ -472,23 +447,28 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({
               </div>
 
               {/* Couple GL Count - Conditionally rendered */}
-              <div id="coupleGlCountContainer" className="hidden">
-                <label
-                  htmlFor="coupleGlCount"
-                  className="block text-sm font-medium text-gray-300 mb-1"
-                >
-                  Couple Guest List Count
-                </label>
-                <input
-                  type="number"
-                  name="coupleGlCount"
-                  id="coupleGlCount"
-                  min={0}
-                  placeholder="Enter Couple GL Count"
-                  disabled={isDisabled}
-                  className="w-full bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-600"
-                />
-              </div>
+              {coupleGl && (
+                <div>
+                  <label
+                    htmlFor="coupleGlCount"
+                    className="block text-sm font-medium text-gray-300 mb-1"
+                  >
+                    Couple Guest List Count
+                  </label>
+                  <input
+                    type="number"
+                    name="coupleGlCount"
+                    id="coupleGlCount"
+                    min={0}
+                    placeholder="Enter Couple GL Count"
+                    required={coupleGl}
+                    disabled={isDisabled}
+                    value={coupleGlCount}
+                    onChange={(e) => setCoupleGlCount(Number(e.target.value))}
+                    className="w-full bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-600"
+                  />
+                </div>
+              )}
 
               <div>
               <label
@@ -542,11 +522,16 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({
                 {fields.length < 4 && (
                   <button
                     type="button"
-                    className="py-2 px-4 rounded transition duration-300 bg-gray-700 hover:bg-gray-600 text-gray-200"
+                    className={`py-2 px-4 rounded transition duration-300 ${
+                      isPending || isDisabled
+                        ? "bg-gray-800 text-gray-500 cursor-not-allowed opacity-50 hover:bg-gray-800"
+                        : "bg-gray-700 hover:bg-gray-600 text-gray-200"
+                    }`}
                     onClick={(e) => {
                       e.preventDefault();
                       addField();
                     }}
+                    disabled={isPending || isDisabled}
                   >
                     Add More Artist
                   </button>
