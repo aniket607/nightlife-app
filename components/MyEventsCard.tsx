@@ -13,6 +13,8 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import parse from "html-react-parser";
+import { FaRegCopy } from "react-icons/fa";
+
 
 interface EventWithVenue extends Event {
   venue: Venue;
@@ -25,6 +27,18 @@ interface MyEventsCardProps {
 
 function EventCard({ event, isPast }: { event: EventWithVenue, isPast?: boolean }) {
   const router = useRouter();
+
+  const domain = "https://nightlife-two.vercel.app/events"
+  const cleanEventName = event.eventName.replace(/\s+/g, '')
+  const eventString = `${domain}/${event.eventId}-${cleanEventName}`
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(eventString);
+      // toast.success("Success!")
+    } catch (error) {
+    }
+  };
   
   return (
     <div className="flex flex-col md:flex-row bg-gradient-to-r from-gray-900/90 via-gray-800/90 to-gray-900/90 rounded-3xl shadow-lg w-full overflow-clip hover:shadow-xl transition-all h-auto relative group">
@@ -136,6 +150,17 @@ function EventCard({ event, isPast }: { event: EventWithVenue, isPast?: boolean 
 
               {/* Action Buttons */}
               <div className="flex gap-3 w-full sm:w-auto">
+                <button
+                onClick={handleCopy}
+                className="flex-1 sm:flex-none px-6 py-2.5 rounded-lg text-sm font-semibold
+                bg-white/10 backdrop-blur-md border border-white/20
+                text-white shadow-lg
+                transition-all duration-300
+                hover:bg-white/20 hover:border-white/30 hover:scale-105 hover:shadow-white/20
+                active:scale-95 active:bg-white/25 group relative overflow-hidden"
+                >
+                  <FaRegCopy/>
+                </button>
                 <button 
                   disabled={isPast}
                   className="flex-1 sm:flex-none px-6 py-2.5 rounded-lg text-sm font-semibold
