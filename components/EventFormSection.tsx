@@ -3,18 +3,37 @@
 import { useState, useTransition, FormEvent, useEffect } from "react";
 import UploadForm from "@/components/UploadForm";
 import { putEventData } from "@/actions/putEventData"; // Action for submitting event data
+import { fetchArtists } from "@/actions/fetchArtists";
 import toast, { Toaster } from "react-hot-toast";
 import DatePicker from "react-datepicker"; // React Datepicker for date selection
 import "react-datepicker/dist/react-datepicker.css"; // Import datepicker styles
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
-import { FaBold, FaItalic, FaUnderline, FaListUl, FaListOl } from "react-icons/fa";
-import Placeholder from "@tiptap/extension-placeholder"; 
+import {
+  FaBold,
+  FaItalic,
+  FaUnderline,
+  FaListUl,
+  FaListOl,
+} from "react-icons/fa";
+import { MdDelete } from "react-icons/md";
+import Placeholder from "@tiptap/extension-placeholder";
+import { upsertArtists } from "@/actions/upsertArtists";
 
 interface EventFormSectionProps {
   userId: string;
   venueId: string;
+}
+
+interface Artist {
+  id: number;
+  name: string;
+}
+
+interface Field {
+  id: number;
+  value: string;
 }
 
 const EVENT_TYPES = [
@@ -38,48 +57,79 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({
   const [eventDate, setEventDate] = useState<Date | null>(null); // State for selected date
   const [eventTime, setEventTime] = useState<Date | null>(null); // Changed to Date type for DatePicker
   const [content, setContent] = useState(""); // State to store editor content
-  const [description, setDescription] = useState("")
+  const [description, setDescription] = useState("");
+  const [fields, setFields] = useState<Field[]>([{ id: Date.now(), value: "" }]); // Initial input field
+  const [suggestions, setSuggestions] = useState<Record<number, Artist[]>>({});
+  const [coupleGl, setCoupleGl] = useState(false);
+  const [coupleGlCount, setCoupleGlCount] = useState<number>(0);
 
   useEffect(() => {
-    // Add event listener to radio buttons
-    const radioButtons = document.querySelectorAll('input[name="coupleGl"]');
-    const coupleGlCountContainer = document.getElementById(
-      "coupleGlCountContainer"
-    );
-    const coupleGlCountInput = document.querySelector(
-      '[name="coupleGlCount"]'
-    ) as HTMLInputElement;
+    setDescription(content);
+  }, [content]);
 
-    radioButtons.forEach((radio) => {
-      radio.addEventListener("change", (e) => {
-        const target = e.target as HTMLInputElement;
-        if (coupleGlCountContainer && coupleGlCountInput) {
-          if (target.value === "true") {
-            coupleGlCountContainer.classList.remove("hidden");
-            coupleGlCountInput.required = true;
-          } else {
-            coupleGlCountContainer.classList.add("hidden");
-            coupleGlCountInput.required = false;
-            coupleGlCountInput.value = "";
-          }
-        }
-      });
+  const handleCoupleGlToggle = (enabled: boolean) => {
+    setCoupleGl(enabled);
+    if (!enabled) {
+      setCoupleGlCount(0);
+    }
+  };
+
+  const fetchSuggestions = async (query:string, id:number) => {
+    if (!query.trim()) {
+      setSuggestions((prev) => ({ ...prev, [id]: [] }));
+      return;
+    }
+
+    try {
+      const res = await fetchArtists(query);
+      setSuggestions((prev) => ({ ...prev, [id]: res }));
+    } catch (error) {
+      console.error("Error fetching artists:", error);
+    }
+  };
+
+  const handleInputChange = (id:number, value:string) => {
+    setFields((prev) =>
+      prev.map((field) => (field.id === id ? { ...field, value } : field))
+    );
+    fetchSuggestions(value, id);
+  };
+
+  const handleSuggestionClick = (id:number, name:string) => {
+    setFields((prev) =>
+      prev.map((field) => (field.id === id ? { ...field, value: name } : field))
+    );
+    setSuggestions((prev) => ({ ...prev, [id]: [] })); // Hide suggestions
+  };
+
+  const addField = () => {
+    if (fields.length < 4) {
+      setFields([...fields, { id: Date.now(), value: "" }]);
+    }
+  };
+
+  const removeField = (id:number) => {
+    setFields(fields.filter((field) => field.id !== id));
+    setSuggestions((prev) => {
+      const newSuggestions = { ...prev };
+      delete newSuggestions[id];
+      return newSuggestions;
     });
-  }, []);
+  };
 
   const editor = useEditor({
-    extensions: [StarterKit, Underline, Placeholder.configure({
-      placeholder: "Start typing here...",
-    }),], // Includes basic formatting options
+    extensions: [
+      StarterKit,
+      Underline,
+      Placeholder.configure({
+        placeholder: "Start typing here.ff..",
+      }),
+    ], 
     content: "",
     onUpdate: ({ editor }) => {
       setContent(editor.getHTML());
     },
   });
-
-  useEffect(() => {
-    setDescription(content);
-  }, [content]);
 
   if (!editor) {
     return null;
@@ -111,7 +161,11 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({
     const minutes = eventTime.getMinutes().toString().padStart(2, "0");
     formData.append("eventTime", `${hours}:${minutes}`);
 
-    formData.append("eventDescription", description)
+    formData.append("eventDescription", description);
+
+    const selectedArtists = fields.map((field) => field.value).filter((name) => name.trim() !== "");
+    formData.append("artistNames", JSON.stringify(selectedArtists))
+    upsertArtists(selectedArtists)
 
     startTransition(async () => {
       try {
@@ -191,10 +245,9 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({
               </div>
 
               {/* Event Description */}
-              
 
               <div>
-              <label
+                <label
                   htmlFor="eventDescription"
                   className="block text-sm font-medium text-gray-300 mb-1"
                 >
@@ -209,7 +262,7 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({
                         editor.isActive("bold") ? "bg-gray-300" : ""
                       }`}
                     >
-                      <FaBold className="text-white"/>
+                      <FaBold className="text-white" />
                     </button>
                     <button
                       onClick={() =>
@@ -219,7 +272,7 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({
                         editor.isActive("italic") ? "bg-gray-300" : ""
                       }`}
                     >
-                      <FaItalic className="text-white"/>
+                      <FaItalic className="text-white" />
                     </button>
 
                     <button
@@ -227,12 +280,10 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({
                         editor.chain().focus().toggleUnderline().run()
                       }
                       className={`px-3 py-1 border rounded ${
-                        editor?.isActive("underline")
-                          ? "bg-gray-300"
-                          : ""
+                        editor?.isActive("underline") ? "bg-gray-300" : ""
                       }`}
                     >
-                      <FaUnderline className="text-white"/>
+                      <FaUnderline className="text-white" />
                     </button>
                     <button
                       onClick={() =>
@@ -242,7 +293,7 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({
                         editor.isActive("bulletList") ? "bg-gray-300" : ""
                       }`}
                     >
-                      <FaListUl className="text-white"/>
+                      <FaListUl className="text-white" />
                     </button>
                     <button
                       onClick={() =>
@@ -252,13 +303,19 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({
                         editor.isActive("orderedList") ? "bg-gray-300" : ""
                       }`}
                     >
-                      <FaListOl className="text-white"/>
+                      <FaListOl className="text-white" />
                     </button>
                   </div>
 
                   {/* Editor Content */}
-                  <div className=" mt-2 prose prose-p:m-0 prose-li:m-0 prose-ul:m-0 prose-ol:m-0 prose-ol:text-white text-white [&_strong]:text-white">
-                    <EditorContent placeholder="Enter Event Description" editor={editor} className="w-full bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 rounded  focus:outline-nonefocus:ring-gray-600"/>
+                  <div className="mt-2 prose prose-p:m-0 prose-li:m-0 prose-ul:m-0 prose-ol:m-0 prose-ol:text-white text-white [&_strong]:text-white">
+                    <div className="w-full bg-gray-800 border border-gray-700 rounded group focus-within:ring-2 focus-within:ring-gray-600 focus-within:border-gray-600">
+                      <EditorContent
+                        placeholder="Enter Event Description"
+                        editor={editor}
+                        className="w-full text-gray-200 placeholder:text-gray-500 p-3 [&_.ProseMirror]:outline-none [&_.ProseMirror]:min-h-[100px]"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -367,17 +424,8 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({
                       type="radio"
                       name="coupleGl"
                       value="true"
-                      onChange={(e) => {
-                        const form = e.target.form;
-                        if (form) {
-                          const coupleCountInput = form.querySelector(
-                            '[name="coupleGlCount"]'
-                          ) as HTMLInputElement;
-                          if (coupleCountInput) {
-                            coupleCountInput.required = e.target.checked;
-                          }
-                        }
-                      }}
+                      checked={coupleGl === true}
+                      onChange={() => handleCoupleGlToggle(true)}
                       disabled={isDisabled}
                       className="form-radio text-gray-600 bg-gray-800 border-gray-700"
                     />
@@ -388,7 +436,8 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({
                       type="radio"
                       name="coupleGl"
                       value="false"
-                      defaultChecked
+                      checked={coupleGl === false}
+                      onChange={() => handleCoupleGlToggle(false)}
                       disabled={isDisabled}
                       className="form-radio text-gray-600 bg-gray-800 border-gray-700"
                     />
@@ -398,22 +447,96 @@ const EventFormSection: React.FC<EventFormSectionProps> = ({
               </div>
 
               {/* Couple GL Count - Conditionally rendered */}
-              <div id="coupleGlCountContainer" className="hidden">
-                <label
-                  htmlFor="coupleGlCount"
+              {coupleGl && (
+                <div>
+                  <label
+                    htmlFor="coupleGlCount"
+                    className="block text-sm font-medium text-gray-300 mb-1"
+                  >
+                    Couple Guest List Count
+                  </label>
+                  <input
+                    type="number"
+                    name="coupleGlCount"
+                    id="coupleGlCount"
+                    min={0}
+                    placeholder="Enter Couple GL Count"
+                    required={coupleGl}
+                    disabled={isDisabled}
+                    value={coupleGlCount}
+                    onChange={(e) => setCoupleGlCount(Number(e.target.value))}
+                    className="w-full bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-600"
+                  />
+                </div>
+              )}
+
+              <div>
+              <label
                   className="block text-sm font-medium text-gray-300 mb-1"
                 >
-                  Couple Guest List Count
+                  Artists
                 </label>
-                <input
-                  type="number"
-                  name="coupleGlCount"
-                  id="coupleGlCount"
-                  min={0}
-                  placeholder="Enter Couple GL Count"
-                  disabled={isDisabled}
-                  className="w-full bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-600"
-                />
+
+                {fields.map((field) => (
+                  <div key={field.id} className="mb-4">
+                    <div className="flex justify-center items-center">
+                    <input
+                      type="text"
+                      value={field.value}
+                      onChange={(e) =>
+                        handleInputChange(field.id, e.target.value)
+                      }
+                      className="w-full bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-600"
+                      placeholder="Enter artist name"
+                    />
+                    {fields.length > 1 && (
+                      <button
+                        onClick={() => removeField(field.id)}
+                        className=" p-2 bg-red-500 text-white rounded ml-5"
+                      >
+                        <MdDelete/>
+                      </button>
+                    )}
+                    </div>
+
+                    {suggestions[field.id]?.length > 0 && (
+                      <ul className="border border-gray-300 mt-1 bg-white">
+                        {suggestions[field.id].map((artist) => (
+                          <li
+                            key={artist.id}
+                            onClick={() =>
+                              handleSuggestionClick(field.id, artist.name)
+                            }
+                            className="p-2 cursor-pointer hover:bg-gray-100"
+                          >
+                            {artist.name}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+
+                    
+                  </div>
+                ))}
+
+                {fields.length < 4 && (
+                  <button
+                    type="button"
+                    className={`py-2 px-4 rounded transition duration-300 ${
+                      isPending || isDisabled
+                        ? "bg-gray-800 text-gray-500 cursor-not-allowed opacity-50 hover:bg-gray-800"
+                        : "bg-gray-700 hover:bg-gray-600 text-gray-200"
+                    }`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      addField();
+                    }}
+                    disabled={isPending || isDisabled}
+                  >
+                    Add More Artist
+                  </button>
+                )}
+
               </div>
 
               {/* Submit Button */}

@@ -89,7 +89,7 @@ export default function VenuePageRightSection({
                   pastEvents.map((event: Event) => (
                     <div
                       key={event?.eventId}
-                      className="flex flex-col sm:flex-row bg-gradient-to-r from-gray-900/90 via-gray-800/90 to-gray-900/90 rounded-lg shadow-lg w-full overflow-hidden hover:shadow-xl transition-all sm:h-[200px] relative group"
+                      className="flex flex-col sm:flex-row bg-gradient-to-r from-gray-900/90 via-gray-800/90 to-gray-900/90 rounded-lg shadow-lg w-full overflow-hidden hover:shadow-xl transition-all sm:min-h-[200px] relative group"
                     >
                       {/* Decorative Pattern */}
                       <div
@@ -160,12 +160,16 @@ export default function VenuePageRightSection({
                               </div>
                             </div>
                             
-                            <h3 className="text-lg font-semibold text-gray-200 truncate">
+                            <h3 className="text-lg font-semibold text-gray-200 break-words">
                               {event.eventName}
                             </h3>
-                            <p className="text-sm text-gray-400 mt-2 line-clamp-3">
+                            <div className="text-sm text-gray-400 mt-2 prose prose-invert max-w-none line-clamp-3 min-h-[3em]
+                              prose-ul:list-disc prose-ul:pl-5 prose-ul:mt-0 prose-ul:mb-0
+                              prose-ol:list-decimal prose-ol:pl-5 prose-ol:mt-0 prose-ol:mb-0
+                              prose-li:mt-0 prose-li:mb-0
+                              prose-p:mt-0 prose-p:mb-0">
                               {parse(event?.eventDescription??"")}
-                            </p>
+                            </div>
                             <div className="mt-auto pt-2 flex gap-2">
                               <div className="inline-flex items-center px-2.5 py-1 rounded-full bg-gray-700/50 border border-gray-600/50 backdrop-blur-sm">
                               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -230,12 +234,16 @@ export default function VenuePageRightSection({
                               </div>
                             </div>
 
-                            <h3 className="text-xl font-semibold text-gray-200 truncate">
+                            <h3 className="text-xl font-semibold text-gray-200 break-words">
                               {event.eventName}
                             </h3>
-                            <p className="text-sm text-gray-400 mt-2 line-clamp-4">
-                              {event.eventDescription}
-                            </p>
+                            <div className="text-sm text-gray-400 mt-2 prose prose-invert max-w-none line-clamp-4 min-h-[4em]
+                              prose-ul:list-disc prose-ul:pl-5 prose-ul:mt-0 prose-ul:mb-0
+                              prose-ol:list-decimal prose-ol:pl-5 prose-ol:mt-0 prose-ol:mb-0
+                              prose-li:mt-0 prose-li:mb-0
+                              prose-p:mt-0 prose-p:mb-0">
+                              {parse(event?.eventDescription??"")}
+                            </div>
                             <div className="mt-auto pt-2 flex gap-2">
                               <div className="inline-flex items-center px-2.5 py-1 rounded-full bg-gray-700/50 border border-gray-600/50 backdrop-blur-sm">
                               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -313,7 +321,7 @@ export default function VenuePageRightSection({
                   upcomingEvents.map((event: Event) => (
                     <div
                       key={event?.eventId}
-                      className="flex flex-col sm:flex-row bg-gradient-to-r from-gray-900/90 via-gray-800/90 to-gray-900/90 rounded-lg shadow-lg w-full overflow-hidden hover:shadow-xl transition-all sm:h-[200px] relative group"
+                      className="flex flex-col sm:flex-row bg-gradient-to-r from-gray-900/90 via-gray-800/90 to-gray-900/90 rounded-lg shadow-lg w-full overflow-hidden hover:shadow-xl transition-all sm:min-h-[200px] relative group"
                     >
                       {/* Decorative Pattern */}
                       <div
@@ -384,12 +392,16 @@ export default function VenuePageRightSection({
                               </div>
                             </div>
                             
-                            <h3 className="text-lg font-semibold text-gray-200 truncate">
+                            <h3 className="text-lg font-semibold text-gray-200 break-words">
                               {event.eventName}
                             </h3>
-                            <p className="text-sm text-gray-400 mt-2 line-clamp-3">
-                              {event.eventDescription}
-                            </p>
+                            <div className="text-sm text-gray-400 mt-2 prose prose-invert max-w-none line-clamp-3 min-h-[3em]
+                              prose-ul:list-disc prose-ul:pl-5 prose-ul:mt-0 prose-ul:mb-0
+                              prose-ol:list-decimal prose-ol:pl-5 prose-ol:mt-0 prose-ol:mb-0
+                              prose-li:mt-0 prose-li:mb-0
+                              prose-p:mt-0 prose-p:mb-0">
+                              {parse(event?.eventDescription??"")}
+                            </div>
                             <div className="mt-auto pt-2 flex gap-2">
                               <div className="inline-flex items-center px-2.5 py-1 rounded-full bg-gray-700/50 border border-gray-600/50 backdrop-blur-sm">
                               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -454,10 +466,14 @@ export default function VenuePageRightSection({
                               </div>
                             </div>
 
-                            <h3 className="text-xl font-semibold text-gray-200 truncate">
+                            <h3 className="text-xl font-semibold text-gray-200 break-words">
                               {event.eventName}
                             </h3>
-                            <div className="text-sm text-gray-400 mt-2 line-clamp-4">
+                            <div className="text-sm text-gray-400 mt-2 prose prose-invert max-w-none line-clamp-4 min-h-[4em]
+                              prose-ul:list-disc prose-ul:pl-5 prose-ul:mt-0 prose-ul:mb-0
+                              prose-ol:list-decimal prose-ol:pl-5 prose-ol:mt-0 prose-ol:mb-0
+                              prose-li:mt-0 prose-li:mb-0
+                              prose-p:mt-0 prose-p:mb-0">
                               {parse(event?.eventDescription??"")}
                             </div>
                             <div className="mt-auto pt-2 flex gap-2">

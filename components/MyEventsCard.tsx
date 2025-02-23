@@ -91,9 +91,13 @@ function EventCard({ event, isPast }: { event: EventWithVenue, isPast?: boolean 
             </div>
 
             {/* Description */}
-            <p className="text-sm text-gray-400 mt-2 flex-grow">
+            <div className="text-sm text-gray-400 mt-2 flex-grow prose prose-invert max-w-none
+              prose-ul:list-disc prose-ul:pl-5 prose-ul:mt-0 prose-ul:mb-0
+              prose-ol:list-decimal prose-ol:pl-5 prose-ol:mt-0 prose-ol:mb-0
+              prose-li:mt-0 prose-li:mb-0
+              prose-p:mt-0 prose-p:mb-0">
               {parse(event?.eventDescription??"")}
-            </p>
+            </div>
 
             {/* Bottom Section */}
             <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">

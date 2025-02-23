@@ -25,6 +25,10 @@ import {
   FaListOl,
 } from "react-icons/fa";
 import Placeholder from "@tiptap/extension-placeholder";
+import { MdDelete } from "react-icons/md";
+import { fetchArtists } from "@/actions/fetchArtists";
+import { upsertArtists } from "@/actions/upsertArtists";
+
 
 interface Event {
   eventId: number; // Assuming `Int` maps to `number`
@@ -40,10 +44,16 @@ interface Event {
   eventType: string;
   userId: string;
   createdAt: Date; // Maps to `DateTime`
+  artists: Artist[];
 }
 
 interface EventFormSectionProps {
   eventData: Event | null;
+}
+
+interface Artist {
+  id: number;
+  name: string;
 }
 
 const EVENT_TYPES = [
@@ -67,7 +77,7 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
   const [eventDate, setEventDate] = useState<Date | null>(
     eventData?.eventDate ? new Date(eventData.eventDate) : null
   );
-  const [content, setContent] = useState(""); // State to store editor content
+  const [content, setContent] = useState(eventData?.eventDescription ?? ""); // Initialize content with eventDescription
 
   // Move time parsing logic to a separate function
   const parseEventTime = (timeData: Date | null) => {
@@ -104,6 +114,62 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
   const [isImageUpdated, setIsImageUpdated] = useState(false);
   const [imageUploadError, setImageUploadError] = useState<string | null>(null);
 
+  const [fields, setFields] = useState<Artist[]>(
+    eventData?.artists && eventData.artists.length > 0
+      ? eventData.artists.map((artist) => ({
+          id: artist.id,
+          name: artist.name,
+        }))
+      : [{ id: Date.now(), name: "" }]
+  );
+  console.log(fields)
+
+   const [suggestions, setSuggestions] = useState<Record<number, Artist[]>>({});
+  
+    const fetchSuggestions = async (query:string, id:number) => {
+      if (!query.trim()) {
+        setSuggestions((prev) => ({ ...prev, [id]: [] }));
+        return;
+      }
+  
+      try {
+        const res = await fetchArtists(query); // Replace with your API endpoint
+        // const data = res.map((item) => item.name);
+        setSuggestions((prev) => ({ ...prev, [id]: res }));
+      } catch (error) {
+        console.error("Error fetching artists:", error);
+      }
+    };
+  
+    const handleInputChange = (id:number, name:string) => {
+      setFields((prev) =>
+        prev.map((field) => (field.id === id ? { ...field, name } : field))
+      );
+      fetchSuggestions(name, id);
+    };
+  
+    const handleSuggestionClick = (id:number, name:string) => {
+      setFields((prev) =>
+        prev.map((field) => (field.id === id ? { ...field, name } : field))
+      );
+      setSuggestions((prev) => ({ ...prev, [id]: [] })); // Hide suggestions
+    };
+  
+    const addField = () => {
+      if (fields.length < 4) {
+        setFields([...fields, { id: Date.now(), name: "" }]);
+      }
+    };
+  
+    const removeField = (id:number) => {
+      setFields(fields.filter((field) => field.id !== id));
+      setSuggestions((prev) => {
+        const newSuggestions = { ...prev };
+        delete newSuggestions[id];
+        return newSuggestions;
+      });
+    };
+
   // Function to check if any field has changed
   const checkIfFieldsChanged = useCallback(() => {
     // Improve image change detection with error handling
@@ -132,6 +198,14 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
         ? eventTime.toISOString() !== localDate.toISOString()
         : false;
 
+    // Check if artists have changed
+    const currentArtists = fields.map(field => field.name).filter(name => name.trim() !== "");
+    const originalArtists = eventData?.artists?.map(artist => artist.name) || [];
+    
+    const hasArtistsChanged = 
+      currentArtists.length !== originalArtists.length ||
+      currentArtists.some((artist, index) => artist !== originalArtists[index]);
+
     return (
       eventName !== eventData?.eventName ||
       eventDescription !== eventData?.eventDescription ||
@@ -141,7 +215,8 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
       stagGlCount !== eventData.stagGlCount ||
       coupleGl !== eventData.coupleGl ||
       coupleGlCount !== (eventData.coupleGlCount || 0) ||
-      hasImageChanged
+      hasImageChanged ||
+      hasArtistsChanged
     );
   }, [
     eventData,
@@ -156,6 +231,7 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
     isImageUpdated,
     newImageUrl,
     imageUploadError,
+    fields // Add fields to the dependency array
   ]);
 
   // Update submit button state based on field changes
@@ -259,6 +335,10 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
       formData.append("eventImgUrl", finalImageUrl);
       formData.append("eventType", eventType ?? "");
 
+          const selectedArtists = fields.map((field) => field.name).filter((name) => name.trim() !== "");
+          formData.append("artistNames", JSON.stringify(selectedArtists))
+          upsertArtists(selectedArtists)
+
       console.log("Final form data:", Object.fromEntries(formData));
 
       startTransition(async () => {
@@ -318,16 +398,14 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
       Placeholder.configure({
         placeholder: "Start typing here...",
       }),
-    ], // Includes basic formatting options
-    content: eventDescription,
+    ],
+    content: eventData?.eventDescription ?? "", // Set initial content
     onUpdate: ({ editor }) => {
-      setContent(editor.getHTML());
+      const newContent = editor.getHTML();
+      setContent(newContent);
+      setEventDescription(newContent); // Update both states together
     },
   });
-
-  useEffect(() => {
-    setEventDescription(content);
-  }, [content]);
 
   if (!editor) {
     return null;
@@ -363,7 +441,12 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
                 <button
                   type="button"
                   onClick={() => setIsImageUpdated(true)}
-                  className="mt-2 px-4 py-2 bg-gray-700 text-gray-200 rounded hover:bg-gray-600 transition"
+                  disabled={isPending || isDisabled}
+                  className={`mt-2 px-4 py-2 rounded text-sm font-semibold transition-all duration-300 ${
+                    isPending || isDisabled
+                      ? "bg-gray-800 text-gray-500 cursor-not-allowed opacity-50 hover:bg-gray-800"
+                      : "bg-gray-700 text-gray-200 hover:bg-gray-600"
+                  }`}
                 >
                   Change Image
                 </button>
@@ -386,6 +469,7 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
                       handleImageUpload(false, "");
                     }
                   }}
+                  disabled={isPending || isDisabled}
                 />
                 {imageUploadError && (
                   <p className="text-red-500 text-sm mt-2">
@@ -448,6 +532,7 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
                   {/* Formatting Buttons */}
                   <div className="flex gap-2 mb-2 outline-none">
                     <button
+                      type="button"
                       onClick={() => editor.chain().focus().toggleBold().run()}
                       className={`px-3 py-1 border rounded ${
                         editor.isActive("bold") ? "bg-gray-300" : ""
@@ -456,6 +541,7 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
                       <FaBold className="text-white" />
                     </button>
                     <button
+                      type="button"
                       onClick={() =>
                         editor.chain().focus().toggleItalic().run()
                       }
@@ -467,6 +553,7 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
                     </button>
 
                     <button
+                      type="button"
                       onClick={() =>
                         editor.chain().focus().toggleUnderline().run()
                       }
@@ -477,6 +564,7 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
                       <FaUnderline className="text-white" />
                     </button>
                     <button
+                      type="button"
                       onClick={() =>
                         editor.chain().focus().toggleBulletList().run()
                       }
@@ -487,6 +575,7 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
                       <FaListUl className="text-white" />
                     </button>
                     <button
+                      type="button"
                       onClick={() =>
                         editor.chain().focus().toggleOrderedList().run()
                       }
@@ -498,12 +587,14 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
                     </button>
                   </div>
                   {/* Editor Content */}
-                  <div className=" mt-2 prose prose-p:m-0 prose-li:m-0 prose-ul:m-0 prose-ol:m-0 prose-ol:text-white text-white [&_strong]:text-white">
-                    <EditorContent
-                      placeholder="Enter Event Description"
-                      editor={editor}
-                      className="w-full bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 rounded  focus:outline-nonefocus:ring-gray-600"
-                    />
+                  <div className="mt-2 prose prose-p:m-0 prose-li:m-0 prose-ul:m-0 prose-ol:m-0 prose-ol:text-white text-white [&_strong]:text-white">
+                    <div className="w-full bg-gray-800 border border-gray-700 rounded group focus-within:ring-2 focus-within:ring-gray-600 focus-within:border-gray-600">
+                      <EditorContent
+                        placeholder="Enter Event Description"
+                        editor={editor}
+                        className="w-full text-gray-200 placeholder:text-gray-500 p-3 [&_.ProseMirror]:outline-none [&_.ProseMirror]:min-h-[100px]"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -660,6 +751,70 @@ const UpdateEventForm: React.FC<EventFormSectionProps> = ({ eventData }) => {
                   />
                 </div>
               )}
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">
+                  Artists
+                </label>
+
+                {fields.map((field) => (
+                  <div key={field.id} className="mb-4">
+                    <div className="flex justify-center items-center">
+                      <input
+                        type="text"
+                        value={field.name}
+                        onChange={(e) =>
+                          handleInputChange(field.id, e.target.value)
+                        }
+                        className="w-full bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-600"
+                        placeholder="Enter artist name"
+                      />
+                      {fields.length > 1 && (
+                        <button
+                          onClick={() => removeField(field.id)}
+                          className="p-2 bg-red-500 text-white rounded ml-5"
+                        >
+                          <MdDelete />
+                        </button>
+                      )}
+                    </div>
+
+                    {suggestions[field.id]?.length > 0 && (
+                      <ul className="border border-gray-300 mt-1 bg-white">
+                        {suggestions[field.id].map((artist) => (
+                          <li
+                            key={artist.id}
+                            onClick={() =>
+                              handleSuggestionClick(field.id, artist.name)
+                            }
+                            className="p-2 cursor-pointer hover:bg-gray-100"
+                          >
+                            {artist.name}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                ))}
+
+                {fields.length < 4 && (
+                  <button
+                    type="button"
+                    className={`py-2 px-4 rounded transition duration-300 ${
+                      isPending || isDisabled
+                        ? "bg-gray-800 text-gray-500 cursor-not-allowed opacity-50 hover:bg-gray-800"
+                        : "bg-gray-700 hover:bg-gray-600 text-gray-200"
+                    }`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      addField();
+                    }}
+                    disabled={isPending || isDisabled}
+                  >
+                    Add More Artist
+                  </button>
+                )}
+              </div>
 
               {/* Submit Button */}
               <button
