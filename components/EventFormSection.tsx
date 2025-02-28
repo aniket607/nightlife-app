@@ -37,13 +37,12 @@ interface Field {
 }
 
 const EVENT_TYPES = [
-  "Regular Night",
-  "Ladies Night",
-  "Bollywood Night",
-  "EDM Night",
-  "Live Music",
-  "Special Event",
-  "Private Party",
+  "EDM",
+  "Bollywood",
+  "Techno",
+  "Commercial",
+  "Old School",
+  "Afrobeats",
 ] as const;
 
 const EventFormSection: React.FC<EventFormSectionProps> = ({
